@@ -63,12 +63,23 @@ export async function getNextPair(type: SkillType): Promise<ArenaPair | null> {
   const pair = pairRows?.[0];
   if (!pair) return null;
 
+  type SkillRow = {
+    id: string;
+    slug: string;
+    title: string;
+    summary: string;
+    type: string;
+    tags: string[] | null;
+    homepage_url: string | null;
+    source_url: string | null;
+  };
   const { data: skills, error: skillsError } = await supabase
     .from("sd_skills")
     .select(
       "id, slug, title, summary, type, tags, homepage_url, source_url"
     )
-    .in("id", [pair.skill_a_id, pair.skill_b_id]);
+    .in("id", [pair.skill_a_id, pair.skill_b_id])
+    .returns<SkillRow[]>();
   if (skillsError) throw new Error(skillsError.message);
   if (!skills || skills.length !== 2) return null;
 
@@ -76,9 +87,10 @@ export async function getNextPair(type: SkillType): Promise<ArenaPair | null> {
     .from("sd_arena_ratings")
     .select("skill_id, rating, wins, losses")
     .eq("type", type)
-    .in("skill_id", [pair.skill_a_id, pair.skill_b_id]);
+    .in("skill_id", [pair.skill_a_id, pair.skill_b_id])
+    .returns<{ skill_id: string; rating: number; wins: number; losses: number }[]>();
 
-  function decorate(row: (typeof skills)[number]): ArenaSkill {
+  function decorate(row: SkillRow): ArenaSkill {
     const r = ratings?.find((x) => x.skill_id === row.id);
     return {
       id: row.id,
