@@ -42,6 +42,12 @@ export async function SiteHeader() {
             <Link href="/feed" className="hover:text-foreground">
               Trending
             </Link>
+            <Link href="/arena" className="hover:text-foreground">
+              Arena
+            </Link>
+            <Link href="/arena/leaderboard" className="hover:text-foreground">
+              Leaderboard
+            </Link>
             <Link href="/search" className="hover:text-foreground">
               Search
             </Link>
