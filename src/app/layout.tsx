@@ -1,0 +1,67 @@
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
+import "./globals.css";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://skilldrunk.com";
+
+export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "skilldrunk — the library for AI skills",
+    template: "%s · skilldrunk",
+  },
+  description:
+    "Discover, discuss, and rank the best AI skills — Claude Skills, Custom GPTs, MCP servers, Cursor rules, and prompts. The Reddit for AI skills.",
+  keywords: [
+    "AI skills",
+    "Claude skills",
+    "MCP servers",
+    "Custom GPTs",
+    "Cursor rules",
+    "prompt library",
+    "agent skills",
+  ],
+  openGraph: {
+    title: "skilldrunk — the library for AI skills",
+    description:
+      "Discover, discuss, and rank the best AI skills. Claude Skills, GPTs, MCP servers, Cursor rules, and prompts — all in one place.",
+    url: siteUrl,
+    siteName: "skilldrunk",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "skilldrunk",
+    description: "The library for AI skills.",
+  },
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
+    >
+      <body className="min-h-full flex flex-col bg-background text-foreground">
+        {children}
+        <Toaster />
+      </body>
+    </html>
+  );
+}

@@ -1,0 +1,53 @@
+name: Publish @skilldrunk/mcp
+
+# Trusted Publishing via OIDC — no npm token needed.
+# Enable once at https://www.npmjs.com/package/@skilldrunk/mcp/access
+# by pointing "Trusted publisher" at this workflow file.
+#
+# Triggers on tags of the form `mcp-v*` (e.g. `mcp-v0.1.1`, `mcp-v1.0.0`).
+# Bump the version in packages/mcp/package.json, commit, then:
+#   git tag mcp-v0.1.1 && git push origin mcp-v0.1.1
+
+on:
+  push:
+    tags:
+      - "mcp-v*"
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # required for OIDC trusted publishing
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Build MCP package
+        run: pnpm --filter @skilldrunk/mcp build
+
+      - name: Verify version matches tag
+        working-directory: packages/mcp
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          TAG_VERSION="${GITHUB_REF_NAME#mcp-v}"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::package.json version ($PKG_VERSION) does not match tag ($TAG_VERSION)"
+            exit 1
+          fi
+
+      - name: Publish to npm with provenance
+        working-directory: packages/mcp
+        run: npm publish --provenance --access public

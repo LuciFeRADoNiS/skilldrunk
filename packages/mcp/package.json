@@ -1,0 +1,51 @@
+{
+  "name": "@skilldrunk/mcp",
+  "version": "0.1.1",
+  "description": "MCP server for skilldrunk — search, rate, and publish AI skills from Claude Desktop, Cursor, Windsurf and other MCP-compatible clients.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LuciFeRADoNiS/skilldrunk.git",
+    "directory": "packages/mcp"
+  },
+  "homepage": "https://skilldrunk.com/docs/mcp",
+  "bugs": {
+    "url": "https://github.com/LuciFeRADoNiS/skilldrunk/issues"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "skilldrunk",
+    "claude",
+    "ai-skills",
+    "cursor",
+    "windsurf"
+  ],
+  "type": "module",
+  "bin": {
+    "skilldrunk-mcp": "dist/index.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "pnpm build",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  }
+}

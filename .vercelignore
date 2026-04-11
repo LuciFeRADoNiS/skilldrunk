@@ -1,0 +1,6 @@
+/scripts
+/supabase
+/.next
+node_modules
+packages/*/dist
+
