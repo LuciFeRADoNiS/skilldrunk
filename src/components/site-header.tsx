@@ -2,6 +2,8 @@ import Link from "next/link";
 import { LogOut, Plus, Shield } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
+import { AdminNotifications } from "@/components/admin-notifications";
+import { getUnreadCount } from "@/app/actions/notifications";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -10,6 +12,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
+async function AdminNotificationsBell() {
+  const count = await getUnreadCount();
+  return <AdminNotifications initialCount={count} />;
+}
 
 export async function SiteHeader() {
   const supabase = await createClient();
@@ -62,6 +69,9 @@ export async function SiteHeader() {
         </div>
 
         <div className="flex items-center gap-3">
+          {profile?.role === "admin" && (
+            <AdminNotificationsBell />
+          )}
           {user && (
             <Button asChild size="sm" variant="outline" className="hidden sm:inline-flex">
               <Link href="/new">
