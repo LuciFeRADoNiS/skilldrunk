@@ -1,11 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-// Use service_role to bypass RLS for pageview inserts
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,6 +20,9 @@ export async function POST(req: NextRequest) {
       typeof body.referrer === "string" ? body.referrer.slice(0, 500) : null;
     const userAgent = req.headers.get("user-agent")?.slice(0, 500) ?? null;
     const country = req.headers.get("x-vercel-ip-country") ?? null;
+
+    const supabaseAdmin = createAdminClient();
+    if (!supabaseAdmin) return NextResponse.json({ ok: true });
 
     await supabaseAdmin.from("sd_pageviews").insert({
       path,

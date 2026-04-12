@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { createClient as createAdminClient } from "@supabase/supabase-js";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { SiteHeader } from "@/components/site-header";
 import { SkillCard } from "@/components/skill-card";
 import { Input } from "@/components/ui/input";
@@ -45,18 +45,17 @@ export default async function SearchPage({
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      const admin = createAdminClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!
-      );
-      admin
-        .from("sd_search_logs")
-        .insert({
-          query,
-          results_count: skills.length,
-          user_id: user?.id ?? null,
-        })
-        .then(() => {});
+      const admin = createAdminClient();
+      if (admin) {
+        admin
+          .from("sd_search_logs")
+          .insert({
+            query,
+            results_count: skills.length,
+            user_id: user?.id ?? null,
+          })
+          .then(() => {});
+      }
     } catch {}
   }
 
@@ -64,10 +63,8 @@ export default async function SearchPage({
   let trendingSearches: { query: string; count: number }[] = [];
   if (!query) {
     try {
-      const admin = createAdminClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!
-      );
+      const admin = createAdminClient();
+      if (!admin) throw new Error("no admin client");
       const { data } = await admin.rpc("sd_admin_stats");
       const stats = data as { top_searches?: { query: string; count: number }[] } | null;
       trendingSearches = stats?.top_searches?.slice(0, 10) ?? [];
