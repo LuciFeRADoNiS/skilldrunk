@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LogOut, Plus } from "lucide-react";
+import { LogOut, Plus, Shield } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -17,11 +17,15 @@ export async function SiteHeader() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  let profile: { username: string; avatar_url: string | null } | null = null;
+  let profile: {
+    username: string;
+    avatar_url: string | null;
+    role: string;
+  } | null = null;
   if (user) {
     const { data } = await supabase
       .from("sd_profiles")
-      .select("username, avatar_url")
+      .select("username, avatar_url, role")
       .eq("id", user.id)
       .maybeSingle();
     profile = data;
@@ -88,6 +92,14 @@ export async function SiteHeader() {
                 <DropdownMenuItem asChild>
                   <Link href="/new">Submit skill</Link>
                 </DropdownMenuItem>
+                {profile?.role === "admin" && (
+                  <DropdownMenuItem asChild>
+                    <Link href="/admin" className="gap-2">
+                      <Shield className="h-4 w-4 text-orange-500" />
+                      Admin
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
                 <form action="/auth/signout" method="post">
                   <DropdownMenuItem asChild>
