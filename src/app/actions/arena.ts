@@ -120,7 +120,7 @@ export async function getNextPair(type: SkillType): Promise<ArenaPair | null> {
 }
 
 export type SubmitVoteResult =
-  | { ok: true; skipped: boolean }
+  | { ok: true; skipped: boolean; newRatingA?: number; newRatingB?: number }
   | { ok: false; error: string };
 
 export async function submitArenaVote(
@@ -133,13 +133,30 @@ export async function submitArenaVote(
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "not_authenticated" };
 
-  const { error } = await supabase.rpc("sd_arena_submit_vote", {
-    p_match_id: matchId,
-    p_winner_id: winnerId,
-  });
+  type VoteRow = {
+    match_id: string;
+    winner_id: string | null;
+    a_rating: number;
+    b_rating: number;
+  };
+  const { data: voteRows, error } = await supabase
+    .rpc("sd_arena_submit_vote", {
+      p_match_id: matchId,
+      p_winner_id: winnerId,
+    });
   if (error) return { ok: false, error: error.message };
 
   revalidatePath("/arena");
   revalidatePath("/arena/leaderboard");
-  return { ok: true, skipped: winnerId === null };
+
+  const skipped = winnerId === null;
+  const rows = voteRows as unknown as VoteRow[] | null;
+  const row = rows?.[0];
+
+  return {
+    ok: true,
+    skipped,
+    newRatingA: row ? Math.round(row.a_rating) : undefined,
+    newRatingB: row ? Math.round(row.b_rating) : undefined,
+  };
 }
