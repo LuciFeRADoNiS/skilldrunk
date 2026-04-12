@@ -51,6 +51,9 @@ export async function SiteHeader() {
             <Link href="/search" className="hover:text-foreground">
               Search
             </Link>
+            <Link href="/docs" className="hover:text-foreground">
+              Docs
+            </Link>
           </nav>
         </div>
 
