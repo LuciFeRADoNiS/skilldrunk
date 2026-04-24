@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
-import { signOut } from "@/app/actions/auth";
+import { AdminNav } from "@/components/nav";
 
 export const dynamic = "force-dynamic";
 
@@ -125,19 +125,20 @@ export default async function AdminDashboard() {
   const pvMax = Math.max(1, ...pageviews.map((p) => p.count));
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-10">
-      {/* Header */}
-      <div className="mb-10 flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="mb-1 text-xs uppercase tracking-[0.3em] text-neutral-500">
-            skilldrunk ecosystem
-          </p>
-          <h1 className="text-3xl font-semibold tracking-tight">Admin</h1>
-          <p className="mt-1 text-sm text-neutral-400">
-            {profile?.display_name ?? user.email} · {profile?.role}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
+    <>
+      <AdminNav userLabel={profile?.display_name ?? undefined} />
+      <main className="mx-auto max-w-6xl px-6 py-10">
+        {/* Heading */}
+        <div className="mb-8 flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="mb-1 text-xs uppercase tracking-[0.3em] text-neutral-500">
+              skilldrunk ecosystem
+            </p>
+            <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
+            <p className="mt-1 text-sm text-neutral-400">
+              {profile?.display_name ?? user.email} · {profile?.role}
+            </p>
+          </div>
           <Link
             href="/notifications"
             className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-mono transition ${
@@ -149,22 +150,7 @@ export default async function AdminDashboard() {
           >
             🔔 {unreadCount > 0 ? `${unreadCount} okunmamış` : "Notifications"}
           </Link>
-          <Link
-            href="/reset-password"
-            className="rounded-md border border-neutral-800 px-3 py-1.5 text-sm text-neutral-300 hover:bg-neutral-900"
-          >
-            Şifre
-          </Link>
-          <form action={signOut}>
-            <button
-              type="submit"
-              className="rounded-md border border-neutral-800 px-3 py-1.5 text-sm text-neutral-300 hover:bg-neutral-900"
-            >
-              Çıkış
-            </button>
-          </form>
         </div>
-      </div>
 
       {/* Stat cards */}
       <section className="mb-8">
@@ -348,7 +334,8 @@ export default async function AdminDashboard() {
           </Link>
         </div>
       </section>
-    </main>
+      </main>
+    </>
   );
 }
 
