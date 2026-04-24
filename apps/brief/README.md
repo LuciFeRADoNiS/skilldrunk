@@ -1,25 +1,15 @@
-# @skilldrunk/analiz
+# @skilldrunk/brief
 
-`analiz.skilldrunk.com` — Skilldrunk Portal'ın veri analiz modülü.
+brief.skilldrunk.com — daily briefing module.
 
-## Stack
-- Next.js 16 (App Router, Turbopack)
-- React 19
-- Tailwind CSS 4
-- Supabase (paylaşılan `@skilldrunk/supabase` paketi üzerinden)
+- `/` — today's brief (morning auto-gen at 04:00 UTC)
+- `/daily/[date]` — archive
+- `/api/generate` — manual trigger (auth required)
+- `/api/cron` — Vercel Cron (CRON_SECRET protected)
 
-## Geliştirme
-```bash
-pnpm --filter @skilldrunk/analiz dev
-```
-Port 3001'de açılır.
-
-## Deploy
-Vercel projesi: `skilldrunk-analiz`, root directory: `apps/analiz`, domain: `analiz.skilldrunk.com`.
-
-Env:
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY`
-
-Şema prefix'i: `az_`. Migrationlar: `../../supabase/migrations/0005_analiz_init.sql` (Phase 1'de).
+Env vars:
+- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+- `AUTH_COOKIE_DOMAIN`, `NEXT_PUBLIC_AUTH_COOKIE_DOMAIN`
+- `ANTHROPIC_API_KEY` — optional, enables LLM composition (fallback = group-by-kind template)
+- `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` — optional daily push
+- `CRON_SECRET` — protects /api/cron from spam (set by default by Vercel when this env exists)
