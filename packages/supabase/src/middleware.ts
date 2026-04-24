@@ -1,6 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+const AUTH_COOKIE_DOMAIN = process.env.AUTH_COOKIE_DOMAIN;
+
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
 
@@ -15,9 +17,12 @@ export async function updateSession(request: NextRequest) {
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           response = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options),
-          );
+          cookiesToSet.forEach(({ name, value, options }) => {
+            const mergedOptions = AUTH_COOKIE_DOMAIN
+              ? { ...options, domain: AUTH_COOKIE_DOMAIN }
+              : options;
+            response.cookies.set(name, value, mergedOptions);
+          });
         },
       },
     },
