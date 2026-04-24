@@ -2,9 +2,12 @@ import { redirect } from "next/navigation";
 import { createServerClient } from "@skilldrunk/supabase/server";
 
 /**
- * Central login lives at skilldrunk.com/login. If user isn't authenticated
- * on analiz.skilldrunk.com, redirect to that central login with a next= param
- * pointing back to the current URL on this subdomain.
+ * Private subdomain auth.
+ * - Unauthenticated users → central private login at admin.skilldrunk.com/login
+ * - Only admin-role users pass (analiz is a personal tool, not for community users)
+ *
+ * Community users who sign into skilldrunk.com with Google won't have admin role
+ * and won't be able to access subdomains — which is intentional.
  */
 export async function requireUser(currentPath: string = "/") {
   const supabase = await createServerClient();
@@ -13,12 +16,23 @@ export async function requireUser(currentPath: string = "/") {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    const marketplaceUrl =
-      process.env.NEXT_PUBLIC_MARKETPLACE_URL ?? "https://skilldrunk.com";
+    const adminUrl =
+      process.env.NEXT_PUBLIC_ADMIN_URL ?? "https://admin.skilldrunk.com";
     const returnTo = `https://analiz.skilldrunk.com${currentPath}`;
-    redirect(
-      `${marketplaceUrl}/login?next=${encodeURIComponent(returnTo)}`
-    );
+    redirect(`${adminUrl}/login?next=${encodeURIComponent(returnTo)}`);
+  }
+
+  // Require admin role for private subdomains
+  const { data: profile } = await supabase
+    .from("sd_profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (profile?.role !== "admin") {
+    const adminUrl =
+      process.env.NEXT_PUBLIC_ADMIN_URL ?? "https://admin.skilldrunk.com";
+    redirect(`${adminUrl}/unauthorized`);
   }
 
   return { supabase, user };
