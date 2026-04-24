@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.skilldrunk.obsidian-sync</string>
+
+  <!-- Absolute path to nvm's node. Update if you upgrade Node. -->
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/ozgurgur/.nvm/versions/node/v24.13.0/bin/node</string>
+    <string>/Users/ozgurgur/Documents/skilldrunk/scripts/obsidian-sync/watch.mjs</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/ozgurgur/Documents/skilldrunk/scripts/obsidian-sync</string>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/Users/ozgurgur/.nvm/versions/node/v24.13.0/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+    <key>HOME</key>
+    <string>/Users/ozgurgur</string>
+  </dict>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>KeepAlive</key>
+  <dict>
+    <key>SuccessfulExit</key>
+    <false/>
+  </dict>
+
+  <key>ThrottleInterval</key>
+  <integer>30</integer>
+
+  <key>StandardOutPath</key>
+  <string>/tmp/skilldrunk-obsidian-sync.out.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>/tmp/skilldrunk-obsidian-sync.err.log</string>
+</dict>
+</plist>

@@ -1,0 +1,15 @@
+{
+  "name": "@skilldrunk/obsidian-sync",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "backfill": "node backfill.mjs",
+    "watch": "node watch.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.103.0",
+    "chokidar": "^4.0.3",
+    "gray-matter": "^4.0.3"
+  }
+}
