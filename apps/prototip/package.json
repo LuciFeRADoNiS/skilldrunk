@@ -1,11 +1,11 @@
 {
-  "name": "@skilldrunk/admin",
+  "name": "@skilldrunk/prototip",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3002",
+    "dev": "next dev --port 3004",
     "build": "next build",
-    "start": "next start -p 3002",
+    "start": "next start -p 3004",
     "lint": "eslint"
   },
   "dependencies": {

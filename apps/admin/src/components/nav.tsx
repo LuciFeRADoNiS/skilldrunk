@@ -3,9 +3,12 @@ import { signOut } from "@/app/actions/auth";
 
 const NAV = [
   { href: "/", label: "Dashboard" },
+  { href: "/apps", label: "Apps" },
   { href: "/skills", label: "Skills" },
   { href: "/users", label: "Users" },
   { href: "/reports", label: "Reports" },
+  { href: "/notifications", label: "Notifications" },
+  { href: "/audit", label: "Audit" },
 ];
 
 export function AdminNav({ userLabel }: { userLabel?: string }) {
