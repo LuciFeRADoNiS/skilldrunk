@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import { Tracker } from "@skilldrunk/analytics/tracker";
+import { GA4 } from "@skilldrunk/analytics/ga";
 import "./globals.css";
 
 const siteUrl = "https://quotes.skilldrunk.com";
@@ -65,6 +67,8 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen overflow-x-hidden bg-neutral-950 text-neutral-100 antialiased">
         {children}
+        <Tracker />
+        <GA4 />
       </body>
     </html>
   );

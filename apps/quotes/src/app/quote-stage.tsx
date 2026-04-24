@@ -23,6 +23,36 @@ export function QuoteStage({ initialQuote }: { initialQuote: Quote }) {
   const [pending, startTransition] = useTransition();
   const [animKey, setAnimKey] = useState(0);
   const [aiError, setAiError] = useState<string | null>(null);
+  const [shareToast, setShareToast] = useState<string | null>(null);
+
+  function showToast(msg: string) {
+    setShareToast(msg);
+    setTimeout(() => setShareToast(null), 2200);
+  }
+
+  async function share() {
+    const text = `"${quote.quote_text}" — ${quote.author}${quote.nano_detail ? `\n\n💡 ${quote.nano_detail}` : ""}\n\nvia https://quotes.skilldrunk.com`;
+    const shareData = {
+      title: "Daily Dose · Skilldrunk",
+      text,
+      url: "https://quotes.skilldrunk.com",
+    };
+    try {
+      if (navigator.share && navigator.canShare?.(shareData)) {
+        await navigator.share(shareData);
+        return;
+      }
+    } catch (e) {
+      if (e instanceof Error && e.name === "AbortError") return;
+    }
+    // Fallback: copy to clipboard
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast("Kopyalandı — yapıştır ve paylaş");
+    } catch {
+      showToast("Paylaşım desteklenmiyor");
+    }
+  }
 
   useEffect(() => {
     setAnimKey((k) => k + 1);
@@ -67,6 +97,12 @@ export function QuoteStage({ initialQuote }: { initialQuote: Quote }) {
   return (
     <>
       <ParticleCanvas />
+
+      {shareToast && (
+        <div className="fixed left-1/2 top-6 z-50 -translate-x-1/2 rounded-full bg-emerald-500/90 px-4 py-2 font-body text-xs font-medium text-white shadow-lg backdrop-blur">
+          {shareToast}
+        </div>
+      )}
 
       <main className="relative z-10 mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-between px-6 py-8 sm:py-12">
         {/* Top */}
@@ -139,6 +175,15 @@ export function QuoteStage({ initialQuote }: { initialQuote: Quote }) {
               className="w-full max-w-xs rounded-full bg-gradient-to-r from-orange-500 to-rose-500 px-6 py-3 font-body text-sm font-medium text-white shadow-lg shadow-orange-500/20 transition hover:from-orange-600 hover:to-rose-600 disabled:opacity-60 sm:w-auto"
             >
               {pending && mode === "ai" ? "üretiliyor…" : "✦ Yeni İlham"}
+            </button>
+            <button
+              onClick={share}
+              disabled={pending}
+              aria-label="Paylaş"
+              title="Paylaş"
+              className="w-full max-w-xs rounded-full border border-neutral-800 bg-neutral-900/50 px-6 py-3 font-body text-sm text-neutral-200 transition hover:border-neutral-700 hover:bg-neutral-900 disabled:opacity-50 sm:w-auto"
+            >
+              📤 Paylaş
             </button>
           </div>
 
