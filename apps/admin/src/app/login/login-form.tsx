@@ -1,30 +1,56 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { signInWithPassword } from "@/app/actions/auth";
+import { useState, type FormEvent } from "react";
+import { createBrowserClient } from "@skilldrunk/supabase/client";
 
+/**
+ * Client-side login — bypasses Next.js server actions which were hanging
+ * silently on Vercel. @supabase/ssr browser client handles cookies directly.
+ * Admin role check happens server-side on next navigation (requireAdmin).
+ */
 export function LoginForm({ next }: { next: string }) {
   const [error, setError] = useState<string | null>(null);
-  const [pending, startTransition] = useTransition();
+  const [pending, setPending] = useState(false);
 
-  async function onSubmit(formData: FormData) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (pending) return;
+
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+    const email = String(fd.get("email") ?? "").trim();
+    const password = String(fd.get("password") ?? "");
+
     setError(null);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
+    setPending(true);
 
-    startTransition(async () => {
-      const res = await signInWithPassword(email, password, next);
-      if (!res.ok) {
-        setError(res.error);
+    try {
+      const supabase = createBrowserClient();
+      const { error: signInErr } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInErr) {
+        setError(signInErr.message);
+        setPending(false);
         return;
       }
-      // Full reload so the just-set auth cookies are sent with the next request.
-      window.location.assign(res.next);
-    });
+
+      // Navigate via full reload so the fresh auth cookie goes with the next
+      // request and requireAdmin sees the user. Role is enforced server-side.
+      const target =
+        next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
+      window.location.assign(target);
+    } catch (err) {
+      console.error("[login] exception:", err);
+      setError(err instanceof Error ? err.message : "Bilinmeyen hata");
+      setPending(false);
+    }
   }
 
   return (
-    <form action={onSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className="mb-1.5 block text-xs uppercase tracking-wider text-neutral-500">
           Email
