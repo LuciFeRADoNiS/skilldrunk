@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { Analytics } from "@/components/analytics";
+import { RecoveryHashBridge } from "@/components/recovery-hash-bridge";
 import { createClient } from "@/lib/supabase/server";
 import "./globals.css";
 
@@ -66,6 +67,7 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
+        <RecoveryHashBridge />
         {children}
         <Toaster />
         <Analytics userId={user?.id} />
