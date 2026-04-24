@@ -3,7 +3,9 @@
 import { redirect } from "next/navigation";
 import { createServerClient } from "@skilldrunk/supabase/server";
 
-export type LoginResult = { ok: true } | { ok: false; error: string };
+export type LoginResult =
+  | { ok: true; next: string }
+  | { ok: false; error: string };
 
 export async function signInWithPassword(
   email: string,
@@ -32,7 +34,11 @@ export async function signInWithPassword(
     return { ok: false, error: "Bu alan sadece admin kullanıcılar içindir." };
   }
 
-  redirect(next || "/");
+  // Return the target URL so the client can navigate (full reload) after
+  // the Set-Cookie headers have arrived. Server-side redirect() inside a
+  // useTransition is unreliable in React 19.
+  const safeNext = next && next.startsWith("/") ? next : "/";
+  return { ok: true, next: safeNext };
 }
 
 export async function signOut() {
