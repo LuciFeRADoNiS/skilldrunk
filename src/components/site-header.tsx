@@ -64,6 +64,9 @@ export async function SiteHeader() {
                 ✦ AI
               </span>
             </Link>
+            <Link href="/about" className="hover:text-foreground">
+              About
+            </Link>
             <Link href="/docs" className="hover:text-foreground">
               Docs
             </Link>

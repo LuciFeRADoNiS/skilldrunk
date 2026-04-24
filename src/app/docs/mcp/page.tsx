@@ -64,7 +64,23 @@ export default function McpDocsPage() {
         </li>
       </ul>
 
-      <h2>Claude Desktop</h2>
+      <h2>Two transports</h2>
+      <p>
+        The server speaks both <strong>stdio</strong> (npm package, for
+        locally-running clients) and <strong>Streamable HTTP</strong> (remote,
+        for Smithery, Claude web, hosted clients).
+      </p>
+      <h3>HTTP endpoint</h3>
+      <p>
+        Point any Streamable-HTTP MCP client at{" "}
+        <code>https://skilldrunk.com/api/mcp</code>. Optional auth:{" "}
+        <code>Authorization: Bearer sd_live_...</code>.
+      </p>
+      <Code lang="bash">{`curl -sS https://skilldrunk.com/api/mcp \\
+  -H 'content-type: application/json' \\
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'`}</Code>
+
+      <h2>Claude Desktop (stdio)</h2>
       <p>
         Edit <code>~/Library/Application Support/Claude/claude_desktop_config.json</code>{" "}
         (macOS) or <code>%APPDATA%\Claude\claude_desktop_config.json</code> (Windows):
