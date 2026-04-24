@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Tracker } from "@skilldrunk/analytics/tracker";
+import { GA4 } from "@skilldrunk/analytics/ga";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -16,6 +18,8 @@ export default function RootLayout({
     <html lang="tr">
       <body className="min-h-screen bg-neutral-950 text-neutral-100 antialiased">
         {children}
+        <Tracker />
+        <GA4 />
       </body>
     </html>
   );

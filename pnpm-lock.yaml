@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@skilldrunk/analytics':
+        specifier: workspace:*
+        version: link:packages/analytics
       '@supabase/ssr':
         specifier: ^0.10.2
         version: 0.10.2(@supabase/supabase-js@2.104.0)
@@ -99,6 +102,9 @@ importers:
 
   apps/admin:
     dependencies:
+      '@skilldrunk/analytics':
+        specifier: workspace:*
+        version: link:../../packages/analytics
       '@skilldrunk/supabase':
         specifier: workspace:*
         version: link:../../packages/supabase
@@ -151,6 +157,9 @@ importers:
 
   apps/analiz:
     dependencies:
+      '@skilldrunk/analytics':
+        specifier: workspace:*
+        version: link:../../packages/analytics
       '@skilldrunk/supabase':
         specifier: workspace:*
         version: link:../../packages/supabase
@@ -194,6 +203,9 @@ importers:
 
   apps/brief:
     dependencies:
+      '@skilldrunk/analytics':
+        specifier: workspace:*
+        version: link:../../packages/analytics
       '@skilldrunk/supabase':
         specifier: workspace:*
         version: link:../../packages/supabase
@@ -246,6 +258,9 @@ importers:
 
   apps/prototip:
     dependencies:
+      '@skilldrunk/analytics':
+        specifier: workspace:*
+        version: link:../../packages/analytics
       '@skilldrunk/supabase':
         specifier: workspace:*
         version: link:../../packages/supabase
@@ -289,6 +304,9 @@ importers:
 
   apps/quotes:
     dependencies:
+      '@skilldrunk/analytics':
+        specifier: workspace:*
+        version: link:../../packages/analytics
       '@skilldrunk/supabase':
         specifier: workspace:*
         version: link:../../packages/supabase
@@ -323,6 +341,25 @@ importers:
       tailwindcss:
         specifier: ^4
         version: 4.2.4
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  packages/analytics:
+    dependencies:
+      '@supabase/supabase-js':
+        specifier: ^2.103.0
+        version: 2.104.0
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      next:
+        specifier: 16.2.3
+        version: 16.2.3(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react:
+        specifier: 19.2.4
+        version: 19.2.4
       typescript:
         specifier: ^5
         version: 5.9.3
