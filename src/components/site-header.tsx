@@ -55,6 +55,15 @@ export async function SiteHeader() {
             <Link href="/search" className="hover:text-foreground">
               Search
             </Link>
+            <Link
+              href="/find"
+              className="flex items-center gap-1 hover:text-foreground"
+            >
+              <span>Find</span>
+              <span className="rounded-full bg-orange-500/10 px-1.5 py-0.5 text-[9px] font-mono text-orange-500">
+                ✦ AI
+              </span>
+            </Link>
             <Link href="/docs" className="hover:text-foreground">
               Docs
             </Link>
