@@ -11,11 +11,15 @@ export function LoginForm({ next }: { next: string }) {
     setError(null);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
+
     startTransition(async () => {
       const res = await signInWithPassword(email, password, next);
-      if (res && "ok" in res && !res.ok) {
+      if (!res.ok) {
         setError(res.error);
+        return;
       }
+      // Full reload so the just-set auth cookies are sent with the next request.
+      window.location.assign(res.next);
     });
   }
 
