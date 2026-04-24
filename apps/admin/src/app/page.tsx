@@ -138,11 +138,17 @@ export default async function AdminDashboard() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {unreadCount > 0 && (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-red-500/10 px-3 py-1 text-xs font-mono text-red-400">
-              🔔 {unreadCount} okunmamış
-            </span>
-          )}
+          <Link
+            href="/notifications"
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-mono transition ${
+              unreadCount > 0
+                ? "bg-red-500/10 text-red-400 hover:bg-red-500/20"
+                : "bg-neutral-900 text-neutral-500 hover:bg-neutral-800"
+            }`}
+            title={`${unreadCount} okunmamış · tüm bildirimleri gör`}
+          >
+            🔔 {unreadCount > 0 ? `${unreadCount} okunmamış` : "Notifications"}
+          </Link>
           <Link
             href="/reset-password"
             className="rounded-md border border-neutral-800 px-3 py-1.5 text-sm text-neutral-300 hover:bg-neutral-900"
