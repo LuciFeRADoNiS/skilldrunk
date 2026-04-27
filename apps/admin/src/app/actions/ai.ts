@@ -357,7 +357,10 @@ type EcosystemStats = {
   pageviews_7d: number;
 };
 
-async function buildSystemPrompt(): Promise<string> {
+async function buildSystemPrompt(context?: {
+  page?: string;
+  focus?: string;
+}): Promise<string> {
   const { supabase, profile } = await adminSupabase();
 
   const [{ data: apps }, { data: statsData }] = await Promise.all([
@@ -409,7 +412,12 @@ Sana verilen araçları gerektiğinde KULLAN. Soru sorarken araçla doğrula. Ku
 - Tool hatası → kullanıcıya anlat, "deneyebilirsin" deme, kendi düzeltmeyi öner
 - Türkçe yanıt; teknik terimler İngilizce kalabilir (slug, host, RPC)
 - Hiçbir araç olmadan da yanıt verebilirsin (genel ekosistem soruları için)
-- Owner: ${profile?.display_name ?? profile?.username ?? "Özgür"}`;
+- Owner: ${profile?.display_name ?? profile?.username ?? "Özgür"}
+${
+  context?.page || context?.focus
+    ? `\n## Şu anki bağlam\n${context.page ? `- Kullanıcı şu sayfadaydı: \`${context.page}\`` : ""}${context.focus ? `\n- Odaklandığı şey: ${context.focus}` : ""}\n- Bu bağlamı yanıtında dikkate al.`
+    : ""
+}`;
 }
 
 /* ────────────────────────  Multi-turn loop ──────────────────────── */
@@ -428,6 +436,7 @@ const MAX_TURNS = 6;
 export async function askAssistant(
   history: ChatMessage[],
   userMessage: string,
+  context?: { page?: string; focus?: string },
 ): Promise<AskResult> {
   try {
     const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -439,7 +448,7 @@ export async function askAssistant(
       };
     }
 
-    const system = await buildSystemPrompt();
+    const system = await buildSystemPrompt(context);
 
     // Convert prior history to Anthropic message format. We drop the
     // tool_calls metadata since each turn is independent here.
