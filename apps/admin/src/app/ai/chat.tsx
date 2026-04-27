@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, type FormEvent } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { askAssistant, type ChatMessage } from "@/app/actions/ai";
+import { askAssistant, type ChatMessage, type ToolCallTrace } from "@/app/actions/ai";
 
 const SUGGESTED = [
   "Ekosistemin durumu ne?",
@@ -45,7 +45,11 @@ export function AiChat() {
       if (res.ok) {
         setMessages([
           ...nextHistory,
-          { role: "assistant", content: res.answer },
+          {
+            role: "assistant",
+            content: res.answer,
+            tool_calls: res.tool_calls,
+          },
         ]);
       } else {
         setError(res.error);
@@ -113,11 +117,20 @@ export function AiChat() {
                 {m.role === "user" ? (
                   <p className="whitespace-pre-wrap">{m.content}</p>
                 ) : (
-                  <div className="prose prose-invert prose-sm max-w-none prose-p:my-1.5 prose-ul:my-1.5 prose-li:my-0 prose-headings:mt-3 prose-headings:mb-1.5 prose-a:text-orange-400 prose-code:text-orange-300">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                      {m.content}
-                    </ReactMarkdown>
-                  </div>
+                  <>
+                    {m.tool_calls && m.tool_calls.length > 0 && (
+                      <div className="mb-2 space-y-1">
+                        {m.tool_calls.map((t, j) => (
+                          <ToolBadge key={j} trace={t} />
+                        ))}
+                      </div>
+                    )}
+                    <div className="prose prose-invert prose-sm max-w-none prose-p:my-1.5 prose-ul:my-1.5 prose-li:my-0 prose-headings:mt-3 prose-headings:mb-1.5 prose-a:text-orange-400 prose-code:text-orange-300">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {m.content}
+                      </ReactMarkdown>
+                    </div>
+                  </>
                 )}
               </div>
             </div>
@@ -167,6 +180,29 @@ export function AiChat() {
           {pending ? "…" : "Gönder"}
         </button>
       </form>
+    </div>
+  );
+}
+
+function ToolBadge({ trace }: { trace: ToolCallTrace }) {
+  const ok = !trace.error;
+  const inputSummary = Object.entries(trace.input)
+    .map(([k, v]) => `${k}=${typeof v === "string" ? v : JSON.stringify(v)}`)
+    .join(" ");
+  return (
+    <div
+      className={`rounded-md border px-2.5 py-1.5 font-mono text-[11px] ${
+        ok
+          ? "border-emerald-900 bg-emerald-500/5 text-emerald-300"
+          : "border-red-900 bg-red-500/5 text-red-300"
+      }`}
+    >
+      <span className="opacity-70">🔧 {trace.name}</span>
+      {inputSummary && <span className="opacity-60"> ({inputSummary})</span>}
+      <span className="opacity-50">
+        {" → "}
+        {ok ? "ok" : `error: ${trace.error}`}
+      </span>
     </div>
   );
 }
