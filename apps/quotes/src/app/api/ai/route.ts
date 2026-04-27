@@ -48,33 +48,32 @@ JSON formatında döndür:
 Sadece JSON döndür, başka metin yok.`;
 
   try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "claude-haiku-4-5",
-        max_tokens: 1024,
-        messages: [{ role: "user", content: prompt }],
-      }),
-      signal: AbortSignal.timeout(25_000),
+    const { callClaude } = await import("@skilldrunk/llm");
+    const res = await callClaude({
+      apiKey,
+      model: "claude-haiku-4-5",
+      max_tokens: 1024,
+      timeoutMs: 25_000,
+      messages: [{ role: "user", content: prompt }],
+      app: "quotes",
+      route: "/api/ai",
+      metadata: { category, mood },
+      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+      supabaseServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
     });
 
     if (!res.ok) {
-      const text = await res.text();
       return NextResponse.json(
-        { error: "anthropic_error", detail: text.slice(0, 300) },
+        { error: "anthropic_error", detail: res.error.slice(0, 300) },
         { status: 502 },
       );
     }
 
-    const json = (await res.json()) as {
-      content?: Array<{ type: string; text?: string }>;
-    };
-    const text = json.content?.find((c) => c.type === "text")?.text ?? "";
+    const text =
+      (res.data.content?.find((c) => (c as { type: string }).type === "text") as
+        | { text?: string }
+        | undefined
+      )?.text ?? "";
 
     // Try to extract JSON from the response (strip markdown fences if any)
     const cleaned = text

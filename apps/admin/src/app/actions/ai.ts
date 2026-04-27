@@ -463,31 +463,30 @@ export async function askAssistant(
     const traces: ToolCallTrace[] = [];
     let finalText = "";
     let modelUsed = "claude-haiku-4-5";
+    const { callClaude } = await import("@skilldrunk/llm");
+    const { user: actingUser } = await adminSupabase();
 
     for (let turn = 0; turn < MAX_TURNS; turn++) {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: {
-          "x-api-key": apiKey,
-          "anthropic-version": "2023-06-01",
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "claude-haiku-4-5",
-          max_tokens: 2048,
-          system,
-          tools: TOOLS,
-          messages,
-        }),
-        signal: AbortSignal.timeout(45_000),
+      const callRes = await callClaude({
+        apiKey,
+        model: "claude-haiku-4-5",
+        max_tokens: 2048,
+        system,
+        tools: TOOLS as Array<Record<string, unknown>>,
+        messages: messages as unknown as import("@skilldrunk/llm").AnthropicMessage[],
+        app: "admin-ai",
+        route: "/ai",
+        userId: actingUser.id,
+        metadata: { turn, has_context: !!context },
+        supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+        supabaseServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
       });
 
-      if (!res.ok) {
-        const txt = await res.text();
-        return { ok: false, error: `API ${res.status}: ${txt.slice(0, 200)}` };
+      if (!callRes.ok) {
+        return { ok: false, error: callRes.error };
       }
 
-      const json = (await res.json()) as {
+      const json = callRes.data as unknown as {
         content: AnthropicContent[];
         stop_reason: string;
         model?: string;

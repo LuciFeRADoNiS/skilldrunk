@@ -108,24 +108,22 @@ export async function POST(req: NextRequest) {
 
   const prompt = buildPrompt(query, candidates);
   try {
-    const llm = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "claude-haiku-4-5",
-        max_tokens: 1024,
-        messages: [{ role: "user", content: prompt }],
-      }),
-      // Guard against hanging — we'd rather fall back than block
-      signal: AbortSignal.timeout(15_000),
+    const { callClaude } = await import("@skilldrunk/llm");
+    const llm = await callClaude({
+      apiKey,
+      model: "claude-haiku-4-5",
+      max_tokens: 1024,
+      timeoutMs: 15_000,
+      messages: [{ role: "user", content: prompt }],
+      app: "marketplace-find",
+      route: "/api/ai/find",
+      metadata: { query, candidates: candidates.length },
+      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+      supabaseServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
     });
 
     if (!llm.ok) {
-      console.error("[ai-find] anthropic api error:", llm.status);
+      console.error("[ai-find] anthropic api error:", llm.error);
       return NextResponse.json({
         query,
         skills: candidates.slice(0, 5),
@@ -133,10 +131,11 @@ export async function POST(req: NextRequest) {
       } satisfies FinderResult);
     }
 
-    const llmJson = (await llm.json()) as {
-      content?: Array<{ type: string; text?: string }>;
-    };
-    const text = llmJson.content?.find((c) => c.type === "text")?.text ?? "";
+    const text =
+      (llm.data.content?.find((c) => (c as { type: string }).type === "text") as
+        | { text?: string }
+        | undefined
+      )?.text ?? "";
 
     const picks = parseLlmResponse(text, candidates);
     return NextResponse.json({

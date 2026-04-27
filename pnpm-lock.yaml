@@ -11,6 +11,9 @@ importers:
       '@skilldrunk/analytics':
         specifier: workspace:*
         version: link:packages/analytics
+      '@skilldrunk/llm':
+        specifier: workspace:*
+        version: link:packages/llm
       '@supabase/ssr':
         specifier: ^0.10.2
         version: 0.10.2(@supabase/supabase-js@2.104.0)
@@ -105,6 +108,9 @@ importers:
       '@skilldrunk/analytics':
         specifier: workspace:*
         version: link:../../packages/analytics
+      '@skilldrunk/llm':
+        specifier: workspace:*
+        version: link:../../packages/llm
       '@skilldrunk/supabase':
         specifier: workspace:*
         version: link:../../packages/supabase
@@ -209,6 +215,9 @@ importers:
       '@skilldrunk/analytics':
         specifier: workspace:*
         version: link:../../packages/analytics
+      '@skilldrunk/llm':
+        specifier: workspace:*
+        version: link:../../packages/llm
       '@skilldrunk/supabase':
         specifier: workspace:*
         version: link:../../packages/supabase
@@ -319,6 +328,9 @@ importers:
       '@skilldrunk/analytics':
         specifier: workspace:*
         version: link:../../packages/analytics
+      '@skilldrunk/llm':
+        specifier: workspace:*
+        version: link:../../packages/llm
       '@skilldrunk/supabase':
         specifier: workspace:*
         version: link:../../packages/supabase
@@ -372,6 +384,16 @@ importers:
       react:
         specifier: 19.2.4
         version: 19.2.4
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  packages/llm:
+    dependencies:
+      '@supabase/supabase-js':
+        specifier: ^2.103.0
+        version: 2.104.0
+    devDependencies:
       typescript:
         specifier: ^5
         version: 5.9.3

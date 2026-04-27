@@ -27,6 +27,7 @@ export type BriefResult = {
     window_end: string;
     input_tokens?: number;
     output_tokens?: number;
+    cost_usd?: number;
   };
 };
 
@@ -113,42 +114,41 @@ export async function composeBrief(
 
   // Claude Haiku compose
   const prompt = buildPrompt(briefDate, input, events.length);
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "claude-haiku-4-5",
-      max_tokens: 2048,
-      messages: [{ role: "user", content: prompt }],
-    }),
-    signal: AbortSignal.timeout(45_000),
+
+  const { callClaude } = await import("@skilldrunk/llm");
+  const res = await callClaude({
+    apiKey,
+    model: "claude-haiku-4-5",
+    max_tokens: 2048,
+    messages: [{ role: "user", content: prompt }],
+    app: "brief",
+    route: "/lib/compose",
+    userId,
+    metadata: { brief_date: briefDate, events_count: events.length },
+    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    supabaseServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
   });
 
   if (!res.ok) {
-    throw new Error(`anthropic api error: ${res.status}`);
+    throw new Error(`anthropic api error: ${res.error}`);
   }
 
-  const json = (await res.json()) as {
-    content?: Array<{ type: string; text?: string }>;
-    usage?: { input_tokens?: number; output_tokens?: number };
-    model?: string;
-  };
-
-  const text = json.content?.find((c) => c.type === "text")?.text ?? "";
+  const text =
+    (res.data.content?.find((c) => (c as { type: string }).type === "text") as
+      | { text?: string }
+      | undefined
+    )?.text ?? "";
   const { summary, body_md } = splitBrief(text, briefDate);
 
   return {
     summary,
     body_md,
-    model: json.model ?? "claude-haiku-4-5",
+    model: res.model,
     metadata: {
       ...metadata,
-      input_tokens: json.usage?.input_tokens,
-      output_tokens: json.usage?.output_tokens,
+      input_tokens: res.usage.input_tokens,
+      output_tokens: res.usage.output_tokens,
+      cost_usd: res.cost_usd,
     },
   };
 }
