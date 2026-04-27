@@ -196,9 +196,7 @@ export default async function PrototipHome() {
 function AppCard({ app, featured }: { app: App; featured?: boolean }) {
   return (
     <a
-      href={app.url}
-      target="_blank"
-      rel="noreferrer"
+      href={`/${app.slug}`}
       className={`group block rounded-xl border p-5 transition hover:border-neutral-700 ${CAT_COLOR[app.category] ?? "border-neutral-900 bg-neutral-950"}`}
     >
       <div className="mb-2 flex flex-wrap items-center gap-2">

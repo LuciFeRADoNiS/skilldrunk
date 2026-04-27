@@ -112,7 +112,7 @@ function AppNode({ data, selected }: NodeProps<Node<AppNodeData>>) {
 
   return (
     <div
-      className={`relative cursor-pointer rounded-xl border bg-gradient-to-br ${palette.bg} ${palette.border} px-4 py-3 backdrop-blur-sm transition hover:scale-[1.03] ${ring}`}
+      className={`relative rounded-xl border bg-gradient-to-br ${palette.bg} ${palette.border} px-4 py-3 backdrop-blur-sm transition-shadow hover:shadow-xl ${ring}`}
       style={{ minWidth: 200 }}
     >
       <Handle type="target" position={Position.Top} className="!bg-neutral-700" />
@@ -391,6 +391,9 @@ export function EcosystemMap({
           fitViewOptions={{ padding: 0.2 }}
           colorMode="dark"
           proOptions={{ hideAttribution: true }}
+          nodesDraggable
+          nodesConnectable={false}
+          elementsSelectable
         >
           <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="#262626" />
           <Controls className="!bg-neutral-900 !border-neutral-800" />
@@ -572,6 +575,12 @@ function Drawer({
           className="rounded-md bg-orange-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-orange-600"
         >
           Aç ↗
+        </a>
+        <a
+          href={`/ai?from=${encodeURIComponent("/map")}&focus=${encodeURIComponent(app.slug)}`}
+          className="rounded-md border border-orange-700 bg-orange-500/10 px-3 py-1.5 text-xs text-orange-300 hover:bg-orange-500/20"
+        >
+          🤖 AI&apos;a sor
         </a>
         <a
           href="/apps"

@@ -13,7 +13,13 @@ const SUGGESTED = [
   "Kaç event analiz'de var?",
 ];
 
-export function AiChat() {
+export function AiChat({
+  contextPage,
+  contextFocus,
+}: {
+  contextPage?: string;
+  contextFocus?: string;
+} = {}) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [pending, setPending] = useState(false);
@@ -41,7 +47,10 @@ export function AiChat() {
     setPending(true);
 
     try {
-      const res = await askAssistant(messages, trimmed);
+      const res = await askAssistant(messages, trimmed, {
+        page: contextPage,
+        focus: contextFocus,
+      });
       if (res.ok) {
         setMessages([
           ...nextHistory,
