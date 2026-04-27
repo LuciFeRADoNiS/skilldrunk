@@ -71,8 +71,13 @@ export async function POST(req: NextRequest) {
   const cmd = rawCmd.toLowerCase().split("@")[0]; // strip @botname
   const args = rest.join(" ").trim();
 
-  // Always return 200 fast; do work async if needed
-  void handleCommand(cmd, args, msg);
+  // Vercel serverless functions terminate after response — must await.
+  // Telegram timeout is 60s; our handlers stay well under.
+  try {
+    await handleCommand(cmd, args, msg);
+  } catch (err) {
+    console.error("[telegram] handleCommand failed:", err);
+  }
   return NextResponse.json({ ok: true });
 }
 
