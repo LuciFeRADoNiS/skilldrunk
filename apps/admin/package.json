@@ -18,7 +18,8 @@
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
     "@skilldrunk/analytics": "workspace:*",
-    "@xyflow/react": "^12.4.4"
+    "@xyflow/react": "^12.4.4",
+    "@skilldrunk/llm": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22",

@@ -138,31 +138,26 @@ Format (markdown):
 Veri:
 ${compactInput}`;
 
-    try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: {
-          "x-api-key": apiKey,
-          "anthropic-version": "2023-06-01",
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "claude-haiku-4-5",
-          max_tokens: 1500,
-          messages: [{ role: "user", content: prompt }],
-        }),
-        signal: AbortSignal.timeout(45_000),
-      });
-      if (res.ok) {
-        const json = (await res.json()) as {
-          content?: Array<{ type: string; text?: string }>;
-          model?: string;
-        };
-        summaryMd = json.content?.find((c) => c.type === "text")?.text ?? "";
-        model = json.model ?? "claude-haiku-4-5";
-      }
-    } catch {
-      // ignore — fallback below
+    const { callClaude } = await import("@skilldrunk/llm");
+    const res = await callClaude({
+      apiKey,
+      model: "claude-haiku-4-5",
+      max_tokens: 1500,
+      messages: [{ role: "user", content: prompt }],
+      app: "brief",
+      route: "/api/cron/weekly",
+      userId: owner.id,
+      metadata: { kind: "weekly_digest" },
+      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+      supabaseServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+    });
+    if (res.ok) {
+      summaryMd =
+        (res.data.content?.find((c) => (c as { type: string }).type === "text") as
+          | { text?: string }
+          | undefined
+        )?.text ?? "";
+      model = res.model;
     }
   }
 
