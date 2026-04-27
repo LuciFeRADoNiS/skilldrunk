@@ -3,6 +3,7 @@ import { signOut } from "@/app/actions/auth";
 
 const NAV = [
   { href: "/", label: "Dashboard" },
+  { href: "/map", label: "Map" },
   { href: "/ai", label: "AI" },
   { href: "/analytics", label: "Analytics" },
   { href: "/apps", label: "Apps" },
