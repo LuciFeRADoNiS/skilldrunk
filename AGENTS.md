@@ -13,16 +13,28 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 **Monorepo**: `/Users/ozgurgur/Documents/skilldrunk/` — pnpm workspaces + Next.js 16 (Turbopack) + React 19 + Supabase + Tailwind 4.
 
-**Live subdomains** (7 tane — pt_apps tablosundan canlı veri):
+**Live subdomains** (9 tane — pt_apps tablosundan canlı veri):
 ```
 skilldrunk.com           PUBLIC   Marketplace + MCP HTTP + AI Finder
-admin.skilldrunk.com     PRIVATE  Ecosystem control panel
+admin.skilldrunk.com     PRIVATE  Ecosystem control panel + AI assistant (tool use)
 analiz.skilldrunk.com    PRIVATE  Event stream (Obsidian + GitHub)
 brief.skilldrunk.com     PRIVATE  Günlük brief (Claude Haiku cron)
-quotes.skilldrunk.com    PUBLIC   Daily Dose (Supabase edge proxy rewrite)
+quotes.skilldrunk.com    PUBLIC   Daily Dose (real Next.js app + AI)
 prototip.skilldrunk.com  PUBLIC   Ecosystem showcase (kronolojik, pt_apps)
-radyo.skilldrunk.com     PRIVATE  Suno AI + DistroKid (WIP)
+radyo.skilldrunk.com     SEMI     Public /vote, admin /review (Suno+DistroKid WIP)
+sub.skilldrunk.com       PRIVATE  AI subscription tracker (ai-sub-tracker rebrand)
+bday.skilldrunk.com      PRIVATE  Birthday reminders (birthdaysfunetc rebrand)
 ```
+
+**Analytics**:
+- First-party: `sd_pageviews` (host column, RLS admin-read), `<Tracker />` her layout'ta, `/api/track` her app'te (shared via `@skilldrunk/analytics/track-handler`)
+- GA4: `NEXT_PUBLIC_GA_MEASUREMENT_ID=G-38N14BZMQR` 6 projede, cross-domain `.skilldrunk.com` cookie
+
+**AI Assistant (admin.skilldrunk.com/ai)**:
+Claude Haiku tool use ile gerçek aksiyonlar yapabiliyor:
+- `count_pageviews`, `count_az_events`, `list_apps`, `get_recent_audit` (read)
+- `toggle_app_featured`, `toggle_app_public`, `set_app_status`, `set_skill_status`, `add_quote` (write)
+Multi-turn loop (max 6 turn), tool result'lar UI'da yeşil/kırmızı badge ile gösterilir (transparency).
 
 **Schema prefixleri** (tek Supabase DB: `vrgohatarieeguyyhfan`):
 - `sd_*` marketplace (skills, votes, arena, notifications, audit, pageviews, ...)
