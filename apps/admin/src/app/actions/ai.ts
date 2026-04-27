@@ -185,11 +185,31 @@ const TOOLS = [
 
 /* ────────────────────────  Tool execution ──────────────────────── */
 
+// Read-only tool names — Telegram path only allows these.
+const READ_ONLY_TOOLS = new Set([
+  "count_pageviews",
+  "count_az_events",
+  "list_apps",
+  "get_recent_audit",
+]);
+
+type ExecuteCtx = {
+  supabase: import("@supabase/supabase-js").SupabaseClient;
+  allowWrites: boolean;
+};
+
 async function executeTool(
   name: string,
   input: Record<string, unknown>,
+  ctx: ExecuteCtx,
 ): Promise<unknown> {
-  const { supabase } = await adminSupabase();
+  const { supabase, allowWrites } = ctx;
+
+  if (!allowWrites && !READ_ONLY_TOOLS.has(name)) {
+    throw new Error(
+      `'${name}' bu kontekste izinli değil (read-only mode)`,
+    );
+  }
 
   switch (name) {
     case "count_pageviews": {
@@ -357,12 +377,14 @@ type EcosystemStats = {
   pageviews_7d: number;
 };
 
-async function buildSystemPrompt(context?: {
-  page?: string;
-  focus?: string;
-}): Promise<string> {
-  const { supabase, profile } = await adminSupabase();
-
+async function buildSystemPrompt(
+  supabase: import("@supabase/supabase-js").SupabaseClient,
+  profile: { display_name?: string | null; username?: string | null } | null,
+  context?: {
+    page?: string;
+    focus?: string;
+  },
+): Promise<string> {
   const [{ data: apps }, { data: statsData }] = await Promise.all([
     supabase
       .from("pt_apps")
@@ -433,22 +455,65 @@ type AnthropicMessage = {
 
 const MAX_TURNS = 6;
 
+/**
+ * Server action — entry from /admin/ai web UI. Auth via cookie.
+ */
 export async function askAssistant(
   history: ChatMessage[],
   userMessage: string,
   context?: { page?: string; focus?: string },
 ): Promise<AskResult> {
   try {
+    const { supabase, user, profile } = await adminSupabase();
+    return await runAskAssistantCore({
+      supabase,
+      userId: user.id,
+      profile,
+      history,
+      userMessage,
+      context,
+      allowWrites: true,
+    });
+  } catch (err) {
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : String(err),
+    };
+  }
+}
+
+/**
+ * Core function — used by both server action (web) and Telegram webhook.
+ * Caller is responsible for providing supabase client + profile.
+ * `allowWrites=false` filters out write tools (Telegram path).
+ */
+export async function runAskAssistantCore(opts: {
+  supabase: import("@supabase/supabase-js").SupabaseClient;
+  userId: string;
+  profile: {
+    display_name?: string | null;
+    username?: string | null;
+  } | null;
+  history: ChatMessage[];
+  userMessage: string;
+  context?: { page?: string; focus?: string };
+  allowWrites: boolean;
+}): Promise<AskResult> {
+  try {
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
       return {
         ok: false,
-        error:
-          "ANTHROPIC_API_KEY yok. Vercel → skilldrunk-admin → Settings → Environment ekle.",
+        error: "ANTHROPIC_API_KEY yok",
       };
     }
 
-    const system = await buildSystemPrompt(context);
+    const { supabase, userId, profile, history, userMessage, context, allowWrites } = opts;
+    const system = await buildSystemPrompt(supabase, profile, context);
+
+    const enabledTools = allowWrites
+      ? TOOLS
+      : TOOLS.filter((t) => READ_ONLY_TOOLS.has(t.name));
 
     // Convert prior history to Anthropic message format. We drop the
     // tool_calls metadata since each turn is independent here.
@@ -464,7 +529,6 @@ export async function askAssistant(
     let finalText = "";
     let modelUsed = "claude-haiku-4-5";
     const { callClaude } = await import("@skilldrunk/llm");
-    const { user: actingUser } = await adminSupabase();
 
     for (let turn = 0; turn < MAX_TURNS; turn++) {
       const callRes = await callClaude({
@@ -472,12 +536,12 @@ export async function askAssistant(
         model: "claude-haiku-4-5",
         max_tokens: 2048,
         system,
-        tools: TOOLS as Array<Record<string, unknown>>,
+        tools: enabledTools as Array<Record<string, unknown>>,
         messages: messages as unknown as import("@skilldrunk/llm").AnthropicMessage[],
-        app: "admin-ai",
-        route: "/ai",
-        userId: actingUser.id,
-        metadata: { turn, has_context: !!context },
+        app: allowWrites ? "admin-ai" : "telegram-ai",
+        route: allowWrites ? "/ai" : "/telegram/ask",
+        userId,
+        metadata: { turn, has_context: !!context, mode: allowWrites ? "full" : "read_only" },
         supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
         supabaseServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
       });
@@ -514,7 +578,10 @@ export async function askAssistant(
           result: null,
         };
         try {
-          trace.result = await executeTool(tu.name, tu.input);
+          trace.result = await executeTool(tu.name, tu.input, {
+            supabase,
+            allowWrites,
+          });
         } catch (err) {
           trace.error = err instanceof Error ? err.message : String(err);
         }
