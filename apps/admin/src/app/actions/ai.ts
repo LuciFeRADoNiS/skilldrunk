@@ -164,6 +164,22 @@ const TOOLS = [
     },
   },
   {
+    name: "query_db",
+    description:
+      "Read-only SQL SELECT against the ecosystem DB. Use when no other tool fits — e.g. ad-hoc aggregation, joins, time-series breakdown. Allowlisted tables only: sd_skills, sd_profiles, sd_pageviews, sd_ai_usage, sd_audit_log, az_events, br_briefings, qt_quotes, pt_apps. Always include LIMIT (will be auto-capped to 100). NO writes (insert/update/delete/drop/etc reddedilir).",
+    input_schema: {
+      type: "object",
+      properties: {
+        sql: {
+          type: "string",
+          description:
+            "Tek bir SELECT statement. Örn: SELECT date_trunc('day', created_at) as d, count(*) FROM sd_pageviews WHERE created_at > now() - interval '30 days' GROUP BY 1 ORDER BY 1 DESC LIMIT 30",
+        },
+      },
+      required: ["sql"],
+    },
+  },
+  {
     name: "add_quote",
     description:
       "quotes.skilldrunk.com için yeni bir söz ekler. Curated kaynak olarak işaretlenir.",
@@ -191,7 +207,63 @@ const READ_ONLY_TOOLS = new Set([
   "count_az_events",
   "list_apps",
   "get_recent_audit",
+  "query_db",
 ]);
+
+// query_db allowlist — tables exposed to ad-hoc SQL. Anything outside this
+// is rejected at validation time. Keep this conservative; widening exposes
+// data to whoever owns the AI conversation.
+const QUERY_DB_TABLES = [
+  "sd_skills",
+  "sd_profiles",
+  "sd_pageviews",
+  "sd_ai_usage",
+  "sd_audit_log",
+  "az_events",
+  "br_briefings",
+  "qt_quotes",
+  "pt_apps",
+] as const;
+
+// Words that immediately disqualify a query. We rely on the RPC's
+// READ ONLY transaction as a backstop, but reject obvious mutations early.
+const QUERY_DB_BLACKLIST =
+  /\b(insert|update|delete|drop|alter|create|grant|revoke|truncate|copy|vacuum|analyze|reindex|cluster|comment|listen|notify|refresh|do|call|execute|prepare|deallocate)\b/i;
+
+function validateAndNormalizeSql(rawInput: string): string {
+  const sql = rawInput.trim().replace(/;+\s*$/, "");
+  if (!sql) throw new Error("query_db: sql boş");
+  if (!/^\s*select\s/i.test(sql)) throw new Error("query_db: sadece SELECT");
+  if (sql.includes(";"))
+    throw new Error("query_db: birden fazla statement yok");
+  if (QUERY_DB_BLACKLIST.test(sql))
+    throw new Error("query_db: yasaklı keyword");
+
+  // Extract table refs after FROM/JOIN. Strip schema prefix if user wrote
+  // `public.foo`. Reject anything not in the allowlist.
+  const tables = new Set<string>();
+  const re = /\b(?:from|join)\s+("?[\w.]+"?)/gi;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(sql)) !== null) {
+    const ref = m[1].replace(/"/g, "");
+    const name = ref.includes(".") ? ref.split(".").pop()! : ref;
+    tables.add(name.toLowerCase());
+  }
+  for (const t of tables) {
+    if (!(QUERY_DB_TABLES as readonly string[]).includes(t)) {
+      throw new Error(
+        `query_db: tablo izinli değil: ${t}. İzinli: ${QUERY_DB_TABLES.join(", ")}`,
+      );
+    }
+  }
+
+  // Auto-cap LIMIT. If absent, append. If present and >100, lower it.
+  const limitMatch = sql.match(/\blimit\s+(\d+)\s*$/i);
+  if (!limitMatch) return `${sql} LIMIT 100`;
+  const n = parseInt(limitMatch[1], 10);
+  if (n > 100) return sql.replace(/\blimit\s+\d+\s*$/i, "LIMIT 100");
+  return sql;
+}
 
 type ExecuteCtx = {
   supabase: import("@supabase/supabase-js").SupabaseClient;
@@ -330,6 +402,29 @@ async function executeTool(
       return data;
     }
 
+    case "query_db": {
+      const normalized = validateAndNormalizeSql(String(input.sql ?? ""));
+      // The RPC is service_role-only, so the auth-cookie supabase here
+      // can't reach it. Build a one-off service_role client.
+      const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      if (!url || !serviceKey) throw new Error("query_db: supabase config eksik");
+      const { createClient } = await import("@supabase/supabase-js");
+      const svc = createClient(url, serviceKey, {
+        auth: { persistSession: false },
+      });
+      const { data, error } = await svc.rpc("sd_query_readonly", {
+        p_sql: normalized,
+      });
+      if (error) throw new Error(error.message);
+      const rows = Array.isArray(data) ? data : [];
+      return {
+        sql: normalized,
+        row_count: rows.length,
+        rows: rows.slice(0, 100),
+      };
+    }
+
     case "add_quote": {
       const { data, error } = await supabase
         .from("qt_quotes")
@@ -426,6 +521,7 @@ Sana verilen araçları gerektiğinde KULLAN. Soru sorarken araçla doğrula. Ku
 - set_skill_status → marketplace skill yönetimi (publish/archive/draft)
 - get_recent_audit → "son ne yaptım" sorularına
 - add_quote → quotes.skilldrunk.com'a yeni söz ekleme
+- query_db → "son 30g günlük pageview", "en aktif app" gibi ad-hoc SELECT sorgular. Hazır tool'lardan biri yoksa bunu kullan. **Allowlist**: sd_skills, sd_profiles, sd_pageviews, sd_ai_usage, sd_audit_log, az_events, br_briefings, qt_quotes, pt_apps. LIMIT zorunlu (otomatik 100'e cap). Sadece SELECT.
 
 ## Kurallar
 - URL ver: admin.skilldrunk.com/apps, https://skilldrunk.com/arena, vs (absolute)
