@@ -195,9 +195,20 @@ export function AiChat({
 
 function ToolBadge({ trace }: { trace: ToolCallTrace }) {
   const ok = !trace.error;
-  const inputSummary = Object.entries(trace.input)
-    .map(([k, v]) => `${k}=${typeof v === "string" ? v : JSON.stringify(v)}`)
-    .join(" ");
+  const isQueryDb = trace.name === "query_db";
+  const inputSummary = isQueryDb
+    ? ""
+    : Object.entries(trace.input)
+        .map(([k, v]) => `${k}=${typeof v === "string" ? v : JSON.stringify(v)}`)
+        .join(" ");
+  const queryResult =
+    isQueryDb && ok
+      ? (trace.result as {
+          sql?: string;
+          row_count?: number;
+          rows?: Array<Record<string, unknown>>;
+        } | null)
+      : null;
   return (
     <div
       className={`rounded-md border px-2.5 py-1.5 font-mono text-[11px] ${
@@ -206,12 +217,69 @@ function ToolBadge({ trace }: { trace: ToolCallTrace }) {
           : "border-red-900 bg-red-500/5 text-red-300"
       }`}
     >
-      <span className="opacity-70">🔧 {trace.name}</span>
-      {inputSummary && <span className="opacity-60"> ({inputSummary})</span>}
-      <span className="opacity-50">
-        {" → "}
-        {ok ? "ok" : `error: ${trace.error}`}
-      </span>
+      <div>
+        <span className="opacity-70">🔧 {trace.name}</span>
+        {inputSummary && <span className="opacity-60"> ({inputSummary})</span>}
+        <span className="opacity-50">
+          {" → "}
+          {ok
+            ? isQueryDb && queryResult
+              ? `${queryResult.row_count ?? 0} satır`
+              : "ok"
+            : `error: ${trace.error}`}
+        </span>
+      </div>
+      {isQueryDb && queryResult?.sql && (
+        <details className="mt-1 cursor-pointer">
+          <summary className="opacity-60 text-[10.5px] select-none">
+            SQL + sonuç
+          </summary>
+          <pre className="mt-1 whitespace-pre-wrap break-all opacity-80 text-[10.5px] leading-relaxed">
+            {queryResult.sql}
+          </pre>
+          {queryResult.rows && queryResult.rows.length > 0 && (
+            <div className="mt-2 overflow-x-auto">
+              <table className="w-full text-[10.5px]">
+                <thead className="opacity-60">
+                  <tr>
+                    {Object.keys(queryResult.rows[0]).map((k) => (
+                      <th
+                        key={k}
+                        className="border-b border-emerald-900/50 px-1.5 py-1 text-left font-normal"
+                      >
+                        {k}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {queryResult.rows.slice(0, 10).map((row, i) => (
+                    <tr key={i}>
+                      {Object.values(row).map((v, j) => (
+                        <td
+                          key={j}
+                          className="border-b border-emerald-900/20 px-1.5 py-0.5"
+                        >
+                          {v === null
+                            ? "∅"
+                            : typeof v === "object"
+                              ? JSON.stringify(v)
+                              : String(v)}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {queryResult.rows.length > 10 && (
+                <div className="mt-1 opacity-50 text-[10px]">
+                  +{queryResult.rows.length - 10} satır daha…
+                </div>
+              )}
+            </div>
+          )}
+        </details>
+      )}
     </div>
   );
 }
