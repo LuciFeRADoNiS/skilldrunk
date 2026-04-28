@@ -120,3 +120,42 @@ Eğer yeni bir **pattern** (reusable nasıl-yapılır) veya **kritik karar** olu
 ## Turkish UI, English code
 
 UI metinleri Türkçe (kullanıcı için). Değişken/fonksiyon isimleri ve commit mesajları İngilizce. Schema isimleri İngilizce. Yorumlar genelde Türkçe ama teknik detaylar İngilizce ok.
+
+
+## Sınır — Cowork tarafının alanı (DOKUNMA)
+
+Skilldrunk monorepo dışında kalan ve **Cowork (Claude desktop, başka session)** tarafından yönetilen sistemler bu repo'nun sorumluluğu DEĞİL — referans için okuyabilirsin ama müdahale etme:
+
+| Sistem | Konum | Kim yönetir |
+|---|---|---|
+| LesTaT Inc. core 5 bot (Atlas/Hephaestus/Mnemosyne/Hermes/Apollo) | Hetzner VPS Python (`/opt/*-bot/`, `/root/.openclaw/`) | Cowork |
+| Obsidian `Sistemler/LesTaT-Inc/` klasörü (bot organizasyonu, VERSION, KULLANIM-KILAVUZU vb.) | Mac local vault | Cowork |
+| `lestat-inc-agents` repo + agents.skilldrunk.com (LuciFeRADoNiS/lestat-inc-agents) | GitHub + Vercel | Cowork |
+| Cowork scheduled tasks (`~/Documents/Claude/Scheduled/`) | Mac local | Cowork |
+| VPS cron + maintenance script (`/root/openclaw-maintenance.sh`) | Hetzner | Cowork |
+
+**Skilldrunk repo'da dokunabileceğin alan:** `apps/*`, `packages/*`, `src/*`, `supabase/migrations/`, `vercel.json`, root config'ler. Bu repo'nun standart kapsamı.
+
+**Skilldrunk botu** (`@skilldrunk_bot`, `apps/admin/src/app/api/telegram/webhook/`) — bu repo'nun parçası, Claude Code geliştirir. Cowork tarafı sadece dokümante eder (Calliope kodadıyla, tier: brand-side).
+
+## ŞU AN — Sprint Snapshot
+
+> Repo'yu açar açmaz buradan başla. "Nerede kalmıştık?" sorusunun cevabı.
+
+**Son güncelleme:** 2026-04-28 (her PR/sprint sonrası bu bölümü güncelle)
+
+**Son ship'ler (kronolojik, en yeni üstte — detay: `Personal Brain/Projects/Skilldrunk/build-log.md`):**
+- PR #24 — fix(telegram): await handleCommand (Vercel serverless terminates after response)
+- PR #23 — feat(telegram): interactive bot commands `/brief` `/quote` `/ask` `/stats` `/help`
+- PR #22 — chore: trigger redeploy for TELEGRAM_BOT_TOKEN + CHAT_ID env
+- PR #21 — feat: AI Usage Counter (`sd_ai_usage` + `/admin/usage` page)
+
+**Aktif:** Telegram bot canlı (`@skilldrunk_bot`), webhook OK, brief üretiyor. Skilldrunk ekosistemi `pt_apps`'ta 9 subdomain catalog'lu.
+
+**Sıradaki olası:** (Claude Code'un karar vereceği — son commit + Obsidian build-log + bu kullanıcı oturumundaki istekler)
+
+**Blockers:** yok (gözlemlenmiş).
+
+**Bağlantılı LesTaT Inc. ekosistemi:** Cowork tarafı 5 VPS Python botunu yönetiyor (Atlas/Hephaestus/Mnemosyne/Hermes/Apollo). Skilldrunk botu Calliope olarak kataloglanmış (Obsidian `Sistemler/LesTaT-Inc/02-Bots/Calliope.md`). Çakışma yok, ortak Supabase project (`vrgohatarieeguyyhfan`).
+
+**Disiplin:** Her ship sonrası **ŞU AN bölümünü güncelle** (yukarıdaki "ZORUNLU 3 dokümantasyon noktası"na ek).
