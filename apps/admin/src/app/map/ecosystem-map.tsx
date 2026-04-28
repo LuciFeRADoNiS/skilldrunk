@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Background,
   BackgroundVariant,
@@ -10,6 +10,8 @@ import {
   Position,
   ReactFlow,
   ReactFlowProvider,
+  useEdgesState,
+  useNodesState,
   type Edge,
   type Node,
   type NodeProps,
@@ -17,6 +19,7 @@ import {
 import "@xyflow/react/dist/style.css";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { applyDagreLayout, LAYER_2 } from "./_layout-helpers";
 
 export type MapApp = {
   slug: string;
@@ -90,10 +93,34 @@ type AppNodeData = {
   category: string;
   pageviews?: number;
   selected?: boolean;
+  /** Layer-2 sub-route node (e.g. marketplace./feed). */
+  child?: { parentSlug: string; label: string; path: string };
 };
 
 function AppNode({ data, selected }: NodeProps<Node<AppNodeData>>) {
   const palette = CAT_PALETTE[data.category] ?? CAT_PALETTE.experiment;
+
+  // Compact rendering for Layer-2 child nodes.
+  if (data.child) {
+    const ringChild = selected
+      ? "ring-2 ring-orange-400 ring-offset-2 ring-offset-neutral-950"
+      : "";
+    return (
+      <div
+        className={`rounded-lg border ${palette.border} bg-neutral-950/70 px-2.5 py-1.5 backdrop-blur-sm hover:shadow-md ${ringChild}`}
+        style={{ minWidth: 130 }}
+      >
+        <Handle type="target" position={Position.Top} className="!bg-neutral-700" />
+        <Handle type="source" position={Position.Bottom} className="!bg-neutral-700" />
+        <span className={`text-[11px] font-medium ${palette.text}`}>
+          {data.child.label}
+        </span>
+        <p className="font-mono text-[9.5px] text-neutral-500">
+          {data.child.path}
+        </p>
+      </div>
+    );
+  }
 
   const label =
     data.app?.title ??
@@ -182,6 +209,9 @@ const LAYOUT: Record<string, { x: number; y: number }> = {
   sub: { x: 340, y: 280 },
   bday: { x: -340, y: 280 },
 
+  // Cowork-managed showcase
+  agents: { x: 0, y: 320 },
+
   // Experiment
   "movetech-worth": { x: 0, y: 480 },
   site: { x: 200, y: 480 },
@@ -259,8 +289,9 @@ export function EcosystemMap({
   stats: MapStat;
 }) {
   const [selected, setSelected] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
-  const { nodes, edges } = useMemo(() => {
+  const { initialNodes, initialEdges } = useMemo(() => {
     const appNodes: Node<AppNodeData>[] = apps
       .filter((a) => LAYOUT[a.slug])
       .map((a) => ({
@@ -367,8 +398,77 @@ export function EcosystemMap({
       labelBgBorderRadius: 3,
     }));
 
-    return { nodes: allNodes, edges: allEdges };
+    return { initialNodes: allNodes, initialEdges: allEdges };
   }, [apps, stats]);
+
+  // ── Mutable node/edge state — supports drag, expand, auto-layout ──
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node<AppNodeData>>(
+    initialNodes,
+  );
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>(initialEdges);
+
+  // Re-sync when source data changes (RSC re-render). We intentionally drop
+  // any prior expand state — easier than reconciling, and apps rarely change
+  // mid-session.
+  useEffect(() => {
+    setNodes(initialNodes);
+    setEdges(initialEdges);
+    setExpanded(new Set());
+  }, [initialNodes, initialEdges, setNodes, setEdges]);
+
+  const handleAutoLayout = useCallback(() => {
+    setNodes((cur) => applyDagreLayout(cur, edges, "LR") as Node<AppNodeData>[]);
+  }, [edges, setNodes]);
+
+  // Layer-2 expand: double-click a parent that has children defined to toggle
+  // them in/out. Children are positioned relative to the parent at click time.
+  const handleNodeDoubleClick = useCallback(
+    (_e: unknown, node: Node) => {
+      const children = LAYER_2[node.id];
+      if (!children) return;
+      setExpanded((prev) => {
+        const next = new Set(prev);
+        if (next.has(node.id)) {
+          next.delete(node.id);
+          setNodes((cur) =>
+            cur.filter((n) => !n.id.startsWith(`${node.id}.`)),
+          );
+          setEdges((cur) =>
+            cur.filter((e) => !String(e.id).startsWith(`l2-${node.id}-`)),
+          );
+        } else {
+          next.add(node.id);
+          const px = node.position.x;
+          const py = node.position.y;
+          const childNodes: Node<AppNodeData>[] = children.map((c, i) => ({
+            id: c.slug,
+            type: "app",
+            position: {
+              x: px - 80 + (i % 3) * 160,
+              y: py + 140 + Math.floor(i / 3) * 90,
+            },
+            data: {
+              category:
+                (initialNodes.find((n) => n.id === node.id)?.data
+                  .category as string) ?? "experiment",
+              child: { parentSlug: node.id, label: c.label, path: c.path },
+            },
+          }));
+          const childEdges: Edge[] = children.map((c) => ({
+            id: `l2-${node.id}-${c.slug}`,
+            source: node.id,
+            target: c.slug,
+            style: { stroke: "#404040", strokeDasharray: "2 3" },
+            animated: false,
+          }));
+          setNodes((cur) => [...cur, ...childNodes]);
+          setEdges((cur) => [...cur, ...childEdges]);
+        }
+        return next;
+      });
+    },
+    [initialNodes, setNodes, setEdges],
+  );
 
   const selectedApp = useMemo(() => {
     if (!selected) return null;
@@ -376,6 +476,9 @@ export function EcosystemMap({
   }, [apps, selected]);
 
   const onNodeClick = useCallback((_e: unknown, node: Node) => {
+    // Don't open drawer for child nodes — they're informational only.
+    const data = node.data as AppNodeData;
+    if (data?.child) return;
     setSelected(node.id);
   }, []);
 
@@ -386,7 +489,10 @@ export function EcosystemMap({
           nodes={nodes}
           edges={edges}
           nodeTypes={nodeTypes}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
           onNodeClick={onNodeClick}
+          onNodeDoubleClick={handleNodeDoubleClick}
           fitView
           fitViewOptions={{ padding: 0.2 }}
           colorMode="dark"
@@ -416,6 +522,24 @@ export function EcosystemMap({
             maskColor="rgba(0,0,0,0.7)"
           />
         </ReactFlow>
+
+        {/* Toolbar */}
+        <div className="absolute left-4 top-4 z-10 flex gap-2 text-[11px]">
+          <button
+            type="button"
+            onClick={handleAutoLayout}
+            className="rounded-md border border-neutral-800 bg-neutral-950/90 px-2.5 py-1 text-neutral-300 backdrop-blur hover:bg-neutral-900"
+            title="Dagre auto-layout — drag sonrası overlap'i düzeltir"
+          >
+            Auto layout (LR)
+          </button>
+          <span
+            className="rounded-md border border-neutral-800 bg-neutral-950/70 px-2.5 py-1 text-[10px] text-neutral-500 backdrop-blur"
+            title="Layer-2 alt-sayfaları aç/kapa"
+          >
+            Çift tıkla → alt sayfalar
+          </span>
+        </div>
 
         {/* Legend */}
         <div className="pointer-events-none absolute right-4 top-4 z-10 rounded-lg border border-neutral-800 bg-neutral-950/90 p-3 text-[10px] backdrop-blur">
