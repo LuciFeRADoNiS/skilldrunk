@@ -37,10 +37,15 @@ Claude Haiku tool use ile gerçek aksiyonlar yapabiliyor:
 Multi-turn loop (max 6 turn), tool result'lar UI'da yeşil/kırmızı badge ile gösterilir (transparency).
 
 **Schema prefixleri** (tek Supabase DB: `vrgohatarieeguyyhfan`):
-- `sd_*` marketplace (skills, votes, arena, notifications, audit, pageviews, ...)
+- `sd_*` marketplace (skills, votes, arena, notifications, audit, pageviews, **ai_usage**)
 - `az_*` analiz (events)
 - `br_*` brief (briefings)
+- `qt_*` quotes (qt_quotes — Haiku-enriched)
 - `pt_*` prototip/apps catalog (apps)
+
+**Telegram bot @skilldrunk_bot**: webhook `apps/admin/src/app/api/telegram/webhook/route.ts`. Komutlar: `/brief /quote /ask /stats /help`. `/ask` → `runAskAssistantCore({ allowWrites: false })`. Whitelist: `secret_token` header + `chat_id === TELEGRAM_CHAT_ID`. Cron pushes: günlük 07:00, haftalık Pazar 22:00.
+
+**AI usage tracking** (`packages/llm`): tek `callClaude(opts)` wrapper, her çağrıda `sd_ai_usage` insert (fire-and-forget). Pricing tablosu (haiku-4-5: $1/$5, sonnet-4-5: $3/$15, opus-4-5: $15/$75 per 1M tokens). `app` field: `'brief' | 'quotes' | 'admin-ai' | 'marketplace-find'`. Panel: `admin.skilldrunk.com/usage`.
 
 **Auth**: `admin.skilldrunk.com/login` email+password (ozgurgur@gmail.com/admin role) + `.skilldrunk.com` cookie → tüm private subdomainler. Marketplace ayrıca Google OAuth (community role=user).
 
@@ -101,6 +106,18 @@ Eğer yeni bir **pattern** (reusable nasıl-yapılır) veya **kritik karar** olu
 - Yeni schema prefix? → ekosistem özetine ekle
 - Breaking change, bilinen tuzak? → üst kısımlara uyarı olarak ekle
 
+## ⚠️ Kritik tuzaklar
+
+### Vercel serverless `await` zorunlu
+POST handler'larda response döndüğünde Vercel runtime async işi terminate eder. **Fire-and-forget yapma** — `void handleSomething()` yerine `await handleSomething()`. Telegram webhook'ta bu yüzden bot cevap vermiyordu (PR #24 fix).
+
+### Codex sınırı (ÖNEMLİ)
+OpenAI Codex `~/Documents/skimsoulfat-app/` ve `*.skimsoulfat.com` domain'leriyle çalışıyor. **Skilldrunk repo'suna, Vercel projelerine veya `*.skilldrunk.com` domain'lerine dokunmamalı.** Eğer codex skimsoulfat domain'ini yanlışlıkla skilldrunk Vercel projesine bağlarsa:
+```bash
+TOKEN=$(cat ~/Library/Application\ Support/com.vercel.cli/auth.json | python3 -c "import sys,json; print(json.load(sys.stdin)['token'])")
+curl -X DELETE "https://api.vercel.com/v9/projects/<wrong-project>/domains/<domain>?teamId=team_FIWBic9LwfGzRkAT5QfXkZtA" -H "Authorization: Bearer $TOKEN"
+```
+
 ## Deployment
 
 **GitHub push-to-deploy bağlı (4 proje + prototip + quotes-skilldrunk)**.
@@ -145,9 +162,11 @@ Skilldrunk monorepo dışında kalan ve **Cowork (Claude desktop, başka session
 **Son güncelleme:** 2026-04-28 (her PR/sprint sonrası bu bölümü güncelle)
 
 **Son ship'ler (kronolojik, en yeni üstte — detay: `Personal Brain/Projects/Skilldrunk/build-log.md`):**
+- PR #27 — feat(map): dagre auto-layout + Layer 2 expand + public prototip/map
+- PR #26 — feat(ai): query_db tool — read-only ad-hoc SQL for admin assistant (migration 0010, RPC sd_query_readonly)
+- PR #25 — docs(agents): Cowork sınırı + ŞU AN sprint snapshot
 - PR #24 — fix(telegram): await handleCommand (Vercel serverless terminates after response)
 - PR #23 — feat(telegram): interactive bot commands `/brief` `/quote` `/ask` `/stats` `/help`
-- PR #22 — chore: trigger redeploy for TELEGRAM_BOT_TOKEN + CHAT_ID env
 - PR #21 — feat: AI Usage Counter (`sd_ai_usage` + `/admin/usage` page)
 
 **Aktif:** Telegram bot canlı (`@skilldrunk_bot`), webhook OK, brief üretiyor. Skilldrunk ekosistemi `pt_apps`'ta 9 subdomain catalog'lu.
