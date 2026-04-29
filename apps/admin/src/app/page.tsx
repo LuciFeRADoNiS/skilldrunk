@@ -26,44 +26,14 @@ type Notification = {
 
 type PageviewDay = { day: string; count: number };
 
-const APPS = [
-  {
-    name: "Marketplace",
-    url: "https://skilldrunk.com",
-    description: "Public community — Claude skills, MCP, GPTs",
-    status: "live",
-  },
-  {
-    name: "Analiz",
-    url: "https://analiz.skilldrunk.com",
-    description: "Kişisel event log, dashboard",
-    status: "live",
-  },
-  {
-    name: "Admin",
-    url: "https://admin.skilldrunk.com",
-    description: "Bu panel",
-    status: "live",
-  },
-  {
-    name: "Brief",
-    url: "https://brief.skilldrunk.com",
-    description: "Briefings modülü",
-    status: "planned",
-  },
-  {
-    name: "Sub",
-    url: "https://sub.skilldrunk.com",
-    description: "AI subscription tracker",
-    status: "planned",
-  },
-  {
-    name: "Bday",
-    url: "https://bday.skilldrunk.com",
-    description: "Birthday reminders",
-    status: "planned",
-  },
-];
+type AppRow = {
+  slug: string;
+  title: string;
+  tagline: string | null;
+  url: string;
+  status: string;
+  tags: string[] | null;
+};
 
 const KIND_ICONS: Record<string, string> = {
   new_user: "👤",
@@ -88,7 +58,7 @@ export default async function AdminDashboard() {
 
   // Parallel queries
   const since7d = new Date(Date.now() - 7 * 86400_000).toISOString();
-  const [statsRes, notifRes, pvRes, unreadRes] = await Promise.all([
+  const [statsRes, notifRes, pvRes, unreadRes, appsRes] = await Promise.all([
     supabase.rpc("sd_admin_stats"),
     supabase
       .from("sd_notifications")
@@ -104,11 +74,19 @@ export default async function AdminDashboard() {
       .from("sd_notifications")
       .select("id", { count: "exact", head: true })
       .eq("read", false),
+    supabase
+      .from("pt_apps")
+      .select("slug, title, tagline, url, status, tags")
+      .neq("status", "archived")
+      .or("subdomain.not.is.null,slug.eq.marketplace")
+      .order("title", { ascending: true })
+      .returns<AppRow[]>(),
   ]);
 
   const stats = (statsRes.data as EcosystemStats) ?? ({} as EcosystemStats);
   const notifications = notifRes.data ?? [];
   const unreadCount = unreadRes.count ?? 0;
+  const apps = appsRes.data ?? [];
 
   // Build 7-day pageview breakdown from raw rows
   const pageviews: PageviewDay[] = [];
@@ -255,44 +233,60 @@ export default async function AdminDashboard() {
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-400">
             Apps
           </h2>
-          <div className="space-y-2">
-            {APPS.map((app) => (
-              <a
-                key={app.name}
-                href={app.url}
-                target="_blank"
-                rel="noreferrer"
-                className={`group flex items-center justify-between rounded-lg border px-4 py-2.5 transition ${
-                  app.status === "live"
-                    ? "border-neutral-800 bg-neutral-950 hover:border-orange-900 hover:bg-neutral-900"
-                    : "border-dashed border-neutral-900 bg-transparent opacity-60"
-                }`}
-              >
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold">{app.name}</span>
-                    {app.status === "live" ? (
-                      <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-mono text-emerald-400">
-                        LIVE
-                      </span>
-                    ) : (
-                      <span className="rounded-full bg-neutral-800 px-2 py-0.5 text-[10px] font-mono text-neutral-500">
-                        SOON
+          {apps.length === 0 ? (
+            <div className="rounded-lg border border-dashed border-neutral-900 p-8 text-center text-sm text-neutral-500">
+              pt_apps tablosu boş — /apps'tan ekle.
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {apps.map((app) => {
+                const isLive = app.status === "live";
+                const isCowork = (app.tags ?? []).includes("cowork-managed");
+                return (
+                  <a
+                    key={app.slug}
+                    href={app.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={`group flex items-center justify-between rounded-lg border px-4 py-2.5 transition ${
+                      isLive
+                        ? "border-neutral-800 bg-neutral-950 hover:border-orange-900 hover:bg-neutral-900"
+                        : "border-dashed border-neutral-900 bg-transparent opacity-60"
+                    }`}
+                  >
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold">{app.title}</span>
+                        {isLive ? (
+                          <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-mono uppercase text-emerald-400">
+                            live
+                          </span>
+                        ) : (
+                          <span className="rounded-full bg-neutral-800 px-2 py-0.5 text-[10px] font-mono uppercase text-neutral-500">
+                            {app.status}
+                          </span>
+                        )}
+                        {isCowork && (
+                          <span
+                            title="Cowork-managed"
+                            className="inline-block h-1.5 w-1.5 rounded-full bg-amber-400/80"
+                          />
+                        )}
+                      </div>
+                      <p className="truncate font-mono text-[10px] text-neutral-600">
+                        {app.url.replace("https://", "")}
+                      </p>
+                    </div>
+                    {isLive && (
+                      <span className="text-neutral-600 transition group-hover:text-orange-400">
+                        →
                       </span>
                     )}
-                  </div>
-                  <p className="truncate font-mono text-[10px] text-neutral-600">
-                    {app.url.replace("https://", "")}
-                  </p>
-                </div>
-                {app.status === "live" && (
-                  <span className="text-neutral-600 transition group-hover:text-orange-400">
-                    →
-                  </span>
-                )}
-              </a>
-            ))}
-          </div>
+                  </a>
+                );
+              })}
+            </div>
+          )}
         </section>
       </div>
 
