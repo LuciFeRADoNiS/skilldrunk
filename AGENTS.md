@@ -159,9 +159,10 @@ Skilldrunk monorepo dışında kalan ve **Cowork (Claude desktop, başka session
 
 > Repo'yu açar açmaz buradan başla. "Nerede kalmıştık?" sorusunun cevabı.
 
-**Son güncelleme:** 2026-04-28 (her PR/sprint sonrası bu bölümü güncelle)
+**Son güncelleme:** 2026-04-29 (her PR/sprint sonrası bu bölümü güncelle)
 
 **Son ship'ler (kronolojik, en yeni üstte — detay: `Personal Brain/Projects/Skilldrunk/build-log.md`):**
+- PR #29 — feat(admin+agents): pt_apps tabanlı dinamik subdomain nav + agents.skilldrunk.com v2 fork (7 yeni infografik, Calliope 6. bot, state schema v2 spec) — **commit edilmedi, kullanıcı/Cowork push'a bekliyor**
 - PR #27 — feat(map): dagre auto-layout + Layer 2 expand + public prototip/map
 - PR #26 — feat(ai): query_db tool — read-only ad-hoc SQL for admin assistant (migration 0010, RPC sd_query_readonly)
 - PR #25 — docs(agents): Cowork sınırı + ŞU AN sprint snapshot
@@ -169,12 +170,14 @@ Skilldrunk monorepo dışında kalan ve **Cowork (Claude desktop, başka session
 - PR #23 — feat(telegram): interactive bot commands `/brief` `/quote` `/ask` `/stats` `/help`
 - PR #21 — feat: AI Usage Counter (`sd_ai_usage` + `/admin/usage` page)
 
-**Aktif:** Telegram bot canlı (`@skilldrunk_bot`), webhook OK, brief üretiyor. Skilldrunk ekosistemi `pt_apps`'ta 9 subdomain catalog'lu.
+**Aktif:** Telegram bot canlı (`@skilldrunk_bot`), webhook OK, brief üretiyor. Skilldrunk ekosistemi `pt_apps`'ta 10 subdomain catalog'lu (agents dahil, prototip de eklendi). Admin nav 2 katmanlı: iç route'lar + dinamik ekosistem chip'leri.
+
+**Cowork sınırı esnetildi (bu sprintte):** `~/Desktop/lestat-inc-agents/` repo'sunda biz fork edip `index.html` v2 + `STATE-SCHEMA-V2.md` + `state.json` v2 yazdık. Push hâlâ Cowork/kullanıcının elinde — Cowork session onaylar, push eder. Standart kural geri devreye girer: agents repo Cowork yönetir.
 
 **Sıradaki olası:** (Claude Code'un karar vereceği — son commit + Obsidian build-log + bu kullanıcı oturumundaki istekler)
 
 **Blockers:** yok (gözlemlenmiş).
 
-**Bağlantılı LesTaT Inc. ekosistemi:** Cowork tarafı 5 VPS Python botunu yönetiyor (Atlas/Hephaestus/Mnemosyne/Hermes/Apollo). Skilldrunk botu Calliope olarak kataloglanmış (Obsidian `Sistemler/LesTaT-Inc/02-Bots/Calliope.md`). Çakışma yok, ortak Supabase project (`vrgohatarieeguyyhfan`).
+**Bağlantılı LesTaT Inc. ekosistemi:** Cowork tarafı 5 VPS Python botunu yönetiyor (Atlas/Hephaestus/Mnemosyne/Hermes/Apollo). Skilldrunk botu Calliope olarak kataloglanmış (Obsidian `Sistemler/LesTaT-Inc/02-Bots/Calliope.md`) ve agents v2 showcase'inde 6. bot olarak yer alıyor. Çakışma yok, ortak Supabase project (`vrgohatarieeguyyhfan`).
 
 **Disiplin:** Her ship sonrası **ŞU AN bölümünü güncelle** (yukarıdaki "ZORUNLU 3 dokümantasyon noktası"na ek).
