@@ -10,15 +10,42 @@ export default async function SettingsPage() {
   return (
     <>
       <AdminNav userLabel={profile?.username ?? user.email ?? undefined} />
-      <main className="mx-auto max-w-3xl px-6 py-10">
-        <h1 className="text-2xl font-semibold tracking-tight mb-2">Settings</h1>
-        <p className="text-sm text-neutral-500 mb-8">
-          {user.email} · {profile?.role ?? "—"}
-        </p>
+      <main className="mx-auto max-w-3xl px-6 py-8">
+        <div
+          style={{
+            display: "flex",
+            alignItems: "baseline",
+            gap: 12,
+            marginBottom: 20,
+          }}
+        >
+          <h1 className="sd-h1">Settings</h1>
+          <span
+            className="sd-mono"
+            style={{ fontSize: 12, color: "var(--sd-text-3)" }}
+          >
+            {user.email} · {profile?.role ?? "—"}
+          </span>
+        </div>
 
-        <section className="border border-neutral-800 rounded-lg p-6 bg-neutral-900/30">
-          <h2 className="text-lg font-semibold mb-1">Şifre Değiştir</h2>
-          <p className="text-sm text-neutral-500 mb-5">
+        <section
+          style={{
+            background: "var(--sd-surface)",
+            border: "1px solid var(--sd-border)",
+            borderRadius: "var(--sd-r-lg)",
+            padding: "20px 24px",
+          }}
+        >
+          <h2 className="sd-h2" style={{ marginBottom: 4 }}>
+            Şifre Değiştir
+          </h2>
+          <p
+            style={{
+              fontSize: 13,
+              color: "var(--sd-text-3)",
+              marginBottom: 18,
+            }}
+          >
             Yeni şifre sadece bu hesap için değişir. En az 8 karakter.
           </p>
           <PasswordForm />

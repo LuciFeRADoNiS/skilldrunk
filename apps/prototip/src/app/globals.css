@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "@skilldrunk/sd-ui/tokens.css";
 @plugin "@tailwindcss/typography";
 
 :root {

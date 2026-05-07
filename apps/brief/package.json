@@ -18,6 +18,7 @@
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
     "@skilldrunk/analytics": "workspace:*",
+    "@skilldrunk/sd-ui": "workspace:*",
     "@skilldrunk/llm": "workspace:*"
   },
   "devDependencies": {

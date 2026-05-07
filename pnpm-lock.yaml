@@ -178,6 +178,9 @@ importers:
       '@skilldrunk/analytics':
         specifier: workspace:*
         version: link:../../packages/analytics
+      '@skilldrunk/sd-ui':
+        specifier: workspace:*
+        version: link:../../packages/sd-ui
       '@skilldrunk/supabase':
         specifier: workspace:*
         version: link:../../packages/supabase
@@ -227,6 +230,9 @@ importers:
       '@skilldrunk/llm':
         specifier: workspace:*
         version: link:../../packages/llm
+      '@skilldrunk/sd-ui':
+        specifier: workspace:*
+        version: link:../../packages/sd-ui
       '@skilldrunk/supabase':
         specifier: workspace:*
         version: link:../../packages/supabase
@@ -282,6 +288,9 @@ importers:
       '@skilldrunk/analytics':
         specifier: workspace:*
         version: link:../../packages/analytics
+      '@skilldrunk/sd-ui':
+        specifier: workspace:*
+        version: link:../../packages/sd-ui
       '@skilldrunk/supabase':
         specifier: workspace:*
         version: link:../../packages/supabase
@@ -349,6 +358,9 @@ importers:
       '@skilldrunk/llm':
         specifier: workspace:*
         version: link:../../packages/llm
+      '@skilldrunk/sd-ui':
+        specifier: workspace:*
+        version: link:../../packages/sd-ui
       '@skilldrunk/supabase':
         specifier: workspace:*
         version: link:../../packages/supabase
