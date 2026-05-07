@@ -14,6 +14,7 @@ const NAV = [
   { href: "/reports", label: "Reports" },
   { href: "/notifications", label: "Notifications" },
   { href: "/audit", label: "Audit" },
+  { href: "/settings", label: "Settings" },
 ];
 
 type SubdomainRow = {
