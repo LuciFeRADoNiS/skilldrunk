@@ -111,6 +111,9 @@ importers:
       '@skilldrunk/llm':
         specifier: workspace:*
         version: link:../../packages/llm
+      '@skilldrunk/sd-ui':
+        specifier: workspace:*
+        version: link:../../packages/sd-ui
       '@skilldrunk/supabase':
         specifier: workspace:*
         version: link:../../packages/supabase
@@ -389,6 +392,9 @@ importers:
       '@skilldrunk/analytics':
         specifier: workspace:*
         version: link:../../packages/analytics
+      '@skilldrunk/sd-ui':
+        specifier: workspace:*
+        version: link:../../packages/sd-ui
       '@skilldrunk/supabase':
         specifier: workspace:*
         version: link:../../packages/supabase
@@ -473,6 +479,21 @@ importers:
         version: 22.19.17
       typescript:
         specifier: ^5.6.0
+        version: 5.9.3
+
+  packages/sd-ui:
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      next:
+        specifier: 16.2.3
+        version: 16.2.3(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react:
+        specifier: 19.2.4
+        version: 19.2.4
+      typescript:
+        specifier: ^5
         version: 5.9.3
 
   packages/supabase:

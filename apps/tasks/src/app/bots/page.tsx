@@ -1,97 +1,178 @@
 import { requireAdmin } from "@/lib/auth";
 import { getBotHealth } from "@/lib/queries";
 import { Shell } from "@/components/Shell";
+import { Stat, StatGrid, Dot, Badge } from "@skilldrunk/sd-ui";
 
 export const dynamic = "force-dynamic";
 
-const STATUS_DESC: Record<string, string> = {
+const STATUS_DOT: Record<string, "green" | "yellow" | "red" | "gray"> = {
+  green: "green",
+  yellow: "yellow",
+  red: "red",
+  unknown: "gray",
+};
+const STATUS_LABEL: Record<string, string> = {
   green: "Sağlıklı",
   yellow: "Uyarı",
   red: "Kritik",
-  unknown: "Bilinmiyor (henüz veri yok)",
+  unknown: "Bilinmiyor",
 };
 
-const STATUS_COLOR: Record<string, string> = {
-  green: "bg-emerald-500",
-  yellow: "bg-amber-500",
-  red: "bg-rose-500",
-  unknown: "bg-neutral-700",
-};
-
-function formatUptime(s: number | null) {
+function fmtUptime(s: number | null) {
   if (!s) return "—";
   if (s < 3600) return `${Math.floor(s / 60)}dk`;
-  if (s < 86400) return `${Math.floor(s / 3600)}sa ${Math.floor((s % 3600) / 60)}dk`;
+  if (s < 86400)
+    return `${Math.floor(s / 3600)}sa ${Math.floor((s % 3600) / 60)}dk`;
   return `${Math.floor(s / 86400)}g ${Math.floor((s % 86400) / 3600)}sa`;
+}
+
+function fmtRel(iso: string | null) {
+  if (!iso) return "—";
+  const diff = Date.now() - new Date(iso).getTime();
+  const s = Math.floor(diff / 1000);
+  if (s < 60) return `${s}sn önce`;
+  if (s < 3600) return `${Math.floor(s / 60)}dk önce`;
+  if (s < 86400) return `${Math.floor(s / 3600)}sa önce`;
+  return `${Math.floor(s / 86400)}g önce`;
 }
 
 export default async function BotsPage() {
   await requireAdmin("/bots");
   const bots = await getBotHealth();
 
-  return (
-    <Shell>
-      <h1 className="text-2xl font-semibold tracking-tight mb-2">Bot Health</h1>
-      <p className="text-sm text-neutral-500 mb-6">
-        VPS systemd + RAM + uptime. Veri kaynağı: 5dk cron (henüz canlı değil).
-      </p>
+  const counts = {
+    green: bots.filter((b) => b.status === "green").length,
+    yellow: bots.filter((b) => b.status === "yellow").length,
+    red: bots.filter((b) => b.status === "red").length,
+    unknown: bots.filter((b) => b.status === "unknown").length,
+  };
+  const totalRam = bots.reduce((sum, b) => sum + (b.ram_mb ?? 0), 0);
 
-      <div className="grid md:grid-cols-2 gap-4">
-        {bots.map((b) => (
-          <div
-            key={b.bot_name}
-            id={b.bot_name}
-            className="border border-neutral-800 rounded-lg p-5 bg-neutral-900/40"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`w-2 h-2 rounded-full ${
-                      STATUS_COLOR[b.status] ?? STATUS_COLOR.unknown
-                    }`}
+  return (
+    <Shell currentPath="/bots">
+      <div
+        style={{
+          display: "flex",
+          alignItems: "baseline",
+          gap: 12,
+          marginBottom: 16,
+        }}
+      >
+        <h1 className="sd-h1">Bot Health</h1>
+        <span
+          className="sd-mono"
+          style={{ fontSize: 12, color: "var(--sd-text-3)" }}
+        >
+          {bots.length} bot · jax-health-collect 5dk timer
+        </span>
+      </div>
+
+      <div style={{ marginBottom: 16 }}>
+        <StatGrid cols={4}>
+          <Stat label="Sağlıklı" value={counts.green} tone="up" />
+          <Stat label="Uyarı / Kritik" value={counts.yellow + counts.red} />
+          <Stat label="Bilinmiyor" value={counts.unknown} />
+          <Stat label="Toplam RAM" value={`${totalRam} MB`} />
+        </StatGrid>
+      </div>
+
+      <div className="sd-card" style={{ overflow: "hidden" }}>
+        <table className="sd-table">
+          <thead>
+            <tr>
+              <th style={{ width: 32 }}></th>
+              <th>Bot</th>
+              <th>Durum</th>
+              <th style={{ width: 100, textAlign: "right" }}>RAM</th>
+              <th style={{ width: 130, textAlign: "right" }}>Uptime</th>
+              <th style={{ width: 100, textAlign: "right" }}>Restart</th>
+              <th style={{ width: 130 }}>Son görüldü</th>
+            </tr>
+          </thead>
+          <tbody>
+            {bots.map((b) => (
+              <tr key={b.bot_name} id={b.bot_name}>
+                <td>
+                  <Dot
+                    color={STATUS_DOT[b.status] ?? "gray"}
+                    pulse={b.status === "green"}
                   />
-                  <h2 className="text-lg font-semibold capitalize">
-                    {b.bot_name}
-                  </h2>
-                </div>
-                <p className="text-xs text-neutral-500 mt-1">
-                  {STATUS_DESC[b.status] ?? "—"}
-                </p>
-              </div>
-              <span className="text-xs font-mono text-neutral-500">
-                {b.last_seen
-                  ? new Date(b.last_seen).toLocaleString("tr-TR")
-                  : "—"}
-              </span>
-            </div>
-            <dl className="grid grid-cols-3 gap-2 text-xs">
-              <Stat label="RAM" value={b.ram_mb ? `${b.ram_mb} MB` : "—"} />
-              <Stat label="Uptime" value={formatUptime(b.uptime_s)} />
-              <Stat
-                label="Restart"
-                value={b.restart_count != null ? String(b.restart_count) : "—"}
-              />
-            </dl>
-            {b.last_error && (
-              <div className="mt-3 text-xs text-rose-400 font-mono truncate">
-                {b.last_error}
-              </div>
-            )}
-          </div>
-        ))}
+                </td>
+                <td
+                  style={{
+                    fontWeight: 500,
+                    textTransform: "capitalize",
+                  }}
+                >
+                  {b.bot_name}
+                </td>
+                <td>
+                  <Badge
+                    tone={
+                      b.status === "green"
+                        ? "success"
+                        : b.status === "yellow"
+                          ? "warn"
+                          : b.status === "red"
+                            ? "danger"
+                            : "neutral"
+                    }
+                  >
+                    {STATUS_LABEL[b.status] ?? "—"}
+                  </Badge>
+                  {b.last_error && (
+                    <div
+                      style={{
+                        fontSize: 11,
+                        color: "var(--sd-danger)",
+                        marginTop: 2,
+                      }}
+                    >
+                      {b.last_error.slice(0, 60)}
+                    </div>
+                  )}
+                </td>
+                <td
+                  className="sd-mono"
+                  style={{
+                    fontSize: 12,
+                    textAlign: "right",
+                    color: "var(--sd-text-2)",
+                  }}
+                >
+                  {b.ram_mb != null ? `${b.ram_mb} MB` : "—"}
+                </td>
+                <td
+                  className="sd-mono"
+                  style={{
+                    fontSize: 12,
+                    textAlign: "right",
+                    color: "var(--sd-text-2)",
+                  }}
+                >
+                  {fmtUptime(b.uptime_s)}
+                </td>
+                <td
+                  className="sd-mono"
+                  style={{
+                    fontSize: 12,
+                    textAlign: "right",
+                    color: "var(--sd-text-2)",
+                  }}
+                >
+                  {b.restart_count != null ? b.restart_count : "—"}
+                </td>
+                <td
+                  className="sd-mono"
+                  style={{ fontSize: 11, color: "var(--sd-text-3)" }}
+                >
+                  {fmtRel(b.last_seen)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </Shell>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="border border-neutral-800 rounded p-2">
-      <dt className="text-neutral-500 uppercase tracking-wider mb-1">
-        {label}
-      </dt>
-      <dd className="font-mono text-neutral-200">{value}</dd>
-    </div>
   );
 }
