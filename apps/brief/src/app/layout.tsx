@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Tracker } from "@skilldrunk/analytics/tracker";
 import { GA4 } from "@skilldrunk/analytics/ga";
+import { DocsLink } from "@skilldrunk/sd-ui";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -17,6 +18,7 @@ export default function RootLayout({
   return (
     <html lang="tr">
       <body className="min-h-screen bg-neutral-950 text-neutral-100 antialiased">
+        <DocsLink />
         {children}
         <Tracker />
         <GA4 />

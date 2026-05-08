@@ -42,9 +42,21 @@ export async function Shell({
       currentPath={currentPath}
       ecosystem={ecosystem}
       rightSlot={
-        <span style={{ fontSize: 11, color: "var(--sd-text-3)" }}>
-          admin only
-        </span>
+        <>
+          <a
+            href="https://skimsoulfat.com/docs"
+            target="_blank"
+            rel="noreferrer"
+            className="sd-btn"
+            style={{ fontSize: 11 }}
+            title="Kullanım Kılavuzu"
+          >
+            Docs ↗
+          </a>
+          <span style={{ fontSize: 11, color: "var(--sd-text-3)" }}>
+            admin only
+          </span>
+        </>
       }
     >
       {children}

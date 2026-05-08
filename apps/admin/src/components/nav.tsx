@@ -72,6 +72,15 @@ export async function AdminNav({ userLabel }: { userLabel?: string }) {
             </nav>
           </div>
           <div className="flex items-center gap-3 text-xs text-neutral-500">
+            <a
+              href="https://skimsoulfat.com/docs"
+              target="_blank"
+              rel="noreferrer"
+              className="rounded border border-neutral-800 px-2.5 py-1 hover:bg-neutral-900 hover:text-neutral-200"
+              title="Kullanım Kılavuzu (skimsoulfat.com/docs)"
+            >
+              Docs ↗
+            </a>
             {userLabel && <span>{userLabel}</span>}
             <form action={signOut}>
               <button className="rounded border border-neutral-800 px-2.5 py-1 hover:bg-neutral-900">
