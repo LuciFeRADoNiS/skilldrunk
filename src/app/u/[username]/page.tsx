@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createAnonClient } from "@/lib/supabase/anon";
 import { SiteHeader } from "@/components/site-header";
 import { SkillCard } from "@/components/skill-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -25,7 +25,7 @@ export default async function ProfilePage({
   params: Promise<Params>;
 }) {
   const { username } = await params;
-  const supabase = await createClient();
+  const supabase = createAnonClient();
 
   const { data: profile } = await supabase
     .from("sd_profiles")

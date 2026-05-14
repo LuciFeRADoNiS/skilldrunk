@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { createClient } from "@/lib/supabase/server";
+import { createAnonClient } from "@/lib/supabase/anon";
 import { SiteHeader } from "@/components/site-header";
 import { SkillCard } from "@/components/skill-card";
 import type { Skill } from "@/lib/types";
@@ -26,7 +26,7 @@ export default async function TagPage({
   params: Promise<Params>;
 }) {
   const { tag } = await params;
-  const supabase = await createClient();
+  const supabase = createAnonClient();
 
   const { data } = await supabase
     .from("sd_skills")

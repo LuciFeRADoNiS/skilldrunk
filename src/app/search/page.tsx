@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createAnonClient } from "@/lib/supabase/anon";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { SiteHeader } from "@/components/site-header";
 import { SkillCard } from "@/components/skill-card";
@@ -25,7 +25,7 @@ export default async function SearchPage({
   const { q } = await searchParams;
   const query = q?.trim() ?? "";
 
-  const supabase = await createClient();
+  const supabase = createAnonClient();
   let skills: Skill[] = [];
 
   if (query) {
@@ -40,11 +40,8 @@ export default async function SearchPage({
       .limit(50);
     skills = (data ?? []) as Skill[];
 
-    // Log search (fire-and-forget via service_role)
+    // Log search (fire-and-forget via service_role, no user tracking in ISR)
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
       const admin = createAdminClient();
       if (admin) {
         admin
@@ -52,7 +49,7 @@ export default async function SearchPage({
           .insert({
             query,
             results_count: skills.length,
-            user_id: user?.id ?? null,
+            user_id: null,
           })
           .then(() => {});
       }

@@ -1,11 +1,11 @@
 import type { MetadataRoute } from "next";
-import { createClient } from "@/lib/supabase/server";
+import { createAnonClient } from "@/lib/supabase/anon";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600; // regenerate hourly
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = "https://skilldrunk.com";
-  const supabase = await createClient();
+  const supabase = createAnonClient();
 
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [

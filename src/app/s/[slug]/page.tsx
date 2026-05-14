@@ -8,7 +8,7 @@ import { VoteButtons } from "@/components/vote-buttons";
 import { CommentSection } from "@/components/comment-section";
 import { Markdown } from "@/components/markdown";
 import { SiteHeader } from "@/components/site-header";
-import { createClient } from "@/lib/supabase/server";
+import { createAnonClient } from "@/lib/supabase/anon";
 import {
   SKILL_TYPE_COLORS,
   SKILL_TYPE_LABELS,
@@ -22,7 +22,7 @@ export const revalidate = 30;
 type Params = { slug: string };
 
 async function getSkillBySlug(slug: string) {
-  const supabase = await createClient();
+  const supabase = createAnonClient();
   const { data: skill, error } = await supabase
     .from("sd_skills")
     .select("*, author:sd_profiles!sd_skills_author_id_fkey(*)")
@@ -39,7 +39,7 @@ async function getSkillBySlug(slug: string) {
 }
 
 async function getComments(skillId: string) {
-  const supabase = await createClient();
+  const supabase = createAnonClient();
   const { data } = await supabase
     .from("sd_comments")
     .select("*, author:sd_profiles!sd_comments_author_id_fkey(*)")
@@ -50,19 +50,10 @@ async function getComments(skillId: string) {
   return (data ?? []) as Comment[];
 }
 
-async function getMyVote(skillId: string): Promise<-1 | 0 | 1> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return 0;
-  const { data } = await supabase
-    .from("sd_votes")
-    .select("value")
-    .eq("skill_id", skillId)
-    .eq("user_id", user.id)
-    .maybeSingle();
-  return ((data?.value as -1 | 1) ?? 0) as -1 | 0 | 1;
+// Vote status is now determined client-side to avoid cookies() blocking ISR.
+// Always pass 0 (no vote) and let VoteButtons hydrate with real data.
+function getMyVote(_skillId: string): -1 | 0 | 1 {
+  return 0;
 }
 
 export async function generateMetadata({
@@ -95,7 +86,7 @@ export default async function SkillPage({
 
   const [comments, myVote] = await Promise.all([
     getComments(skill.id),
-    getMyVote(skill.id),
+    Promise.resolve(getMyVote(skill.id)),
   ]);
 
   return (

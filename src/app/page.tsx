@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/site-header";
 import { SkillCard } from "@/components/skill-card";
-import { createClient } from "@/lib/supabase/server";
+import { createAnonClient } from "@/lib/supabase/anon";
 import {
   SKILL_TYPE_LABELS,
   SKILL_TYPE_COLORS,
@@ -30,7 +30,7 @@ const SKILL_TYPES: SkillType[] = [
 ];
 
 export default async function HomePage() {
-  const supabase = await createClient();
+  const supabase = createAnonClient();
 
   // Trending skills (top 8)
   const { data: trending } = await supabase

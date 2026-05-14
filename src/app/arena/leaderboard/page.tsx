@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { SiteHeader } from "@/components/site-header";
-import { createClient } from "@/lib/supabase/server";
+import { createAnonClient } from "@/lib/supabase/anon";
 import { SKILL_TYPE_LABELS, type SkillType } from "@/lib/types";
 
 export const revalidate = 30;
@@ -59,7 +59,7 @@ export default async function LeaderboardPage({
 }) {
   const { type } = await searchParams;
   const selectedType = resolveType(type);
-  const supabase = await createClient();
+  const supabase = createAnonClient();
 
   const { data, error } = await supabase
     .from("sd_arena_ratings")

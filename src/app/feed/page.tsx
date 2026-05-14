@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createAnonClient } from "@/lib/supabase/anon";
 import { SiteHeader } from "@/components/site-header";
 import { SkillCard } from "@/components/skill-card";
 import { SKILL_TYPE_LABELS, type Skill, type SkillType } from "@/lib/types";
@@ -20,7 +20,7 @@ export default async function FeedPage({
   searchParams: Promise<SearchParams>;
 }) {
   const { type } = await searchParams;
-  const supabase = await createClient();
+  const supabase = createAnonClient();
 
   let query = supabase
     .from("sd_skills")

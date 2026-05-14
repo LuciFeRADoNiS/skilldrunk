@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createAnonClient } from "@/lib/supabase/anon";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export async function GET() {
-  const supabase = await createClient();
+  const supabase = createAnonClient();
 
   const { data: skills } = await supabase
     .from("sd_skills")
