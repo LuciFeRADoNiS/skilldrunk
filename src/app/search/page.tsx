@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { Skill } from "@/lib/types";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 
 export const metadata: Metadata = {
   title: "Search skills",

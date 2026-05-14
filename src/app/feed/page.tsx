@@ -10,6 +10,8 @@ export const metadata: Metadata = {
   description: "The top AI skills on skilldrunk — voted by the community.",
 };
 
+export const revalidate = 30;
+
 type SearchParams = { type?: string };
 
 export default async function FeedPage({

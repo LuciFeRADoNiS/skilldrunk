@@ -1,7 +1,6 @@
 import { createAnonClient, type Quote } from "@/lib/supabase";
 import { QuoteStage } from "./quote-stage";
 
-export const dynamic = "force-dynamic";
 export const revalidate = 300;
 
 export default async function Home() {

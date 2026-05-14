@@ -4,6 +4,8 @@ import { SiteHeader } from "@/components/site-header";
 import { SkillCard } from "@/components/skill-card";
 import type { Skill } from "@/lib/types";
 
+export const revalidate = 30;
+
 type Params = { tag: string };
 
 export async function generateMetadata({

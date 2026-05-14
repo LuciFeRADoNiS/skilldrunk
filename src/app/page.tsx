@@ -18,7 +18,7 @@ import {
   type SkillType,
 } from "@/lib/types";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 const SKILL_TYPES: SkillType[] = [
   "mcp_server",

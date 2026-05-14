@@ -17,6 +17,8 @@ import {
   type Comment,
 } from "@/lib/types";
 
+export const revalidate = 30;
+
 type Params = { slug: string };
 
 async function getSkillBySlug(slug: string) {

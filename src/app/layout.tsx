@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
-import { Tracker } from "@skilldrunk/analytics/tracker";
+import { TrackerWithAuth } from "@/components/tracker-with-auth";
 import { GA4 } from "@skilldrunk/analytics/ga";
 import { RecoveryHashBridge } from "@/components/recovery-hash-bridge";
-import { createClient } from "@/lib/supabase/server";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -51,16 +50,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
   return (
     <html
       lang="en"
@@ -71,7 +65,7 @@ export default async function RootLayout({
         <RecoveryHashBridge />
         {children}
         <Toaster />
-        <Tracker userId={user?.id} />
+        <TrackerWithAuth />
         <GA4 />
       </body>
     </html>

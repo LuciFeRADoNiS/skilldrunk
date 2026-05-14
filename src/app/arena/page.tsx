@@ -4,7 +4,7 @@ import { getNextPair } from "@/app/actions/arena";
 import type { SkillType } from "@/lib/types";
 import { ArenaClient } from "./arena-client";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 
 export const metadata: Metadata = {
   title: "Arena — skilldrunk",

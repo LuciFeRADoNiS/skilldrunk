@@ -6,6 +6,8 @@ import { SkillCard } from "@/components/skill-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { Profile, Skill } from "@/lib/types";
 
+export const revalidate = 60;
+
 type Params = { username: string };
 
 export async function generateMetadata({

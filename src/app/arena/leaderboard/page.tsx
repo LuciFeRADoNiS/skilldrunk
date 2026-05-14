@@ -14,7 +14,7 @@ import { SiteHeader } from "@/components/site-header";
 import { createClient } from "@/lib/supabase/server";
 import { SKILL_TYPE_LABELS, type SkillType } from "@/lib/types";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 
 export const metadata: Metadata = {
   title: "Arena Leaderboard — skilldrunk",
