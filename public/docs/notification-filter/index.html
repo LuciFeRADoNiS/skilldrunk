@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bildirim Filtresi — Project Specification</title>
+<style>
+:root {
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --bg3: #21262d;
+  --border: #30363d;
+  --text: #c9d1d9;
+  --text-dim: #8b949e;
+  --accent: #58a6ff;
+  --green: #3fb950;
+  --yellow: #d29922;
+  --red: #f85149;
+  --purple: #bc8cff;
+  --orange: #f0883e;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.7; max-width: 900px; margin: 0 auto; padding: 40px 24px; }
+h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+h2 { font-size: 22px; font-weight: 600; color: var(--accent); margin-top: 40px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+h3 { font-size: 16px; font-weight: 600; margin-top: 24px; margin-bottom: 8px; }
+p { margin-bottom: 12px; }
+.subtitle { color: var(--text-dim); font-size: 14px; margin-bottom: 32px; }
+.meta-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 32px; }
+.meta-row { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 6px; }
+.meta-label { color: var(--text-dim); min-width: 120px; font-size: 13px; }
+.meta-value { font-size: 13px; }
+.section-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 24px; margin-bottom: 16px; }
+.option { border-left: 3px solid var(--accent); padding-left: 16px; margin-bottom: 16px; }
+.option-title { font-weight: 600; margin-bottom: 4px; }
+.option-desc { font-size: 14px; color: var(--text-dim); }
+.badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 12px; margin-right: 6px; }
+.badge-mvp { background: rgba(63,185,80,0.15); color: var(--green); }
+.badge-v2 { background: rgba(188,140,255,0.15); color: var(--purple); }
+.badge-v3 { background: rgba(88,166,255,0.15); color: var(--accent); }
+ul { padding-left: 20px; margin-bottom: 12px; }
+li { margin-bottom: 6px; font-size: 14px; }
+code { background: var(--bg3); padding: 2px 6px; border-radius: 4px; font-size: 13px; font-family: 'SF Mono', Monaco, Consolas, monospace; }
+pre { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; margin: 12px 0; font-size: 13px; font-family: 'SF Mono', Monaco, Consolas, monospace; line-height: 1.5; }
+.flow-diagram { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 24px; margin: 16px 0; text-align: center; font-size: 14px; }
+.flow-arrow { color: var(--accent); margin: 0 8px; }
+.priority-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+.priority-table th { text-align: left; font-size: 12px; color: var(--text-dim); padding: 8px; border-bottom: 2px solid var(--border); text-transform: uppercase; }
+.priority-table td { padding: 8px; border-bottom: 1px solid var(--border); font-size: 13px; }
+.category-tag { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 3px; margin-right: 4px; }
+.cat-urgent { background: rgba(248,81,73,0.2); color: var(--red); }
+.cat-important { background: rgba(240,136,62,0.2); color: var(--orange); }
+.cat-wait { background: rgba(210,153,34,0.2); color: var(--yellow); }
+.cat-noise { background: rgba(139,148,158,0.2); color: var(--text-dim); }
+.timestamp { text-align: center; color: var(--text-dim); font-size: 12px; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); }
+@media (max-width: 768px) { body { padding: 16px; } }
+</style>
+</head>
+<body>
+
+<h1>Bildirim Filtresi</h1>
+<p class="subtitle">Notification Filter — Project Specification Document v1.0</p>
+
+<div class="meta-box">
+  <div class="meta-row"><span class="meta-label">Project Code</span><span class="meta-value">NOTIF-FILTER</span></div>
+  <div class="meta-row"><span class="meta-label">Owner</span><span class="meta-value">Özgür GÜR (ozgurgur@gmail.com)</span></div>
+  <div class="meta-row"><span class="meta-label">Status</span><span class="meta-value"><span class="badge badge-mvp">PLANNED — MVP SPEC</span></span></div>
+  <div class="meta-row"><span class="meta-label">Created</span><span class="meta-value">2026-05-15</span></div>
+  <div class="meta-row"><span class="meta-label">Ecosystem</span><span class="meta-value">skimsoulfat.com / Atlas bot / Cowork</span></div>
+  <div class="meta-row"><span class="meta-label">Related</span><span class="meta-value">JaX Notifications (jax_notifications table), Atlas Telegram bot</span></div>
+</div>
+
+<h2>1. Problem Statement</h2>
+<p>Too many notifications from too many apps fragment focus and create constant context-switching. Current state: iOS notifications from ~30+ apps, Mac notifications from ~20 apps, Telegram/WhatsApp/iMessage/Slack/Email all competing for attention simultaneously.</p>
+<p>There is no single filtered channel. The user must manually triage hundreds of daily notifications, missing important ones while being interrupted by noise.</p>
+
+<h2>2. Vision</h2>
+<div class="section-card">
+  <p>All notifications (iOS, Mac, web services) flow through a <strong>central AI filter</strong>. Claude classifies each notification into one of four categories:</p>
+  <table class="priority-table">
+    <thead><tr><th>Category</th><th>Behavior</th><th>Examples</th></tr></thead>
+    <tbody>
+      <tr><td><span class="category-tag cat-urgent">URGENT</span></td><td>Immediate delivery via Telegram push</td><td>Server down alert, meeting in 5min, money transfer, boss DM</td></tr>
+      <tr><td><span class="category-tag cat-important">IMPORTANT</span></td><td>Batched every 2 hours</td><td>PR review request, client email, scheduled event reminder</td></tr>
+      <tr><td><span class="category-tag cat-wait">CAN-WAIT</span></td><td>Daily digest (morning + evening)</td><td>Newsletter, social media mention, app update, shipping notification</td></tr>
+      <tr><td><span class="category-tag cat-noise">NOISE</span></td><td>Logged but never pushed</td><td>Marketing email, game notification, promotional push</td></tr>
+    </tbody>
+  </table>
+  <p>Full history is searchable via skimsoulfat.com dashboard and <code>/bildirim</code> Atlas command.</p>
+</div>
+
+<h2>3. Architecture Options</h2>
+
+<div class="option">
+  <div class="option-title">Option A: iOS App + Mac App (Native)</div>
+  <div class="option-desc">Best UX. iOS Notification Service Extension intercepts push notifications before display. Mac app uses UserNotifications framework. Hardest to build — requires Apple Developer account, Swift expertise, App Store review.</div>
+</div>
+
+<div class="option">
+  <div class="option-title">Option B: iOS Shortcuts + Focus Mode Automation (Quick Win)</div>
+  <div class="option-desc">Leverage existing iOS Shortcuts to forward notifications to a webhook. Limited by Shortcuts capabilities — can't intercept all notification types. Focus Mode profiles for time-based filtering. Good as Phase 0 experiment.</div>
+</div>
+
+<div class="option">
+  <div class="option-title">Option C: Proxy Notification Service (Server-Side) ★ RECOMMENDED FOR MVP</div>
+  <div class="option-desc">Mac AppleScript captures notifications → sends to Supabase → Claude API classifies → important ones forwarded to Telegram via Atlas bot. Cross-platform, leverages existing infrastructure. Can run as Cowork scheduled task.</div>
+</div>
+
+<h2>4. Technical Architecture (MVP — Option C)</h2>
+
+<div class="flow-diagram">
+  <strong>Mac Notifications</strong>
+  <span class="flow-arrow">→</span>
+  <strong>AppleScript Capture</strong>
+  <span class="flow-arrow">→</span>
+  <strong>Supabase (raw_notifications)</strong>
+  <span class="flow-arrow">→</span>
+  <strong>Claude API Classifier</strong>
+  <span class="flow-arrow">→</span>
+  <strong>Atlas Telegram Forward</strong>
+</div>
+
+<h3>4.1 Notification Capture (Mac)</h3>
+<div class="section-card">
+<p>Use macOS Notification Center database + AppleScript to capture notifications. Two approaches:</p>
+<pre>
+-- Approach 1: Read notification center SQLite DB
+-- Location: ~/Library/Group Containers/group.com.apple.usernoted/db2/db
+-- SELECT * FROM record WHERE delivered_date > ?
+
+-- Approach 2: osascript notification listener (Cowork scheduled task)
+-- Poll every 60 seconds, capture new notifications
+-- Store: app_name, title, body, timestamp, bundle_id
+</pre>
+<p>Cowork scheduled task runs every 60 seconds, reads new notifications since last poll, inserts into Supabase.</p>
+</div>
+
+<h3>4.2 Supabase Schema</h3>
+<div class="section-card">
+<pre>
+-- Table: notif_raw (all captured notifications)
+CREATE TABLE notif_raw (
+  id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  source      TEXT NOT NULL,           -- 'mac', 'ios', 'web'
+  app_name    TEXT NOT NULL,           -- 'Mail', 'Slack', 'WhatsApp'
+  bundle_id   TEXT,                    -- 'com.apple.mail'
+  title       TEXT,
+  body        TEXT,
+  captured_at TIMESTAMPTZ DEFAULT now(),
+  classified  BOOLEAN DEFAULT false
+);
+
+-- Table: notif_classified (after AI classification)
+CREATE TABLE notif_classified (
+  id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  raw_id      UUID REFERENCES notif_raw(id),
+  category    TEXT NOT NULL CHECK (category IN ('urgent','important','can_wait','noise')),
+  reason      TEXT,                    -- AI's reasoning
+  forwarded   BOOLEAN DEFAULT false,
+  forwarded_at TIMESTAMPTZ,
+  batch_id    TEXT,                    -- for grouped delivery
+  classified_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Table: notif_rules (user-defined overrides)
+CREATE TABLE notif_rules (
+  id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  app_name    TEXT,
+  bundle_id   TEXT,
+  keyword     TEXT,                    -- title/body contains
+  sender      TEXT,                    -- from specific sender
+  override_to TEXT NOT NULL CHECK (override_to IN ('urgent','important','can_wait','noise','block')),
+  active      BOOLEAN DEFAULT true,
+  created_at  TIMESTAMPTZ DEFAULT now()
+);
+
+-- Index for fast polling
+CREATE INDEX idx_notif_raw_unclassified ON notif_raw(classified, captured_at)
+  WHERE classified = false;
+CREATE INDEX idx_notif_classified_pending ON notif_classified(forwarded, category)
+  WHERE forwarded = false;
+</pre>
+</div>
+
+<h3>4.3 AI Classification</h3>
+<div class="section-card">
+<p>Claude Haiku for speed and cost. Classification prompt:</p>
+<pre>
+System: You are a notification triage assistant for Özgür GÜR, CTO.
+Classify each notification into exactly one category:
+- urgent: requires immediate action (server alerts, meeting in <15min,
+  direct messages from key people, financial transactions)
+- important: should be seen within 2 hours (work emails, PR reviews,
+  calendar events, client messages)
+- can_wait: daily digest material (newsletters, social media, shipping,
+  app updates, non-urgent group messages)
+- noise: log only (marketing, promotions, games, spam)
+
+Context: User works at EGV Group (ENCO, MoveTech). Key contacts include
+team leads and board members. High priority apps: Telegram, Slack, Mail,
+Calendar. Low priority: social media, marketing.
+
+User rules (override AI judgment):
+{user_rules_from_notif_rules_table}
+
+Respond with JSON: {"category": "...", "reason": "..."}
+</pre>
+<p>Estimated cost: ~$0.01-0.02/day (Haiku, ~200 notifications × ~100 tokens each).</p>
+</div>
+
+<h3>4.4 Delivery via Atlas</h3>
+<div class="section-card">
+<p>Atlas bot receives classified notifications via Supabase trigger or Cowork scheduled task:</p>
+<ul>
+  <li><strong>Urgent:</strong> Immediate Telegram push with <code>🔴 URGENT</code> prefix</li>
+  <li><strong>Important:</strong> Batched every 2h, sent as a grouped message with <code>🟠 IMPORTANT</code> header</li>
+  <li><strong>Can-wait:</strong> Morning (07:00) and evening (19:00) digest</li>
+  <li><strong>Noise:</strong> Never forwarded, searchable via <code>/bildirim noise</code></li>
+</ul>
+<p>Atlas commands:</p>
+<pre>
+/bildirim              — Son 24h özet (kaç urgent/important/wait/noise)
+/bildirim urgent       — Son urgent bildirimleri listele
+/bildirim ara &lt;query&gt;  — Full-text search tüm bildirimlerde
+/bildirim kural ekle   — Yeni override kuralı ekle
+/bildirim sessiz &lt;app&gt; — Bir app'i noise'a override et
+</pre>
+</div>
+
+<h3>4.5 Dashboard (skimsoulfat.com)</h3>
+<div class="section-card">
+<p>New route: <code>skimsoulfat.com/notifications</code></p>
+<ul>
+  <li>Timeline view of all notifications (filterable by category)</li>
+  <li>Stats: notifications/day by category, top apps, noise ratio</li>
+  <li>Rules management: create/edit/delete override rules</li>
+  <li>Search: full-text search across all notification history</li>
+  <li>Integrates with existing JaX auth and theme system</li>
+</ul>
+</div>
+
+<h2>5. Implementation Plan</h2>
+
+<h3>Phase 1 — MVP (Estimated: 4-6 hours)</h3>
+<div class="section-card">
+<table class="priority-table">
+  <thead><tr><th>#</th><th>Task</th><th>Effort</th></tr></thead>
+  <tbody>
+    <tr><td>1.1</td><td>Create Supabase tables (notif_raw, notif_classified, notif_rules) + RLS</td><td>30min</td></tr>
+    <tr><td>1.2</td><td>Mac notification capture script (AppleScript + SQLite reader)</td><td>1h</td></tr>
+    <tr><td>1.3</td><td>Cowork scheduled task: capture → Supabase insert (every 60s)</td><td>30min</td></tr>
+    <tr><td>1.4</td><td>Classification function: read unclassified → Claude Haiku → insert classified</td><td>1h</td></tr>
+    <tr><td>1.5</td><td>Cowork scheduled task: classify unprocessed (every 2min)</td><td>15min</td></tr>
+    <tr><td>1.6</td><td>Atlas /bildirim command + urgent forward logic</td><td>1h</td></tr>
+    <tr><td>1.7</td><td>Test with real notifications for 24h, tune classification prompt</td><td>1h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Phase 2 — Dashboard + Rules (Estimated: 3-4 hours)</h3>
+<div class="section-card">
+<table class="priority-table">
+  <thead><tr><th>#</th><th>Task</th><th>Effort</th></tr></thead>
+  <tbody>
+    <tr><td>2.1</td><td>skimsoulfat.com/notifications page — timeline + filters</td><td>2h</td></tr>
+    <tr><td>2.2</td><td>Rules management UI (CRUD for notif_rules)</td><td>1h</td></tr>
+    <tr><td>2.3</td><td>Stats dashboard: charts, top apps, noise ratio</td><td>1h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Phase 3 — iOS Integration (Future)</h3>
+<div class="section-card">
+<ul>
+  <li><span class="badge badge-v2">V2</span> iOS Shortcuts automation: forward specific notification types to webhook</li>
+  <li><span class="badge badge-v2">V2</span> Focus Mode profiles: auto-switch based on calendar (meeting/deep-work/evening)</li>
+  <li><span class="badge badge-v3">V3</span> Native iOS app with Notification Service Extension (full interception)</li>
+  <li><span class="badge badge-v3">V3</span> Calendar-aware filtering: mute during meetings, strict during deep work blocks</li>
+  <li><span class="badge badge-v3">V3</span> MCP server for notification access from Claude Code / Cowork</li>
+</ul>
+</div>
+
+<h2>6. Cost Estimate</h2>
+<div class="section-card">
+<table class="priority-table">
+  <thead><tr><th>Component</th><th>Monthly Cost</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Claude Haiku classification</td><td>~$0.50</td><td>~200 notif/day × 30 days × ~100 tokens</td></tr>
+    <tr><td>Supabase storage</td><td>$0 (free tier)</td><td>Included in existing project</td></tr>
+    <tr><td>Cowork scheduled tasks</td><td>~$5-10</td><td>2 tasks, ~2000 runs/month</td></tr>
+    <tr><td><strong>Total MVP</strong></td><td><strong>~$6-11/month</strong></td><td></td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>7. Success Criteria</h2>
+<div class="section-card">
+<ul>
+  <li>Zero missed urgent notifications (false negative rate &lt; 1%)</li>
+  <li>Noise reduction: &gt;60% of notifications classified as can_wait or noise</li>
+  <li>Response to urgent: &lt;2 minutes from notification to Telegram delivery</li>
+  <li>User satisfaction: fewer context switches per day, measurable via skimsoulfat dashboard</li>
+  <li>Cost: under $15/month total</li>
+</ul>
+</div>
+
+<h2>8. Risks & Mitigations</h2>
+<div class="section-card">
+<table class="priority-table">
+  <thead><tr><th>Risk</th><th>Impact</th><th>Mitigation</th></tr></thead>
+  <tbody>
+    <tr><td>macOS notification DB access restricted in future OS</td><td>High</td><td>Fallback to Accessibility API or native app</td></tr>
+    <tr><td>AI misclassifies urgent as noise</td><td>Critical</td><td>Conservative defaults (bias toward urgent), user rules override, allowlist for key senders</td></tr>
+    <tr><td>Cowork task reliability (missed runs)</td><td>Medium</td><td>Health check via Atlas, alert if no new notifications in 30min during business hours</td></tr>
+    <tr><td>Notification volume spike</td><td>Low</td><td>Rate limit classification, batch processing</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>9. File References</h2>
+<div class="section-card">
+<pre>
+Obsidian:  [[Projects/Bildirim-Filtresi/spec]]
+Dashboard: skimsoulfat.com/notifications
+Supabase:  vrgohatarieeguyyhfan (tables: notif_raw, notif_classified, notif_rules)
+Atlas:     /opt/atlas-bot/ → notification_module.py (to be created)
+Cowork:    scheduled tasks: notif-capture, notif-classify
+Spec HTML: ecosystem outputs → notification-filter-spec.html
+</pre>
+</div>
+
+<div class="timestamp">Bildirim Filtresi Spec v1.0 &middot; 2026-05-15 &middot; Özgür GÜR</div>
+
+</body>
+</html>
