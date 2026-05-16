@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RocKStaR — Premium Profile | skilldrunk</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #0a0a0a;
+            --surface: #111;
+            --surface-2: #1a1a1a;
+            --border: #222;
+            --text: #e8e8e8;
+            --text-muted: #777;
+            --gold: #c9a227;
+            --gold-light: #e8c84a;
+            --gold-dim: #8b7019;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        .banner {
+            height: 200px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .banner::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 100%, rgba(201, 162, 39, 0.15) 0%, transparent 70%);
+        }
+        .profile-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        .profile-header {
+            display: flex;
+            align-items: flex-end;
+            gap: 1.5rem;
+            margin-top: -60px;
+            position: relative;
+            z-index: 1;
+        }
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+            border: 4px solid var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #000;
+            flex-shrink: 0;
+        }
+        .profile-info {
+            padding-bottom: 0.5rem;
+        }
+        .username-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .username {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .premium-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+            color: #000;
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .premium-badge .crown {
+            font-size: 0.8rem;
+        }
+        .bio {
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-top: 2.5rem;
+        }
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.25rem;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--gold);
+        }
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.25rem;
+        }
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        .content-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.25rem;
+            transition: border-color 0.2s, transform 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .content-card:hover {
+            border-color: var(--gold-dim);
+            transform: translateY(-2px);
+        }
+        .content-card .type {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+        }
+        .content-card .title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 0.35rem;
+        }
+        .content-card .desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+        .premium-section {
+            background: var(--surface);
+            border: 1px solid var(--gold-dim);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin-top: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .premium-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+        .premium-section h3 {
+            color: var(--gold);
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .premium-section p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+        .tag {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        .footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+        .footer a {
+            color: var(--gold);
+            text-decoration: none;
+        }
+        @media (max-width: 600px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .content-grid { grid-template-columns: 1fr; }
+            .profile-header { flex-direction: column; align-items: center; text-align: center; }
+            .avatar { margin-top: -60px; }
+            .username { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="banner"></div>
+
+    <div class="profile-container">
+        <div class="profile-header">
+            <div class="avatar">OG</div>
+            <div class="profile-info">
+                <div class="username-row">
+                    <span class="username">RocKStaR</span>
+                    <span class="premium-badge"><span class="crown">&#9733;</span> FOUNDER</span>
+                </div>
+                <p class="bio">CTO @ EGV Group | AI Automation Architect | Sim Racer<br>Building the future of skill-based ecosystems. Istanbul, TR.</p>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">24</div>
+                <div class="stat-label">Skills Created</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">12</div>
+                <div class="stat-label">Tools Built</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">156</div>
+                <div class="stat-label">Contributions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">3.2K</div>
+                <div class="stat-label">Impact Score</div>
+            </div>
+        </div>
+
+        <div class="tags">
+            <span class="tag">AI Automation</span>
+            <span class="tag">Next.js</span>
+            <span class="tag">Supabase</span>
+            <span class="tag">MCP Servers</span>
+            <span class="tag">Prompt Engineering</span>
+            <span class="tag">Sim Racing</span>
+            <span class="tag">Marketing Tech</span>
+        </div>
+
+        <div class="section-title">Featured Content</div>
+        <div class="content-grid">
+            <a href="/blog/reklamciligin-5-efendisi/" class="content-card">
+                <div class="type">Blog Post</div>
+                <div class="title">Reklamciligin 5 Efendisi</div>
+                <div class="desc">Reklam devlerinden AI caginin yeni liderlerine bir yolculuk.</div>
+            </a>
+            <a href="#" class="content-card">
+                <div class="type">Skill</div>
+                <div class="title">AI Meeting Summarizer</div>
+                <div class="desc">Toplanti notlarini otomatik ozetleyen ve aksiyonlari cikartan skill.</div>
+            </a>
+            <a href="#" class="content-card">
+                <div class="type">Tool</div>
+                <div class="title">Obsidian Vault Manager</div>
+                <div class="desc">Obsidian vault'u programatik yoneten MCP server.</div>
+            </a>
+            <a href="#" class="content-card">
+                <div class="type">Automation</div>
+                <div class="title">Lead Scoring Pipeline</div>
+                <div class="desc">Apollo + Supabase + AI ile otomatik lead puanlama sistemi.</div>
+            </a>
+        </div>
+
+        <div class="premium-section">
+            <h3>&#9733; Founder Profile</h3>
+            <p>Bu profil, skilldrunk ekosisteminin kurucusu ve en aktif uyesine aittir. RocKStaR, platformun mimarisinden icerik stratejisine kadar her katmaninda aktif rol almaktadir. Founder badge, yalnizca ekosistemi insa eden ve surekli gelistiren uyelere verilir.</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2026 <a href="/">skilldrunk.com</a> &middot; Premium profiles for builders, creators, and makers.</p>
+    </div>
+</body>
+</html>
