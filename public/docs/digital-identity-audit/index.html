@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Identity Audit | skilldrunk.com</title>
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --surface: #12121a;
+            --border: #1e1e2e;
+            --text: #e4e4e7;
+            --muted: #71717a;
+            --accent: #6366f1;
+            --accent-dim: #4f46e5;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 0;
+        }
+        .hero {
+            padding: 80px 24px 60px;
+            text-align: center;
+            background: linear-gradient(180deg, #1a1a2e 0%, var(--bg) 100%);
+            border-bottom: 1px solid var(--border);
+        }
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #fff, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            color: var(--muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+        .badge-skill { background: var(--accent-dim); color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; padding: 60px 24px; }
+        .section { margin-bottom: 48px; }
+        .section h2 {
+            font-size: 1.4rem;
+            margin-bottom: 16px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section h2 .num {
+            background: var(--accent);
+            color: #fff;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+        .card p { color: var(--muted); margin-bottom: 8px; }
+        .risk-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .risk-item {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+        .risk-item .level { font-size: 0.7rem; text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
+        .risk-critical { color: var(--danger); border-color: var(--danger); }
+        .risk-high { color: var(--warning); border-color: var(--warning); }
+        .risk-medium { color: #6366f1; border-color: #6366f1; }
+        .risk-low { color: var(--success); border-color: var(--success); }
+        .checklist { list-style: none; }
+        .checklist li {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .checklist li::before {
+            content: '';
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+        .template-block {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--muted);
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        .footer {
+            text-align: center;
+            padding: 40px 24px;
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+        .footer a { color: var(--accent); text-decoration: none; }
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 1.8rem; }
+            .container { padding: 40px 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <span class="badge badge-skill">Cowork Skill</span>
+        <h1>Digital Identity Audit</h1>
+        <p>A systematic framework for discovering, assessing, and controlling your digital footprint across the internet.</p>
+    </div>
+
+    <div class="container">
+        <div class="section">
+            <h2><span class="num">1</span> Search Engine Footprint</h2>
+            <div class="card">
+                <p>Discover what the world sees when they search for you. We check Google for your name, email, phone, and known usernames across the first 3 pages of results.</p>
+                <p><strong style="color:#fff">Searches performed:</strong> Full name exact match, name + role, email address, usernames, phone number</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="num">2</span> Data Breach Exposure</h2>
+            <div class="card">
+                <p>Check Have I Been Pwned and breach databases for your email addresses. Every breach is categorized by severity.</p>
+                <div class="risk-grid">
+                    <div class="risk-item risk-critical"><div class="level">Critical</div>Passwords + Financial</div>
+                    <div class="risk-item risk-high"><div class="level">High</div>Passwords exposed</div>
+                    <div class="risk-item risk-medium"><div class="level">Medium</div>Email + personal data</div>
+                    <div class="risk-item risk-low"><div class="level">Low</div>Email only</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="num">3</span> Social Media Audit</h2>
+            <div class="card">
+                <p>Platform-by-platform review of your profiles: LinkedIn, GitHub, Twitter/X, Instagram, Facebook, Reddit. We assess visibility settings, exposed PII, and professional risk.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="num">4</span> Data Broker Scan</h2>
+            <div class="card">
+                <p>Check presence on people-search engines: Spokeo, WhitePages, BeenVerified, Pipl, ThatsThem, PeekYou, Radaris. These aggregate public records and sell your data.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="num">5</span> Account Inventory</h2>
+            <div class="card">
+                <p>Map all known accounts and categorize: Active/Needed, Active/Unused (delete), Cannot Delete (GDPR request), Abandoned (recover then delete). Uses JustDeleteMe difficulty ratings.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="num">6</span> KVKK/GDPR Templates</h2>
+            <div class="card">
+                <p>Pre-filled data deletion request templates for Turkish KVKK (Law 6698) and EU GDPR (Article 17). Ready to send to any data controller.</p>
+                <div class="template-block">Subject: Request for Erasure (GDPR Art. 17)
+
+Dear Data Protection Officer,
+
+Under Article 17 of the GDPR, I request
+erasure of all personal data you hold about me.
+
+Name: [YOUR NAME]
+Email: [YOUR EMAIL]
+
+Please confirm within 30 days.
+
+Regards,
+[YOUR NAME]</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="num">7</span> Visibility Strategy</h2>
+            <div class="card">
+                <p>Recommendations for controlling your narrative: SEO optimization, content strategy, profile consolidation, privacy hardening, and monitoring via Google Alerts.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="num">8</span> Audit Report</h2>
+            <div class="card">
+                <p>Final deliverable includes: risk score (1-10), all findings documented, prioritized remediation checklist, pre-filled templates, and monitoring setup instructions.</p>
+                <ul class="checklist">
+                    <li>Search engine results documented</li>
+                    <li>Breach exposure assessed</li>
+                    <li>Social profiles audited</li>
+                    <li>Data broker presence mapped</li>
+                    <li>Old accounts inventoried</li>
+                    <li>Deletion requests prepared</li>
+                    <li>Monitoring configured</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Built with <a href="https://skilldrunk.com">skilldrunk.com</a> | A Cowork Skill by Ozgur Gur</p>
+        <p style="margin-top:8px">Run this audit: Install the skill in Claude Desktop Cowork mode</p>
+    </div>
+</body>
+</html>
