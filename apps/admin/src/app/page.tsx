@@ -45,18 +45,17 @@ function relTime(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();
   const m = Math.floor(diff / 60000);
   if (m < 1) return "now";
-  if (m < 60) return `${m}m ago`;
+  if (m < 60) return `${m}m`;
   const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
+  if (h < 24) return `${h}h`;
   const d = Math.floor(h / 24);
-  if (d < 30) return `${d}d ago`;
+  if (d < 30) return `${d}d`;
   return iso.split("T")[0];
 }
 
 export default async function AdminDashboard() {
   const { supabase, user, profile } = await requireAdmin("/");
 
-  // Parallel queries
   const since7d = new Date(Date.now() - 7 * 86400_000).toISOString();
   const [statsRes, notifRes, pvRes, unreadRes, appsRes] = await Promise.all([
     supabase.rpc("sd_admin_stats"),
@@ -88,7 +87,7 @@ export default async function AdminDashboard() {
   const unreadCount = unreadRes.count ?? 0;
   const apps = appsRes.data ?? [];
 
-  // Build 7-day pageview breakdown from raw rows
+  // 7-day pageview breakdown
   const pageviews: PageviewDay[] = [];
   const pvMap = new Map<string, number>();
   for (const row of pvRes.data ?? []) {
@@ -99,114 +98,150 @@ export default async function AdminDashboard() {
     const d = new Date(Date.now() - i * 86400_000).toISOString().slice(0, 10);
     pageviews.push({ day: d, count: pvMap.get(d) ?? 0 });
   }
-
   const pvMax = Math.max(1, ...pageviews.map((p) => p.count));
+
+  const liveApps = apps.filter((a) => a.status === "live").length;
+
+  // Hero stats prioritized for mobile glance-ability
+  const heroStats: { label: string; value: number; alert?: boolean }[] = [
+    { label: "Pageview bugün", value: stats.pageviews_today ?? 0 },
+    { label: "Pageview 7g", value: stats.pageviews_7d ?? 0 },
+    { label: "Skills", value: stats.total_skills ?? 0 },
+    { label: "Kullanıcılar", value: stats.total_users ?? 0 },
+    {
+      label: "Açık report",
+      value: stats.open_reports ?? 0,
+      alert: (stats.open_reports ?? 0) > 0,
+    },
+    { label: "Live app", value: liveApps },
+  ];
 
   return (
     <>
+      <div className="aurora" />
       <AdminNav userLabel={profile?.display_name ?? undefined} />
-      <main className="mx-auto max-w-6xl px-6 py-10">
-        {/* Heading */}
-        <div className="mb-8 flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <p className="mb-1 text-xs uppercase tracking-[0.3em] text-neutral-500">
-              skilldrunk ecosystem
-            </p>
-            <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
-            <p className="mt-1 text-sm text-neutral-400">
-              {profile?.display_name ?? user.email} · {profile?.role}
-            </p>
+
+      <main className="mx-auto max-w-6xl px-4 sm:px-6 pt-4 sm:pt-6 pb-10">
+        {/* === Hero === */}
+        <section className="mb-5">
+          <p className="text-[11px] uppercase tracking-[0.3em] text-neutral-500">
+            skilldrunk ecosystem
+          </p>
+          <div className="mt-1 flex items-end justify-between gap-3">
+            <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">
+              Hoş geldin, {profile?.display_name ?? user.email?.split("@")[0]}
+            </h1>
+            <Link
+              href="/notifications"
+              className={`shrink-0 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-mono transition ${
+                unreadCount > 0
+                  ? "bg-red-500/10 text-red-300 ring-1 ring-red-500/30"
+                  : "glass text-neutral-400"
+              }`}
+              title={`${unreadCount} okunmamış`}
+            >
+              <span aria-hidden>🔔</span>
+              {unreadCount > 0 ? unreadCount : ""}
+            </Link>
           </div>
-          <Link
-            href="/notifications"
-            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-mono transition ${
-              unreadCount > 0
-                ? "bg-red-500/10 text-red-400 hover:bg-red-500/20"
-                : "bg-neutral-900 text-neutral-500 hover:bg-neutral-800"
-            }`}
-            title={`${unreadCount} okunmamış · tüm bildirimleri gör`}
-          >
-            🔔 {unreadCount > 0 ? `${unreadCount} okunmamış` : "Notifications"}
-          </Link>
-        </div>
+        </section>
 
-      {/* Stat cards */}
-      <section className="mb-8">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-400">
-          Marketplace
-        </h2>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Stat label="Skills" value={stats.total_skills ?? 0} />
-          <Stat label="Users" value={stats.total_users ?? 0} />
-          <Stat label="Votes" value={stats.total_votes ?? 0} />
-          <Stat label="Comments" value={stats.total_comments ?? 0} />
-          <Stat label="Arena Matches" value={stats.total_arena_matches ?? 0} />
-          <Stat
-            label="Open Reports"
-            value={stats.open_reports ?? 0}
-            alert={(stats.open_reports ?? 0) > 0}
-          />
-          <Stat label="Pageviews (today)" value={stats.pageviews_today ?? 0} />
-          <Stat label="Pageviews (7d)" value={stats.pageviews_7d ?? 0} />
-        </div>
-      </section>
-
-      {/* Pageviews chart */}
-      <section className="mb-8">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-400">
-          Traffic (son 7 gün)
-        </h2>
-        <div className="flex items-end gap-2 rounded-lg border border-neutral-900 bg-neutral-950 p-4">
-          {pageviews.map((d) => {
-            const h = Math.round((d.count / pvMax) * 100);
-            return (
+        {/* === Hero stat carousel (horizontal scroll on mobile, grid on desktop) === */}
+        <section className="mb-6 -mx-4 sm:mx-0">
+          <div className="flex gap-3 overflow-x-auto no-scrollbar px-4 sm:px-0 sm:grid sm:grid-cols-3 lg:grid-cols-6">
+            {heroStats.map((s) => (
               <div
-                key={d.day}
-                className="flex flex-1 flex-col items-center gap-1.5"
+                key={s.label}
+                className={`glass min-w-[140px] sm:min-w-0 rounded-2xl p-4 ${
+                  s.alert ? "ring-1 ring-red-500/40" : ""
+                }`}
               >
-                <div className="flex h-24 w-full items-end">
-                  <div
-                    className="w-full rounded-t bg-orange-500/70"
-                    style={{ height: `${h}%`, minHeight: "2px" }}
-                    title={`${d.day}: ${d.count}`}
-                  />
-                </div>
-                <span className="font-mono text-xs tabular-nums text-neutral-400">
-                  {d.count}
-                </span>
-                <span className="font-mono text-[10px] text-neutral-600">
-                  {d.day.slice(5)}
-                </span>
+                <p className="text-[10px] uppercase tracking-wider text-neutral-500">
+                  {s.label}
+                </p>
+                <p
+                  className={`mt-1 text-2xl font-semibold ${
+                    s.alert ? "text-red-400" : "stat-num"
+                  }`}
+                >
+                  {s.value.toLocaleString()}
+                </p>
               </div>
-            );
-          })}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
 
-      {/* Two-column: activity + apps */}
-      <div className="mb-10 grid gap-6 lg:grid-cols-[1fr,1fr]">
-        {/* Recent activity */}
-        <section>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-400">
+        {/* === Quick actions === */}
+        <section className="mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <QuickAction href="/ai" icon="✦" label="AI Asistan" />
+            <QuickAction href="/map" icon="◈" label="Ekosistem Map" />
+            <QuickAction href="/usage" icon="$" label="AI Maliyet" />
+            <QuickAction href="/apps" icon="▦" label="Tüm Apps" />
+          </div>
+        </section>
+
+        {/* === Traffic chart === */}
+        <section className="mb-6">
+          <div className="mb-2 flex items-center justify-between">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
+              Trafik · son 7g
+            </h2>
+            <span className="text-[11px] font-mono text-neutral-500">
+              tepe {pvMax}
+            </span>
+          </div>
+          <div className="glass rounded-2xl p-4">
+            <div className="flex items-end gap-1.5">
+              {pageviews.map((d) => {
+                const h = Math.round((d.count / pvMax) * 100);
+                return (
+                  <div
+                    key={d.day}
+                    className="flex flex-1 flex-col items-center gap-1.5 min-w-0"
+                  >
+                    <div className="flex h-20 sm:h-24 w-full items-end">
+                      <div
+                        className="w-full rounded-t-md bg-gradient-to-t from-orange-600/60 to-orange-400/80"
+                        style={{ height: `${h}%`, minHeight: "3px" }}
+                        title={`${d.day}: ${d.count}`}
+                      />
+                    </div>
+                    <span className="font-mono text-[10px] tabular-nums text-neutral-400">
+                      {d.count}
+                    </span>
+                    <span className="font-mono text-[9px] text-neutral-600">
+                      {d.day.slice(5)}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* === Activity feed === */}
+        <section className="mb-6">
+          <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-neutral-400">
             Son Aktivite
           </h2>
           {notifications.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-neutral-900 p-8 text-center text-sm text-neutral-500">
+            <div className="glass rounded-2xl p-6 text-center text-sm text-neutral-500">
               Henüz bildirim yok.
             </div>
           ) : (
-            <ul className="divide-y divide-neutral-900 rounded-lg border border-neutral-900 bg-neutral-950">
+            <ul className="space-y-1.5">
               {notifications.map((n) => (
                 <li
                   key={n.id}
-                  className={`flex gap-3 px-4 py-2.5 ${!n.read ? "bg-orange-500/5" : ""}`}
+                  className={`glass flex gap-3 rounded-2xl px-4 py-3 ${
+                    !n.read ? "ring-1 ring-orange-500/20" : ""
+                  }`}
                 >
-                  <span className="text-lg">
-                    {KIND_ICONS[n.kind] ?? "🔔"}
-                  </span>
+                  <span className="text-lg">{KIND_ICONS[n.kind] ?? "🔔"}</span>
                   <div className="min-w-0 flex-1">
                     <p
-                      className={`truncate text-sm ${!n.read ? "font-medium" : ""}`}
+                      className={`truncate text-sm ${!n.read ? "font-medium" : "text-neutral-300"}`}
                     >
                       {n.title}
                     </p>
@@ -215,30 +250,35 @@ export default async function AdminDashboard() {
                         {n.body}
                       </p>
                     )}
-                    <p className="mt-0.5 font-mono text-[10px] text-neutral-600">
-                      {relTime(n.created_at)}
-                    </p>
                   </div>
-                  {!n.read && (
-                    <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-orange-500" />
-                  )}
+                  <span className="shrink-0 self-start font-mono text-[10px] text-neutral-600">
+                    {relTime(n.created_at)}
+                  </span>
                 </li>
               ))}
             </ul>
           )}
         </section>
 
-        {/* Apps */}
-        <section>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-400">
-            Apps
-          </h2>
+        {/* === Apps grid === */}
+        <section className="mb-6">
+          <div className="mb-2 flex items-center justify-between">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
+              Apps
+            </h2>
+            <Link
+              href="/apps"
+              className="text-[11px] font-mono text-neutral-500 hover:text-neutral-300"
+            >
+              tümü →
+            </Link>
+          </div>
           {apps.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-neutral-900 p-8 text-center text-sm text-neutral-500">
-              pt_apps tablosu boş — /apps'tan ekle.
+            <div className="glass rounded-2xl p-6 text-center text-sm text-neutral-500">
+              pt_apps tablosu boş.
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {apps.map((app) => {
                 const isLive = app.status === "live";
                 const isCowork = (app.tags ?? []).includes("cowork-managed");
@@ -248,116 +288,105 @@ export default async function AdminDashboard() {
                     href={app.url}
                     target="_blank"
                     rel="noreferrer"
-                    className={`group flex items-center justify-between rounded-lg border px-4 py-2.5 transition ${
-                      isLive
-                        ? "border-neutral-800 bg-neutral-950 hover:border-orange-900 hover:bg-neutral-900"
-                        : "border-dashed border-neutral-900 bg-transparent opacity-60"
+                    className={`glass relative rounded-2xl p-3 active:scale-[0.98] transition ${
+                      isLive ? "" : "opacity-50"
                     }`}
                   >
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold">{app.title}</span>
-                        {isLive ? (
-                          <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-mono uppercase text-emerald-400">
-                            live
-                          </span>
-                        ) : (
-                          <span className="rounded-full bg-neutral-800 px-2 py-0.5 text-[10px] font-mono uppercase text-neutral-500">
-                            {app.status}
-                          </span>
-                        )}
-                        {isCowork && (
-                          <span
-                            title="Cowork-managed"
-                            className="inline-block h-1.5 w-1.5 rounded-full bg-amber-400/80"
-                          />
-                        )}
-                      </div>
-                      <p className="truncate font-mono text-[10px] text-neutral-600">
-                        {app.url.replace("https://", "")}
-                      </p>
-                    </div>
-                    {isLive && (
-                      <span className="text-neutral-600 transition group-hover:text-orange-400">
-                        →
+                    <div className="flex items-center gap-2 mb-1">
+                      <span
+                        className={`inline-block h-1.5 w-1.5 rounded-full ${
+                          isLive ? "bg-emerald-400" : "bg-neutral-600"
+                        }`}
+                      />
+                      <span className="font-semibold text-sm truncate flex-1">
+                        {app.title}
                       </span>
+                      {isCowork && (
+                        <span
+                          title="Cowork-managed"
+                          className="inline-block h-1.5 w-1.5 rounded-full bg-amber-400/80"
+                        />
+                      )}
+                    </div>
+                    {app.tagline && (
+                      <p className="text-[11px] text-neutral-500 line-clamp-2 mb-1">
+                        {app.tagline}
+                      </p>
                     )}
+                    <p className="font-mono text-[10px] text-neutral-600 truncate">
+                      {app.url.replace("https://", "")}
+                    </p>
                   </a>
                 );
               })}
             </div>
           )}
         </section>
-      </div>
 
-      {/* Marketplace management */}
-      <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-400">
-          Yönetim
-        </h2>
-        <div className="grid gap-3 sm:grid-cols-3">
-          <Link
-            href="/skills"
-            className="rounded-lg border border-neutral-800 bg-neutral-950 p-4 hover:border-orange-900"
-          >
-            <p className="font-medium">Skills</p>
-            <p className="mt-1 text-xs text-neutral-500">
-              Publish / archive / draft
-            </p>
-          </Link>
-          <Link
-            href="/users"
-            className="rounded-lg border border-neutral-800 bg-neutral-950 p-4 hover:border-orange-900"
-          >
-            <p className="font-medium">Users</p>
-            <p className="mt-1 text-xs text-neutral-500">Roles, permissions</p>
-          </Link>
-          <Link
-            href="/reports"
-            className="rounded-lg border border-neutral-800 bg-neutral-950 p-4 hover:border-orange-900"
-          >
-            <p className="font-medium">
-              Reports
-              {(stats.open_reports ?? 0) > 0 && (
-                <span className="ml-2 rounded-full bg-red-500/20 px-1.5 py-0.5 text-[10px] text-red-400">
-                  {stats.open_reports}
-                </span>
-              )}
-            </p>
-            <p className="mt-1 text-xs text-neutral-500">Flagged content</p>
-          </Link>
-        </div>
-      </section>
+        {/* === Yönetim === */}
+        <section>
+          <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-neutral-400">
+            Yönetim
+          </h2>
+          <div className="grid grid-cols-3 gap-2">
+            <Link
+              href="/skills"
+              className="glass rounded-2xl p-4 active:scale-[0.98] transition"
+            >
+              <p className="font-medium text-sm">Skills</p>
+              <p className="mt-0.5 text-[11px] text-neutral-500">
+                publish / draft
+              </p>
+            </Link>
+            <Link
+              href="/users"
+              className="glass rounded-2xl p-4 active:scale-[0.98] transition"
+            >
+              <p className="font-medium text-sm">Users</p>
+              <p className="mt-0.5 text-[11px] text-neutral-500">roles</p>
+            </Link>
+            <Link
+              href="/reports"
+              className="glass rounded-2xl p-4 active:scale-[0.98] transition"
+            >
+              <p className="font-medium text-sm">
+                Reports
+                {(stats.open_reports ?? 0) > 0 && (
+                  <span className="ml-1.5 rounded-full bg-red-500/20 px-1.5 py-0.5 text-[9px] text-red-300">
+                    {stats.open_reports}
+                  </span>
+                )}
+              </p>
+              <p className="mt-0.5 text-[11px] text-neutral-500">flagged</p>
+            </Link>
+          </div>
+        </section>
       </main>
     </>
   );
 }
 
-function Stat({
+function QuickAction({
+  href,
+  icon,
   label,
-  value,
-  alert,
 }: {
+  href: string;
+  icon: string;
   label: string;
-  value: number;
-  alert?: boolean;
 }) {
   return (
-    <div
-      className={`rounded-lg border bg-neutral-950 p-4 ${
-        alert ? "border-red-900" : "border-neutral-800"
-      }`}
+    <Link
+      href={href}
+      className="glass rounded-2xl px-3 py-3.5 flex items-center gap-2.5 active:scale-[0.98] active:ring-accent transition"
     >
-      <p className="text-[10px] uppercase tracking-wider text-neutral-500">
-        {label}
-      </p>
-      <p
-        className={`mt-1 text-2xl font-semibold tabular-nums ${
-          alert ? "text-red-400" : ""
-        }`}
+      <span
+        aria-hidden
+        className="grid place-items-center h-9 w-9 rounded-xl bg-orange-500/10 text-orange-400 text-base"
       >
-        {value.toLocaleString()}
-      </p>
-    </div>
+        {icon}
+      </span>
+      <span className="text-sm font-medium">{label}</span>
+    </Link>
   );
 }

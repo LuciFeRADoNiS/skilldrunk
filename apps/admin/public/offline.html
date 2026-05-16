@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <title>Çevrimdışı — Skilldrunk Admin</title>
+    <style>
+      :root { color-scheme: dark; }
+      html, body { margin: 0; height: 100%; background: #0a0a0a; color: #e5e5e5; font-family: ui-sans-serif, -apple-system, system-ui, sans-serif; }
+      body { display: flex; align-items: center; justify-content: center; padding: 24px; }
+      .card { max-width: 380px; text-align: center; padding: 32px; border: 1px solid #262626; border-radius: 20px; background: linear-gradient(180deg, rgba(20,20,20,0.6), rgba(10,10,10,0.6)); backdrop-filter: blur(20px); }
+      h1 { margin: 0 0 8px; font-size: 24px; letter-spacing: -0.02em; }
+      p { margin: 8px 0; color: #a3a3a3; font-size: 14px; line-height: 1.5; }
+      .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #f97316; margin-right: 6px; }
+      button { margin-top: 16px; padding: 10px 18px; border: 1px solid #404040; background: transparent; color: inherit; border-radius: 999px; font: inherit; font-size: 13px; cursor: pointer; }
+      button:active { background: #1a1a1a; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <p style="font-family: ui-monospace, monospace; color: #737373; font-size: 11px; letter-spacing: 0.2em; margin-bottom: 16px;"><span class="dot"></span>OFFLINE</p>
+      <h1>Çevrimdışısın</h1>
+      <p>Skilldrunk Admin internete bağlandığında otomatik açılacak. Telegram bot'tan @skilldrunk_bot ile temel komutlar çalışmaya devam eder.</p>
+      <button onclick="location.reload()">Tekrar Dene</button>
+    </div>
+  </body>
+</html>
