@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Özgür GÜR — Digital Card</title>
+<meta name="description" content="CTO @ EGV Group | AI Automation Architect | Sim Racer | Builder">
+<meta property="og:title" content="Özgür GÜR — Digital Business Card">
+<meta property="og:description" content="CTO @ EGV Group | AI Automation Architect">
+<meta property="og:url" content="https://skilldrunk.com/card/rockstar/">
+<meta property="og:type" content="profile">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#d4a853;--gold-light:#f0d48a;--gold-dark:#b8912e;
+  --bg:#0a0a0f;--card-bg:#111118;--card-border:#1a1a25;
+  --text:#e8e8ed;--text-muted:#8888a0;--text-dim:#555568;
+  --accent:#d4a853;
+}
+html{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100dvh}
+body{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:20px;overflow-x:hidden;position:relative}
+
+/* Background particles */
+canvas#particles{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+
+/* Card wrapper */
+.card-wrapper{position:relative;z-index:1;width:100%;max-width:420px;opacity:0;transform:translateY(30px);animation:cardIn .8s cubic-bezier(.16,1,.3,1) .2s forwards}
+@keyframes cardIn{to{opacity:1;transform:translateY(0)}}
+
+/* Animated border */
+.card-outer{position:relative;border-radius:24px;padding:2px;background:linear-gradient(135deg,var(--gold),var(--gold-dark),#1a1a25,var(--gold-dark),var(--gold));background-size:300% 300%;animation:borderGlow 6s ease infinite}
+@keyframes borderGlow{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+
+.card{background:var(--card-bg);border-radius:22px;padding:40px 28px 32px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:120px;background:linear-gradient(180deg,rgba(212,168,83,.06) 0%,transparent 100%);pointer-events:none}
+
+/* Avatar */
+.avatar-ring{width:96px;height:96px;border-radius:50%;padding:2px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));margin:0 auto 20px;position:relative}
+.avatar-ring::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:1px solid rgba(212,168,83,.2);animation:pulse 3s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:.8;transform:scale(1.04)}}
+.avatar{width:100%;height:100%;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:var(--gold);letter-spacing:1px;overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover}
+
+/* Name & Title */
+.name{text-align:center;font-family:'Playfair Display',serif;font-size:26px;font-weight:700;letter-spacing:.5px;background:linear-gradient(135deg,var(--gold-light),var(--gold),var(--gold-dark));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.title{text-align:center;font-size:14px;font-weight:500;color:var(--text-muted);margin-top:6px}
+.subtitle{text-align:center;font-size:12px;color:var(--text-dim);margin-top:4px;letter-spacing:.5px;text-transform:uppercase}
+
+/* Divider */
+.divider{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:24px auto}
+
+/* Contact rows */
+.contact-list{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+.contact-row{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:14px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);cursor:pointer;transition:all .25s ease;text-decoration:none;color:var(--text)}
+.contact-row:hover,.contact-row:active{background:rgba(212,168,83,.06);border-color:rgba(212,168,83,.15);transform:translateX(2px)}
+.contact-row .icon{width:36px;height:36px;border-radius:10px;background:rgba(212,168,83,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.contact-row .icon svg{width:18px;height:18px;color:var(--gold);fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.contact-row .info{flex:1;min-width:0}
+.contact-row .label{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px}
+.contact-row .value{font-size:14px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Social links */
+.social-links{display:flex;justify-content:center;gap:12px;margin-bottom:28px}
+.social-btn{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .25s ease;text-decoration:none}
+.social-btn:hover{background:rgba(212,168,83,.1);border-color:rgba(212,168,83,.25);transform:translateY(-2px)}
+.social-btn svg{width:20px;height:20px;color:var(--text-muted);transition:color .25s}
+.social-btn:hover svg{color:var(--gold)}
+
+/* QR Section */
+.qr-section{text-align:center;margin-bottom:24px}
+.qr-label{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.qr-container{display:inline-block;padding:12px;background:#fff;border-radius:12px}
+.qr-container svg{display:block}
+
+/* Action buttons */
+.actions{display:flex;gap:10px}
+.btn{flex:1;padding:14px;border:none;border-radius:14px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .25s ease}
+.btn svg{width:18px;height:18px}
+.btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#0a0a0f}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(212,168,83,.25)}
+.btn-secondary{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--text)}
+.btn-secondary:hover{background:rgba(212,168,83,.08);border-color:rgba(212,168,83,.2)}
+
+/* NFC note */
+.nfc-note{text-align:center;margin-top:20px;font-size:11px;color:var(--text-dim);opacity:.6}
+.nfc-note svg{width:14px;height:14px;vertical-align:middle;margin-right:4px}
+
+/* Toast */
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card-bg);border:1px solid var(--gold);color:var(--gold);padding:12px 24px;border-radius:12px;font-size:13px;font-weight:500;z-index:100;transition:transform .35s cubic-bezier(.16,1,.3,1);pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+
+<div class="card-wrapper">
+  <div class="card-outer">
+    <div class="card">
+
+      <!-- Avatar -->
+      <div class="avatar-ring">
+        <div class="avatar" id="avatar">ÖG</div>
+      </div>
+
+      <!-- Name -->
+      <div class="name">Özgür GÜR</div>
+      <div class="title">CTO @ EGV Group</div>
+      <div class="subtitle">AI Automation Architect · Sim Racer · Builder</div>
+
+      <div class="divider"></div>
+
+      <!-- Contact Info -->
+      <div class="contact-list">
+        <div class="contact-row" onclick="copyText('ozgurgur@gmail.com','Email copied!')">
+          <div class="icon"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+          <div class="info"><div class="label">Email</div><div class="value">ozgurgur@gmail.com</div></div>
+        </div>
+        <div class="contact-row" onclick="copyText('+90 XXX XXX XXXX','Phone copied!')">
+          <div class="icon"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></div>
+          <div class="info"><div class="label">Phone</div><div class="value">+90 XXX XXX XXXX</div></div>
+        </div>
+        <div class="contact-row" onclick="copyText('İstanbul, Türkiye / Boston, USA','Location copied!')">
+          <div class="icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+          <div class="info"><div class="label">Location</div><div class="value">İstanbul, Türkiye / Boston, USA</div></div>
+        </div>
+      </div>
+
+      <!-- Social Links -->
+      <div class="social-links">
+        <a href="https://skilldrunk.com" target="_blank" class="social-btn" title="skilldrunk.com">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10A15.3 15.3 0 0112 2z"/></svg>
+        </a>
+        <a href="https://skimsoulfat.com" target="_blank" class="social-btn" title="skimsoulfat.com">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+        </a>
+        <a href="https://linkedin.com/in/ozgurgur" target="_blank" class="social-btn" title="LinkedIn">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        </a>
+        <a href="https://github.com/ozgurgur" target="_blank" class="social-btn" title="GitHub">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+        </a>
+        <a href="https://t.me/ClaudeBotToken" target="_blank" class="social-btn" title="Telegram">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0a12 12 0 00-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+        </a>
+      </div>
+
+      <!-- QR Code -->
+      <div class="qr-section">
+        <div class="qr-label">Scan to connect</div>
+        <div class="qr-container" id="qrcode"></div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="actions">
+        <button class="btn btn-primary" onclick="saveContact()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Save Contact
+        </button>
+        <button class="btn btn-secondary" onclick="shareCard()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Share
+        </button>
+      </div>
+
+      <!-- NFC Note -->
+      <div class="nfc-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7v-1a2 2 0 012-2h4m10 0h4a2 2 0 012 2v1M2 17v1a2 2 0 002 2h4m10 0h4a2 2 0 002-2v-1"/><path d="M7 12h.01M12 12h.01M17 12h.01"/></svg>
+        NFC enabled — tap phone to share
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── QR Code Generator (minimal, no deps) ───
+function generateQR(text){const e=function(t){const e=t.length;let r=0;for(;r<40;r++){const n=4*r+17,o=Math.ceil((e*8+17)/(getDataBits(r+1,2)-7));if(o<=1)return r+1}return 40}(text);const size=4*e+17;const modules=Array.from({length:size},()=>Array(size).fill(null));const isFunc=Array.from({length:size},()=>Array(size).fill(false));addFinderPatterns(modules,isFunc,size);addAlignmentPatterns(modules,isFunc,e,size);addTimingPatterns(modules,isFunc,size);modules[size-8][8]=1;isFunc[size-8][8]=true;if(e>=7)addVersionInfo(modules,isFunc,e,size);const dataBits=encodeData(text,e);placeBits(modules,isFunc,size,dataBits);const bestMask=applyBestMask(modules,isFunc,size);addFormatInfo(modules,isFunc,size,bestMask);return{modules,size};
+function addFinderPatterns(m,f,s){for(const[cr,cc]of[[0,0],[s-7,0],[0,s-7]]){for(let r=-1;r<=7;r++)for(let c=-1;c<=7;c++){const rr=cr+r,cc2=cc+c;if(rr<0||rr>=s||cc2<0||cc2>=s)continue;const v=(r>=0&&r<=6&&(c===0||c===6))||(c>=0&&c<=6&&(r===0||r===6))||(r>=2&&r<=4&&c>=2&&c<=4)?1:0;m[rr][cc2]=v;f[rr][cc2]=true}}}
+function addAlignmentPatterns(m,f,v,s){if(v<2)return;const positions=getAlignmentPositions(v);for(const r of positions)for(const c of positions){if(f[r][c])continue;for(let dr=-2;dr<=2;dr++)for(let dc=-2;dc<=2;dc++){const val=Math.abs(dr)===2||Math.abs(dc)===2||(!dr&&!dc)?1:0;m[r+dr][c+dc]=val;f[r+dr][c+dc]=true}}}
+function getAlignmentPositions(v){if(v===1)return[];const cnt=Math.floor(v/7)+2;const first=6;const last=4*v+10;const positions=[first];if(cnt>2){const step=Math.ceil((last-first)/(cnt-1));const adj=step%2===0?step:step+1;for(let i=cnt-2;i>=1;i--)positions.push(last-adj*(cnt-1-i))}positions.push(last);return positions}
+function addTimingPatterns(m,f,s){for(let i=8;i<s-8;i++){if(!f[6][i]){m[6][i]=i%2===0?1:0;f[6][i]=true}if(!f[i][6]){m[i][6]=i%2===0?1:0;f[i][6]=true}}}
+function addVersionInfo(m,f,v,s){if(v<7)return;let bits=v;for(let i=0;i<12;i++)bits=(bits<<1)^((bits>>>(11))*(0x1F25));bits=(v<<12)|bits;for(let i=0;i<18;i++){const val=(bits>>>i)&1;const r=Math.floor(i/3);const c=i%3+s-11;m[r][c]=val;f[r][c]=true;m[c][r]=val;f[c][r]=true}}
+function getDataBits(v,ecl){const totalCodewords=getDataCodewords(v);return totalCodewords*8}
+function getDataCodewords(v){const totalMod=(4*v+17)*(4*v+17);let funcMod=3*64+2*(4*v+1)+25+2+1;if(v>=2){const n=Math.floor(v/7)+2;funcMod+=n*n*25-(n>0?3*25:0);funcMod+=(n-2)*2*5}if(v>=7)funcMod+=36;const rawBits=totalMod-funcMod-31;const totalCW=Math.floor(rawBits/8);const ecCW=getEcCodewords(v);return totalCW-ecCW}
+function getEcCodewords(v){const table=[10,16,26,36,48,64,72,88,110,130,150,176,198,216,240,280,300,312,336,360,390,420,450,480,510,540,570,570,600,630,660,720,750,780,810,840,870,900,930,960];return v<=40?table[v-1]:960}
+function encodeData(text,v){const bits=[];bits.push(0,1,0,0);const lenBits=v<=9?8:16;const len=text.length;for(let i=lenBits-1;i>=0;i--)bits.push((len>>>i)&1);for(const ch of text){const c=ch.charCodeAt(0);for(let i=7;i>=0;i--)bits.push((c>>>i)&1)}const totalBits=getDataCodewords(v)*8;while(bits.length<totalBits){if(bits.length>=totalBits)break;bits.push(0);if(bits.length%8===0&&bits.length<totalBits){}}while(bits.length<totalBits){for(const pad of[0xEC,0x11]){if(bits.length>=totalBits)break;for(let i=7;i>=0;i--)bits.push((pad>>>i)&1)}}const dataCW=[];for(let i=0;i<bits.length;i+=8){let b=0;for(let j=0;j<8;j++)b=(b<<1)|(bits[i+j]||0);dataCW.push(b)}const ecCWcount=getEcCodewords(v);const ecCW=reedSolomon(dataCW,ecCWcount);const allBits=[];for(const b of dataCW)for(let i=7;i>=0;i--)allBits.push((b>>>i)&1);for(const b of ecCW)for(let i=7;i>=0;i--)allBits.push((b>>>i)&1);return allBits}
+function reedSolomon(data,ecLen){const gfExp=new Uint8Array(512);const gfLog=new Uint8Array(256);let x=1;for(let i=0;i<255;i++){gfExp[i]=x;gfLog[x]=i;x<<=1;if(x>=256)x^=0x11d}for(let i=255;i<512;i++)gfExp[i]=gfExp[i-255];function gfMul(a,b){return a===0||b===0?0:gfExp[gfLog[a]+gfLog[b]]}const gen=[1];for(let i=0;i<ecLen;i++){const ng=[0];for(let j=gen.length-1;j>=0;j--){const c=gen[j];ng[j+1]=(ng[j+1]||0)^c;ng[j]=gfMul(c,gfExp[i])}gen.length=ng.length;for(let j=0;j<ng.length;j++)gen[j]=ng[j]}const msg=new Uint8Array(data.length+ecLen);for(let i=0;i<data.length;i++)msg[i]=data[i];for(let i=0;i<data.length;i++){const coef=msg[i];if(coef!==0)for(let j=0;j<gen.length;j++)msg[i+j]^=gfMul(gen[j],coef)}return Array.from(msg.slice(data.length))}
+function placeBits(m,f,s,bits){let idx=0;for(let right=s-1;right>=1;right-=2){if(right===6)right=5;for(let vert=0;vert<s;vert++){for(const j of[0,1]){const col=right-j;const row=((Math.floor((s-1-right+1)/2))%2===0)?(s-1-vert):vert;if(row<0||row>=s||col<0||col>=s)continue;if(f[row][col])continue;m[row][col]=idx<bits.length?bits[idx]:0;idx++}}}}
+function applyBestMask(m,f,s){let bestPenalty=Infinity,bestMask=0;for(let mask=0;mask<8;mask++){const copy=m.map(r=>[...r]);applyMask(copy,f,s,mask);const p=calcPenalty(copy,s);if(p<bestPenalty){bestPenalty=p;bestMask=mask}}applyMask(m,f,s,bestMask);return bestMask}
+function applyMask(m,f,s,mask){for(let r=0;r<s;r++)for(let c=0;c<s;c++){if(f[r][c])continue;let flip=false;switch(mask){case 0:flip=(r+c)%2===0;break;case 1:flip=r%2===0;break;case 2:flip=c%3===0;break;case 3:flip=(r+c)%3===0;break;case 4:flip=(Math.floor(r/2)+Math.floor(c/3))%2===0;break;case 5:flip=(r*c)%2+(r*c)%3===0;break;case 6:flip=((r*c)%2+(r*c)%3)%2===0;break;case 7:flip=((r+c)%2+(r*c)%3)%2===0;break}if(flip)m[r][c]^=1}}
+function calcPenalty(m,s){let p=0;for(let r=0;r<s;r++){let cnt=1;for(let c=1;c<s;c++){if(m[r][c]===m[r][c-1])cnt++;else{if(cnt>=5)p+=cnt-2;cnt=1}}if(cnt>=5)p+=cnt-2}for(let c=0;c<s;c++){let cnt=1;for(let r=1;r<s;r++){if(m[r][c]===m[r-1][c])cnt++;else{if(cnt>=5)p+=cnt-2;cnt=1}}if(cnt>=5)p+=cnt-2}return p}
+function addFormatInfo(m,f,s,mask){const ecl=1;let bits=(ecl<<3)|mask;let rem=bits;for(let i=0;i<10;i++)rem=(rem<<1)^((rem>>>9)*0x537);bits=(bits<<10)|rem;bits^=0x5412;const coords1=[[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[7,8],[8,8],[8,7],[8,5],[8,4],[8,3],[8,2],[8,1],[8,0]];const coords2=[[8,s-1],[8,s-2],[8,s-3],[8,s-4],[8,s-5],[8,s-6],[8,s-7],[8,s-8],[s-7,8],[s-6,8],[s-5,8],[s-4,8],[s-3,8],[s-2,8],[s-1,8]];for(let i=0;i<15;i++){const val=(bits>>>i)&1;const[r1,c1]=coords1[i];m[r1][c1]=val;const[r2,c2]=coords2[i];m[r2][c2]=val}}}
+
+function renderQR(container,text,cellSize=4){
+  const{modules,size}=generateQR(text);
+  const px=cellSize;const total=size*px+px*8;
+  let svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${total} ${total}" width="${Math.min(160,total)}" height="${Math.min(160,total)}">`;
+  svg+=`<rect width="${total}" height="${total}" fill="#fff"/>`;
+  for(let r=0;r<size;r++)for(let c=0;c<size;c++){if(modules[r][c])svg+=`<rect x="${c*px+px*4}" y="${r*px+px*4}" width="${px}" height="${px}" rx="${px*.2}" fill="#0a0a0f"/>`;}
+  svg+=`</svg>`;
+  container.innerHTML=svg;
+}
+
+// ─── Initialize QR ───
+renderQR(document.getElementById('qrcode'),'https://skilldrunk.com/card/rockstar/');
+
+// ─── vCard Download ───
+function saveContact(){
+  const vcard=`BEGIN:VCARD
+VERSION:3.0
+FN:Özgür GÜR
+TITLE:CTO @ EGV Group
+ORG:EGV Group
+EMAIL;TYPE=INTERNET:ozgurgur@gmail.com
+TEL;TYPE=CELL:+90 XXX XXX XXXX
+ADR;TYPE=HOME:;;İstanbul;Türkiye
+URL:https://skilldrunk.com
+URL:https://skimsoulfat.com
+NOTE:AI Automation Architect | Sim Racer | Builder
+END:VCARD`;
+  const blob=new Blob([vcard],{type:'text/vcard;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='Ozgur_GUR.vcf';
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Contact file downloaded!');
+}
+
+// ─── Share ───
+function shareCard(){
+  if(navigator.share){
+    navigator.share({title:'Özgür GÜR — Digital Card',text:'CTO @ EGV Group | AI Automation Architect',url:'https://skilldrunk.com/card/rockstar/'}).catch(()=>{});
+  }else{
+    copyText('https://skilldrunk.com/card/rockstar/','Link copied!');
+  }
+}
+
+// ─── Copy to clipboard ───
+function copyText(text,msg){
+  navigator.clipboard.writeText(text).then(()=>showToast(msg||'Copied!')).catch(()=>{});
+}
+
+// ─── Toast ───
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+// ─── Particles ───
+(function(){
+  const canvas=document.getElementById('particles');
+  const ctx=canvas.getContext('2d');
+  let w,h,particles=[];
+  function resize(){w=canvas.width=window.innerWidth;h=canvas.height=window.innerHeight}
+  resize();window.addEventListener('resize',resize);
+  for(let i=0;i<40;i++){
+    particles.push({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:Math.random()*1.5+.5,o:Math.random()*.15+.05});
+  }
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    for(const p of particles){
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=w;if(p.x>w)p.x=0;
+      if(p.y<0)p.y=h;if(p.y>h)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(212,168,83,${p.o})`;ctx.fill();
+    }
+    // Draw connections
+    for(let i=0;i<particles.length;i++){
+      for(let j=i+1;j<particles.length;j++){
+        const dx=particles[i].x-particles[j].x;
+        const dy=particles[i].y-particles[j].y;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<150){
+          ctx.beginPath();ctx.moveTo(particles[i].x,particles[i].y);
+          ctx.lineTo(particles[j].x,particles[j].y);
+          ctx.strokeStyle=`rgba(212,168,83,${.04*(1-dist/150)})`;
+          ctx.lineWidth=.5;ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+</body>
+</html>
