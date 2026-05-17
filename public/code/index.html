@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Code Roadmap &mdash; skilldrunk.com</title>
+<style>
+:root {
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --bg3: #21262d;
+  --border: #30363d;
+  --text: #c9d1d9;
+  --text-dim: #8b949e;
+  --accent: #58a6ff;
+  --green: #3fb950;
+  --yellow: #d29922;
+  --red: #f85149;
+  --purple: #bc8cff;
+  --orange: #f0883e;
+  --warm: #e8b86d;
+  --pink: #f778ba;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.7; max-width: 960px; margin: 0 auto; padding: 40px 24px; }
+h1 { font-size: 32px; font-weight: 700; margin-bottom: 4px; }
+h2 { font-size: 22px; font-weight: 600; color: var(--accent); margin-top: 48px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+h3 { font-size: 16px; font-weight: 600; margin-top: 20px; margin-bottom: 8px; }
+p { margin-bottom: 12px; font-size: 14px; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.subtitle { color: var(--text-dim); font-size: 14px; margin-bottom: 32px; }
+.back-link { display: inline-block; margin-bottom: 24px; font-size: 13px; color: var(--text-dim); }
+.back-link:hover { color: var(--accent); }
+code { background: var(--bg3); padding: 2px 6px; border-radius: 4px; font-size: 13px; font-family: 'SF Mono', Monaco, Consolas, monospace; }
+.badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 12px; margin-right: 6px; vertical-align: middle; }
+.badge-high { background: rgba(248,81,73,0.15); color: var(--red); }
+.badge-medium { background: rgba(210,153,34,0.15); color: var(--yellow); }
+.badge-low { background: rgba(139,148,158,0.15); color: var(--text-dim); }
+.badge-spec { background: rgba(63,185,80,0.15); color: var(--green); }
+.badge-existing { background: rgba(88,166,255,0.15); color: var(--accent); }
+.badge-idea { background: rgba(188,140,255,0.15); color: var(--purple); }
+.badge-pending { background: rgba(240,136,62,0.15); color: var(--orange); }
+.badge-done { background: rgba(63,185,80,0.2); color: var(--green); }
+
+/* Stats row */
+.stats-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 32px; }
+.stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; text-align: center; }
+.stat-number { font-size: 28px; font-weight: 700; }
+.stat-number.green { color: var(--green); }
+.stat-number.accent { color: var(--accent); }
+.stat-number.yellow { color: var(--yellow); }
+.stat-number.purple { color: var(--purple); }
+.stat-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; margin-top: 4px; }
+
+/* Project cards */
+.project-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; overflow: hidden; cursor: pointer; transition: border-color 0.2s; }
+.project-card:hover { border-color: var(--accent); }
+.project-header { padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
+.project-header-left { display: flex; align-items: center; gap: 12px; }
+.project-rank { font-size: 20px; font-weight: 700; color: var(--text-dim); min-width: 28px; }
+.project-title { font-size: 15px; font-weight: 600; }
+.project-domain { font-size: 12px; color: var(--text-dim); }
+.project-toggle { font-size: 18px; color: var(--text-dim); transition: transform 0.2s; padding: 4px 8px; }
+.project-card.open .project-toggle { transform: rotate(180deg); }
+.project-details { display: none; padding: 0 20px 20px; border-top: 1px solid var(--border); }
+.project-card.open .project-details { display: block; padding-top: 16px; }
+.project-meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; font-size: 13px; }
+.project-meta span { color: var(--text-dim); }
+.project-meta strong { color: var(--text); }
+
+/* Progress bar */
+.progress-bar { background: var(--bg3); border-radius: 4px; height: 8px; margin: 8px 0 4px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+.progress-fill.green { background: var(--green); }
+.progress-fill.accent { background: var(--accent); }
+.progress-fill.yellow { background: var(--yellow); }
+.progress-fill.orange { background: var(--orange); }
+.progress-fill.purple { background: var(--purple); }
+.progress-label { font-size: 11px; color: var(--text-dim); }
+
+/* Milestones */
+.milestones { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.milestone { font-size: 12px; background: var(--bg3); border: 1px solid var(--border); border-radius: 4px; padding: 3px 10px; color: var(--text-dim); }
+.milestone.done { border-color: var(--green); color: var(--green); }
+.milestone.current { border-color: var(--accent); color: var(--accent); background: rgba(88,166,255,0.08); }
+
+/* Completed grid */
+.completed-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; margin: 16px 0; }
+.completed-item { background: var(--bg2); border: 1px solid var(--border); border-left: 3px solid var(--green); border-radius: 0 6px 6px 0; padding: 12px 14px; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+.completed-item .check { color: var(--green); font-weight: bold; flex-shrink: 0; }
+
+/* Infra grid */
+.infra-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin: 16px 0; }
+.infra-item { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+.infra-item .check { color: var(--green); flex-shrink: 0; }
+
+.timestamp { text-align: center; color: var(--text-dim); font-size: 12px; margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--border); }
+
+@media (max-width: 768px) {
+  body { padding: 16px; }
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .completed-grid, .infra-grid { grid-template-columns: 1fr; }
+  h1 { font-size: 24px; }
+  .project-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+}
+</style>
+</head>
+<body>
+
+<a href="https://skilldrunk.com" class="back-link">&larr; skilldrunk.com</a>
+
+<h1>Code Roadmap</h1>
+<p class="subtitle">All development projects, priorities, versions, and timelines</p>
+
+<!-- ========== STATS ========== -->
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-number green">7</div>
+    <div class="stat-label">Active Projects</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number accent">9</div>
+    <div class="stat-label">Live Subdomains</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number yellow">6</div>
+    <div class="stat-label">Shipped This Session</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number purple">4</div>
+    <div class="stat-label">MCP Integrations</div>
+  </div>
+</div>
+
+<!-- ========== ACTIVE PROJECTS ========== -->
+<h2>Active Projects</h2>
+
+<!-- Project 1 -->
+<div class="project-card open" onclick="this.classList.toggle('open')">
+  <div class="project-header">
+    <div class="project-header-left">
+      <span class="project-rank">#1</span>
+      <div>
+        <div class="project-title">quotes.skilldrunk.com v2</div>
+        <div class="project-domain">Swipe-to-like, social sharing, analytics</div>
+      </div>
+    </div>
+    <div>
+      <span class="badge badge-spec">SPEC READY</span>
+      <span class="badge badge-high">HIGH</span>
+      <span class="project-toggle">&#9660;</span>
+    </div>
+  </div>
+  <div class="project-details">
+    <div class="project-meta">
+      <span>Est: <strong>2&ndash;3 sessions</strong></span>
+      <span>Stack: <strong>Next.js 16, React 19, Supabase, Canvas API</strong></span>
+      <span>Spec: <strong><a href="/docs/quotes-v2/">View spec</a></strong></span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill green" style="width: 15%;"></div></div>
+    <div class="progress-label">15% &mdash; Spec complete, implementation pending</div>
+    <div class="milestones">
+      <span class="milestone current">v2.0 Swipe UI</span>
+      <span class="milestone">v2.1 Comments + Share</span>
+      <span class="milestone">v2.2 Analytics</span>
+      <span class="milestone">v2.3 Email Sub</span>
+    </div>
+  </div>
+</div>
+
+<!-- Project 2 -->
+<div class="project-card" onclick="this.classList.toggle('open')">
+  <div class="project-header">
+    <div class="project-header-left">
+      <span class="project-rank">#2</span>
+      <div>
+        <div class="project-title">skimsoulfat.com</div>
+        <div class="project-domain">Personal ecosystem platform, blog, dashboard</div>
+      </div>
+    </div>
+    <div>
+      <span class="badge badge-existing">EXISTING</span>
+      <span class="badge badge-high">HIGH</span>
+      <span class="project-toggle">&#9660;</span>
+    </div>
+  </div>
+  <div class="project-details">
+    <div class="project-meta">
+      <span>Est: <strong>3&ndash;5 sessions</strong></span>
+      <span>Needs: <strong>Mobile-first redesign + blog system + RocKStaR profile</strong></span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill accent" style="width: 35%;"></div></div>
+    <div class="progress-label">35% &mdash; Existing, needs redesign</div>
+    <div class="milestones">
+      <span class="milestone">Mobile UI</span>
+      <span class="milestone">Blog System</span>
+      <span class="milestone">Notification Dashboard</span>
+      <span class="milestone">Analytics</span>
+    </div>
+  </div>
+</div>
+
+<!-- Project 3 -->
+<div class="project-card" onclick="this.classList.toggle('open')">
+  <div class="project-header">
+    <div class="project-header-left">
+      <span class="project-rank">#3</span>
+      <div>
+        <div class="project-title">skilldrunk.com mobile-first</div>
+        <div class="project-domain">Admin + public site mobile optimization</div>
+      </div>
+    </div>
+    <div>
+      <span class="badge badge-existing">EXISTING</span>
+      <span class="badge badge-medium">MEDIUM</span>
+      <span class="project-toggle">&#9660;</span>
+    </div>
+  </div>
+  <div class="project-details">
+    <div class="project-meta">
+      <span>Est: <strong>2&ndash;3 sessions</strong></span>
+      <span>Needs: <strong>Responsive overhaul across all pages</strong></span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill yellow" style="width: 50%;"></div></div>
+    <div class="progress-label">50% &mdash; Desktop done, mobile pending</div>
+    <div class="milestones">
+      <span class="milestone done">Desktop layouts</span>
+      <span class="milestone current">Responsive breakpoints</span>
+      <span class="milestone">Touch targets</span>
+      <span class="milestone">Mobile nav</span>
+    </div>
+  </div>
+</div>
+
+<!-- Project 4 -->
+<div class="project-card" onclick="this.classList.toggle('open')">
+  <div class="project-header">
+    <div class="project-header-left">
+      <span class="project-rank">#4</span>
+      <div>
+        <div class="project-title">Bildirim Filtresi MVP</div>
+        <div class="project-domain">Mac notification capture &rarr; Claude classify &rarr; Telegram forward</div>
+      </div>
+    </div>
+    <div>
+      <span class="badge badge-spec">SPEC READY</span>
+      <span class="badge badge-medium">MEDIUM</span>
+      <span class="project-toggle">&#9660;</span>
+    </div>
+  </div>
+  <div class="project-details">
+    <div class="project-meta">
+      <span>Est: <strong>4&ndash;6 sessions</strong></span>
+      <span>Spec: <strong><a href="/docs/notification-filter/">View spec</a></strong></span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill green" style="width: 10%;"></div></div>
+    <div class="progress-label">10% &mdash; Spec complete, no code yet</div>
+    <div class="milestones">
+      <span class="milestone done">Spec</span>
+      <span class="milestone">macOS capture</span>
+      <span class="milestone">Claude classifier</span>
+      <span class="milestone">Telegram relay</span>
+      <span class="milestone">Admin UI</span>
+    </div>
+  </div>
+</div>
+
+<!-- Project 5 -->
+<div class="project-card" onclick="this.classList.toggle('open')">
+  <div class="project-header">
+    <div class="project-header-left">
+      <span class="project-rank">#5</span>
+      <div>
+        <div class="project-title">Nevra Bozok Platform</div>
+        <div class="project-domain">Artist marketplace, AI-powered listing</div>
+      </div>
+    </div>
+    <div>
+      <span class="badge badge-spec">SPEC READY</span>
+      <span class="badge badge-low">LOW</span>
+      <span class="project-toggle">&#9660;</span>
+    </div>
+  </div>
+  <div class="project-details">
+    <div class="project-meta">
+      <span>Est: <strong>5&ndash;8 sessions</strong></span>
+      <span>Blocker: <strong>Domain registration needed</strong></span>
+      <span>Spec: <strong><a href="/docs/nevra-bozok-platform/">View spec</a></strong></span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill green" style="width: 8%;"></div></div>
+    <div class="progress-label">8% &mdash; Spec done, waiting on domain</div>
+    <div class="milestones">
+      <span class="milestone done">Spec</span>
+      <span class="milestone">Domain</span>
+      <span class="milestone">MVP scaffold</span>
+      <span class="milestone">AI listing</span>
+      <span class="milestone">Marketplace</span>
+    </div>
+  </div>
+</div>
+
+<!-- Project 6 -->
+<div class="project-card" onclick="this.classList.toggle('open')">
+  <div class="project-header">
+    <div class="project-header-left">
+      <span class="project-rank">#6</span>
+      <div>
+        <div class="project-title">Turn-Based Strategy Game</div>
+        <div class="project-domain">Red Alert 2 inspired mobile game</div>
+      </div>
+    </div>
+    <div>
+      <span class="badge badge-idea">IDEA</span>
+      <span class="badge badge-low">LOW</span>
+      <span class="project-toggle">&#9660;</span>
+    </div>
+  </div>
+  <div class="project-details">
+    <div class="project-meta">
+      <span>Est: <strong>10+ sessions</strong></span>
+      <span>Stage: <strong>Concept only, no spec</strong></span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill purple" style="width: 2%;"></div></div>
+    <div class="progress-label">2% &mdash; Idea stage</div>
+    <div class="milestones">
+      <span class="milestone">Game design doc</span>
+      <span class="milestone">Prototype</span>
+      <span class="milestone">Core mechanics</span>
+      <span class="milestone">Multiplayer</span>
+      <span class="milestone">Polish + launch</span>
+    </div>
+  </div>
+</div>
+
+<!-- Project 7 -->
+<div class="project-card" onclick="this.classList.toggle('open')">
+  <div class="project-header">
+    <div class="project-header-left">
+      <span class="project-rank">#7</span>
+      <div>
+        <div class="project-title">movetech.app ecosystem</div>
+        <div class="project-domain">DNS fix, mobile optimization</div>
+      </div>
+    </div>
+    <div>
+      <span class="badge badge-pending">PENDING</span>
+      <span class="badge badge-medium">MEDIUM</span>
+      <span class="project-toggle">&#9660;</span>
+    </div>
+  </div>
+  <div class="project-details">
+    <div class="project-meta">
+      <span>Est: <strong>1&ndash;2 sessions</strong></span>
+      <span>Needs: <strong>DNS configuration + responsive CSS</strong></span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill orange" style="width: 20%;"></div></div>
+    <div class="progress-label">20% &mdash; App exists, infrastructure needs work</div>
+    <div class="milestones">
+      <span class="milestone">DNS fix</span>
+      <span class="milestone">Mobile CSS</span>
+    </div>
+  </div>
+</div>
+
+<!-- ========== COMPLETED ========== -->
+<h2>Completed (This Session)</h2>
+
+<div class="completed-grid">
+  <div class="completed-item"><span class="check">&#10003;</span> skilldrunk.com ISR fix (TTFB 1.5s &rarr; 50ms)</div>
+  <div class="completed-item"><span class="check">&#10003;</span> skilldrunk.com proxy.ts 500 fix</div>
+  <div class="completed-item"><span class="check">&#10003;</span> .claude/ folder on 5 projects</div>
+  <div class="completed-item"><span class="check">&#10003;</span> Ecosystem dashboard, blog, profile, card</div>
+  <div class="completed-item"><span class="check">&#10003;</span> Vaultwarden setup</div>
+  <div class="completed-item"><span class="check">&#10003;</span> Atlas Suno migration</div>
+</div>
+
+<!-- ========== INFRASTRUCTURE ========== -->
+<h2>Infrastructure</h2>
+
+<div class="infra-grid">
+  <div class="infra-item"><span class="check">&#10003;</span> Firecrawl MCP</div>
+  <div class="infra-item"><span class="check">&#10003;</span> Context7 MCP</div>
+  <div class="infra-item"><span class="check">&#10003;</span> Plaud MCP</div>
+  <div class="infra-item"><span class="check">&#10003;</span> 3 new skills (who-built-this, humanizer, grill-me)</div>
+  <div class="infra-item"><span class="check">&#10003;</span> CheckVibe evaluation</div>
+</div>
+
+<div class="timestamp">
+  skilldrunk.com/code &mdash; Last updated 2026-05-17 &mdash; <a href="https://skilldrunk.com">skilldrunk.com</a>
+</div>
+
+</body>
+</html>

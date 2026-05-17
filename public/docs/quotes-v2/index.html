@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quotes v2 — Product Specification</title>
+<style>
+:root {
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --bg3: #21262d;
+  --border: #30363d;
+  --text: #c9d1d9;
+  --text-dim: #8b949e;
+  --accent: #58a6ff;
+  --green: #3fb950;
+  --yellow: #d29922;
+  --red: #f85149;
+  --purple: #bc8cff;
+  --orange: #f0883e;
+  --warm: #e8b86d;
+  --pink: #f778ba;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.7; max-width: 920px; margin: 0 auto; padding: 40px 24px; }
+h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+h2 { font-size: 22px; font-weight: 600; color: var(--accent); margin-top: 48px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+h3 { font-size: 16px; font-weight: 600; margin-top: 24px; margin-bottom: 8px; }
+p { margin-bottom: 12px; font-size: 14px; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.subtitle { color: var(--text-dim); font-size: 14px; margin-bottom: 32px; }
+.meta-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 32px; }
+.meta-row { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 6px; }
+.meta-label { color: var(--text-dim); min-width: 120px; font-size: 13px; }
+.meta-value { font-size: 13px; }
+.section-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 24px; margin-bottom: 16px; }
+.badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 12px; margin-right: 6px; }
+.badge-v20 { background: rgba(63,185,80,0.15); color: var(--green); }
+.badge-v21 { background: rgba(188,140,255,0.15); color: var(--purple); }
+.badge-v22 { background: rgba(88,166,255,0.15); color: var(--accent); }
+.badge-v23 { background: rgba(240,136,62,0.15); color: var(--orange); }
+.badge-v24 { background: rgba(247,120,186,0.15); color: var(--pink); }
+.badge-high { background: rgba(248,81,73,0.15); color: var(--red); }
+.badge-spec { background: rgba(63,185,80,0.15); color: var(--green); }
+ul { padding-left: 20px; margin-bottom: 12px; }
+li { margin-bottom: 6px; font-size: 14px; }
+code { background: var(--bg3); padding: 2px 6px; border-radius: 4px; font-size: 13px; font-family: 'SF Mono', Monaco, Consolas, monospace; }
+pre { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; margin: 12px 0; font-size: 13px; font-family: 'SF Mono', Monaco, Consolas, monospace; line-height: 1.5; color: var(--text); }
+.feature-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin: 16px 0; }
+.feature-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+.feature-card h4 { font-size: 14px; margin-bottom: 6px; }
+.feature-card p { font-size: 12px; color: var(--text-dim); margin-bottom: 0; }
+.feature-icon { font-size: 20px; margin-bottom: 8px; display: block; }
+.roadmap { margin: 20px 0; }
+.roadmap-item { display: flex; align-items: stretch; margin-bottom: 0; }
+.roadmap-line { width: 40px; display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+.roadmap-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; }
+.roadmap-dot.active { border-color: var(--green); background: var(--green); }
+.roadmap-connector { width: 2px; flex: 1; background: var(--border); }
+.roadmap-content { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin: 0 0 12px 0; flex: 1; }
+.roadmap-content h4 { font-size: 14px; margin-bottom: 4px; }
+.roadmap-content p { font-size: 12px; color: var(--text-dim); margin-bottom: 0; }
+.schema-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+.schema-table th { text-align: left; font-size: 12px; color: var(--text-dim); padding: 8px; border-bottom: 2px solid var(--border); text-transform: uppercase; }
+.schema-table td { padding: 8px; border-bottom: 1px solid var(--border); font-size: 13px; }
+.flow-diagram { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 24px; margin: 16px 0; text-align: center; font-size: 14px; }
+.flow-step { display: inline-block; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 6px 14px; margin: 4px; }
+.flow-arrow { color: var(--accent); margin: 0 8px; }
+.share-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; margin: 16px 0; }
+.share-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 14px; text-align: center; }
+.share-card .icon { font-size: 24px; margin-bottom: 6px; }
+.share-card h4 { font-size: 13px; margin-bottom: 4px; }
+.share-card p { font-size: 11px; color: var(--text-dim); margin-bottom: 0; }
+.highlight-box { background: linear-gradient(135deg, rgba(88,166,255,0.08), rgba(188,140,255,0.05)); border: 1px solid var(--accent); border-radius: 8px; padding: 20px; margin: 16px 0; }
+.highlight-box h3 { color: var(--accent); margin-top: 0; }
+.timestamp { text-align: center; color: var(--text-dim); font-size: 12px; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); }
+.back-link { display: inline-block; margin-bottom: 24px; font-size: 13px; color: var(--text-dim); }
+.back-link:hover { color: var(--accent); }
+.tab-nav { display: flex; gap: 0; margin-bottom: 24px; border-bottom: 1px solid var(--border); overflow-x: auto; }
+.tab-nav a { padding: 10px 16px; font-size: 13px; font-weight: 500; color: var(--text-dim); border-bottom: 2px solid transparent; white-space: nowrap; }
+.tab-nav a:hover { color: var(--text); text-decoration: none; }
+.tab-nav a.active { color: var(--accent); border-bottom-color: var(--accent); }
+@media (max-width: 768px) {
+  body { padding: 16px; }
+  .feature-grid, .share-grid { grid-template-columns: 1fr; }
+  h1 { font-size: 24px; }
+}
+</style>
+</head>
+<body>
+
+<a href="https://skilldrunk.com" class="back-link">&larr; skilldrunk.com</a>
+
+<h1>quotes.skilldrunk.com v2</h1>
+<p class="subtitle">Product Specification &mdash; Swipe-to-Like, Social Sharing, Analytics</p>
+
+<div class="meta-box">
+  <div class="meta-row"><span class="meta-label">Project</span><span class="meta-value">quotes.skilldrunk.com upgrade</span></div>
+  <div class="meta-row"><span class="meta-label">Owner</span><span class="meta-value">Ozgur GUR (ozgurgur@gmail.com)</span></div>
+  <div class="meta-row"><span class="meta-label">Status</span><span class="meta-value"><span class="badge badge-spec">SPEC READY</span></span></div>
+  <div class="meta-row"><span class="meta-label">Priority</span><span class="meta-value"><span class="badge badge-high">HIGH</span></span></div>
+  <div class="meta-row"><span class="meta-label">Est. Effort</span><span class="meta-value">2&ndash;3 Code sessions</span></div>
+  <div class="meta-row"><span class="meta-label">Stack</span><span class="meta-value">Next.js 16 + React 19 + Supabase + Tailwind 4 + Canvas API</span></div>
+  <div class="meta-row"><span class="meta-label">Created</span><span class="meta-value">2026-05-17</span></div>
+</div>
+
+<nav class="tab-nav">
+  <a href="#ux" class="active">Core UX</a>
+  <a href="#sharing">Social Sharing</a>
+  <a href="#personalization">Personalization</a>
+  <a href="#analytics">Analytics</a>
+  <a href="#schema">DB Schema</a>
+  <a href="#ecosystem">Ecosystem</a>
+  <a href="#roadmap">Roadmap</a>
+</nav>
+
+<!-- ========== CORE UX ========== -->
+<h2 id="ux">Core UX &mdash; Swipe-to-Like</h2>
+
+<div class="highlight-box">
+  <h3>Design Philosophy</h3>
+  <p>Mobile-first, Tinder-style card interface. One quote fills the viewport. Swipe right to like, left to skip. Thumb-friendly, zero-friction engagement. Desktop: arrow keys + click fallback.</p>
+</div>
+
+<div class="feature-grid">
+  <div class="feature-card">
+    <span class="feature-icon">👆</span>
+    <h4>Swipe Right = Like</h4>
+    <p>Touch gesture with spring animation. Card flies off-screen with a heart pulse effect. Like count increments in real-time.</p>
+  </div>
+  <div class="feature-card">
+    <span class="feature-icon">👈</span>
+    <h4>Swipe Left = Skip</h4>
+    <p>Card dismisses left with a subtle fade. No negative action stored &mdash; just advances to the next quote.</p>
+  </div>
+  <div class="feature-card">
+    <span class="feature-icon">❤️</span>
+    <h4>Like Counter</h4>
+    <p>Anonymous, stored in Supabase. Each quote shows total likes. No auth required &mdash; session-based dedup.</p>
+  </div>
+  <div class="feature-card">
+    <span class="feature-icon">💬</span>
+    <h4>Comments</h4>
+    <p>Name + comment form below each quote. No auth &mdash; just name field. Chronological display, newest first.</p>
+  </div>
+  <div class="feature-card">
+    <span class="feature-icon">💡</span>
+    <h4>Suggest a Quote</h4>
+    <p>Floating action button opens a modal form: quote text + author + submitter name. Stored for admin review.</p>
+  </div>
+  <div class="feature-card">
+    <span class="feature-icon">🎴</span>
+    <h4>Card Stack UI</h4>
+    <p>3-card stack visible: current card on top, next two peeking behind with parallax depth. Preloads next 5 quotes.</p>
+  </div>
+</div>
+
+<div class="flow-diagram">
+  <span class="flow-step">Load page</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Fetch batch (10 quotes)</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Display card stack</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Swipe right / left</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Track + animate</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Next card</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Batch exhausted? Fetch more</span>
+</div>
+
+<!-- ========== SOCIAL SHARING ========== -->
+<h2 id="sharing">Social Sharing</h2>
+
+<p>Every quote has a persistent share bar. Platform-specific formatting ensures the shared content looks native on each channel.</p>
+
+<div class="share-grid">
+  <div class="share-card">
+    <div class="icon">📱</div>
+    <h4>WhatsApp</h4>
+    <p>Clean text: quote + attribution + link. Uses <code>wa.me</code> deep link.</p>
+  </div>
+  <div class="share-card">
+    <div class="icon">📸</div>
+    <h4>Instagram</h4>
+    <p>Canvas API generates 1080&times;1080 dark-bg PNG. Download button for IG Stories.</p>
+  </div>
+  <div class="share-card">
+    <div class="icon">🐦</div>
+    <h4>Twitter / X</h4>
+    <p>Pre-formatted tweet with quote, em-dash attribution, and short link.</p>
+  </div>
+  <div class="share-card">
+    <div class="icon">📋</div>
+    <h4>Copy to Clipboard</h4>
+    <p>One-tap copy with &ldquo;Copied!&rdquo; toast animation. Includes attribution.</p>
+  </div>
+  <div class="share-card">
+    <div class="icon">🔗</div>
+    <h4>Native Share</h4>
+    <p>Web Share API for mobile share sheet. Falls back to copy-link on desktop.</p>
+  </div>
+</div>
+
+<div class="section-card">
+  <h3>Instagram Story Generator &mdash; Technical Detail</h3>
+  <p>Uses HTML5 Canvas API to render a 1080&times;1080px image:</p>
+  <ul>
+    <li>Dark gradient background (<code>#0d1117</code> &rarr; <code>#161b22</code>)</li>
+    <li>Quote text: white, centered, auto-wrapped, size scaled to fit</li>
+    <li>Attribution line: accent color, smaller font, below quote</li>
+    <li>Subtle <code>quotes.skilldrunk.com</code> watermark at bottom</li>
+    <li>Export as PNG via <code>canvas.toBlob()</code> &rarr; download trigger</li>
+  </ul>
+</div>
+
+<!-- ========== PERSONALIZATION ========== -->
+<h2 id="personalization">Personalization (Cookie-Based)</h2>
+
+<p>No authentication required. All personalization uses <code>localStorage</code> + a session cookie for cross-tab sync.</p>
+
+<div class="feature-grid">
+  <div class="feature-card">
+    <span class="feature-icon">⭐</span>
+    <h4>Save Favorites</h4>
+    <p>Tap the star icon to save a quote to your local collection. Persists via localStorage. Sync indicator on load.</p>
+  </div>
+  <div class="feature-card">
+    <span class="feature-icon">📚</span>
+    <h4>My Collection</h4>
+    <p>Dedicated page showing all saved quotes. Filterable, sortable by date saved. Export as text or image grid.</p>
+  </div>
+  <div class="feature-card">
+    <span class="feature-icon">🕐</span>
+    <h4>View History</h4>
+    <p>Track which quotes you&rsquo;ve already seen. &ldquo;Show unseen only&rdquo; toggle in settings. History stored locally.</p>
+  </div>
+  <div class="feature-card">
+    <span class="feature-icon">📧</span>
+    <h4>Email Subscription CTA</h4>
+    <p>After 5+ favorites saved: banner appears &mdash; &ldquo;Get a daily quote in your inbox.&rdquo; Email form &rarr; <code>email_subscribers</code> table.</p>
+  </div>
+</div>
+
+<div class="flow-diagram">
+  <span class="flow-step">User saves 5 quotes</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">CTA banner slides in</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Email input + subscribe</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Supabase insert</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Daily cron sends email</span>
+</div>
+
+<!-- ========== ANALYTICS ========== -->
+<h2 id="analytics">Analytics</h2>
+
+<p>Every interaction is tracked for data-driven iteration. Anonymous session fingerprinting (no PII). All data flows to Supabase for real-time dashboards.</p>
+
+<div class="section-card">
+  <h3>Events Tracked</h3>
+  <table class="schema-table">
+    <thead><tr><th>Event</th><th>Table</th><th>Fields</th></tr></thead>
+    <tbody>
+      <tr><td>Quote viewed</td><td><code>quote_views</code></td><td>quote_id, session_id, view_duration_ms</td></tr>
+      <tr><td>Quote liked</td><td><code>quote_likes</code></td><td>quote_id, session_id</td></tr>
+      <tr><td>Quote shared</td><td><code>quote_shares</code></td><td>quote_id, platform, session_id</td></tr>
+      <tr><td>Comment posted</td><td><code>quote_comments</code></td><td>quote_id, author_name, comment_text</td></tr>
+      <tr><td>Email subscribed</td><td><code>email_subscribers</code></td><td>email, is_active</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section-card">
+  <h3>Aggregate Metrics (Daily Cron)</h3>
+  <ul>
+    <li><strong>Most Liked</strong> &mdash; Top 10 quotes by like count (24h / 7d / all-time)</li>
+    <li><strong>Most Shared</strong> &mdash; Top 10 by share count, broken down by platform</li>
+    <li><strong>Trending</strong> &mdash; Velocity formula: <code>(likes_24h * 2 + shares_24h * 3) / hours_since_created</code></li>
+    <li><strong>Engagement Rate</strong> &mdash; <code>(likes + shares + comments) / views</code> per quote</li>
+    <li><strong>Session Depth</strong> &mdash; Average quotes viewed per session, time on page</li>
+  </ul>
+</div>
+
+<!-- ========== DB SCHEMA ========== -->
+<h2 id="schema">Supabase Schema</h2>
+
+<p>All tables use RLS. Public read on aggregates, session-validated writes. Service role for cron jobs only.</p>
+
+<pre>
+-- Quote engagement tables
+-- Prefix: none (extends existing qt_quotes table)
+
+CREATE TABLE quote_likes (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  quote_id int REFERENCES quotes(id),
+  session_id text NOT NULL,
+  created_at timestamptz DEFAULT now()
+);
+-- Unique constraint: one like per session per quote
+CREATE UNIQUE INDEX idx_quote_likes_unique
+  ON quote_likes(quote_id, session_id);
+
+CREATE TABLE quote_comments (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  quote_id int REFERENCES quotes(id),
+  author_name text NOT NULL CHECK (char_length(author_name) BETWEEN 1 AND 50),
+  comment_text text NOT NULL CHECK (char_length(comment_text) BETWEEN 1 AND 500),
+  created_at timestamptz DEFAULT now()
+);
+
+CREATE TABLE quote_shares (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  quote_id int REFERENCES quotes(id),
+  platform text NOT NULL CHECK (platform IN
+    ('whatsapp','instagram','twitter','copy','native')),
+  session_id text NOT NULL,
+  created_at timestamptz DEFAULT now()
+);
+
+CREATE TABLE quote_views (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  quote_id int REFERENCES quotes(id),
+  session_id text NOT NULL,
+  view_duration_ms int DEFAULT 0,
+  created_at timestamptz DEFAULT now()
+);
+
+CREATE TABLE email_subscribers (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  email text UNIQUE NOT NULL,
+  is_active boolean DEFAULT true,
+  created_at timestamptz DEFAULT now()
+);
+
+-- RLS policies
+ALTER TABLE quote_likes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE quote_comments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE quote_shares ENABLE ROW LEVEL SECURITY;
+ALTER TABLE quote_views ENABLE ROW LEVEL SECURITY;
+ALTER TABLE email_subscribers ENABLE ROW LEVEL SECURITY;
+
+-- Public insert (anon key), admin read-all
+CREATE POLICY "anon_insert_likes" ON quote_likes
+  FOR INSERT WITH CHECK (true);
+CREATE POLICY "anon_insert_comments" ON quote_comments
+  FOR INSERT WITH CHECK (true);
+CREATE POLICY "anon_insert_shares" ON quote_shares
+  FOR INSERT WITH CHECK (true);
+CREATE POLICY "anon_insert_views" ON quote_views
+  FOR INSERT WITH CHECK (true);
+CREATE POLICY "anon_insert_subscribers" ON email_subscribers
+  FOR INSERT WITH CHECK (true);
+</pre>
+
+<!-- ========== ECOSYSTEM ========== -->
+<h2 id="ecosystem">Ecosystem Access &amp; Tracking</h2>
+
+<div class="section-card">
+  <h3>Temporary Access Links</h3>
+  <p>Generate time-limited tokens for sharing specific pages with external users. Track their behavior after landing.</p>
+  <ul>
+    <li>Token format: <code>UUID v4</code>, stored in <code>access_tokens</code> table</li>
+    <li>URL: <code>quotes.skilldrunk.com/?token=abc123</code></li>
+    <li>Configurable TTL: 1 hour, 24 hours, 7 days, or custom</li>
+    <li>Each token scoped to a specific target URL or quote ID</li>
+  </ul>
+</div>
+
+<div class="section-card">
+  <h3>Referred User Behavior Tracking</h3>
+  <ul>
+    <li>On token-based landing: create a tracked session linked to the token</li>
+    <li>Track: pages visited, quotes liked/shared, time spent, scroll depth</li>
+    <li>Dashboard view in admin: &ldquo;Who clicked your link and what did they do?&rdquo;</li>
+  </ul>
+</div>
+
+<pre>
+CREATE TABLE access_tokens (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  token text UNIQUE NOT NULL DEFAULT gen_random_uuid()::text,
+  target_url text NOT NULL,
+  expires_at timestamptz NOT NULL,
+  created_by text, -- admin email or 'system'
+  views int DEFAULT 0,
+  created_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE access_tokens ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "public_read_valid_tokens" ON access_tokens
+  FOR SELECT USING (expires_at > now());
+</pre>
+
+<!-- ========== ROADMAP ========== -->
+<h2 id="roadmap">Version Roadmap</h2>
+
+<div class="roadmap">
+  <div class="roadmap-item">
+    <div class="roadmap-line">
+      <div class="roadmap-dot active"></div>
+      <div class="roadmap-connector"></div>
+    </div>
+    <div class="roadmap-content">
+      <h4><span class="badge badge-v20">v2.0</span> Swipe + Like</h4>
+      <p>Mobile-first card stack UI. Swipe gestures with spring physics. Like counter per quote. Card preloading. Session-based dedup.</p>
+    </div>
+  </div>
+  <div class="roadmap-item">
+    <div class="roadmap-line">
+      <div class="roadmap-dot"></div>
+      <div class="roadmap-connector"></div>
+    </div>
+    <div class="roadmap-content">
+      <h4><span class="badge badge-v21">v2.1</span> Comments + Share</h4>
+      <p>Comment system (name + text). WhatsApp, Twitter/X, copy-to-clipboard sharing. Instagram story image generator (Canvas API). Native Web Share API.</p>
+    </div>
+  </div>
+  <div class="roadmap-item">
+    <div class="roadmap-line">
+      <div class="roadmap-dot"></div>
+      <div class="roadmap-connector"></div>
+    </div>
+    <div class="roadmap-content">
+      <h4><span class="badge badge-v22">v2.2</span> Analytics</h4>
+      <p>View tracking with duration. Share tracking by platform. Daily aggregates (trending, most-liked, most-shared). Admin analytics dashboard.</p>
+    </div>
+  </div>
+  <div class="roadmap-item">
+    <div class="roadmap-line">
+      <div class="roadmap-dot"></div>
+      <div class="roadmap-connector"></div>
+    </div>
+    <div class="roadmap-content">
+      <h4><span class="badge badge-v23">v2.3</span> Email Subscription</h4>
+      <p>Triggered CTA after 5+ favorites. Email form &rarr; Supabase. Daily cron sends curated quote. Unsubscribe link in every email.</p>
+    </div>
+  </div>
+  <div class="roadmap-item">
+    <div class="roadmap-line">
+      <div class="roadmap-dot"></div>
+      <div class="roadmap-connector" style="background:transparent;"></div>
+    </div>
+    <div class="roadmap-content">
+      <h4><span class="badge badge-v24">v2.4</span> Instagram Story Generator</h4>
+      <p>Advanced story templates (multiple layouts, color themes). Batch export for multiple quotes. Animated text option (CSS animation &rarr; GIF).</p>
+    </div>
+  </div>
+</div>
+
+<div class="timestamp">
+  quotes.skilldrunk.com v2 &mdash; Spec created 2026-05-17 &mdash; <a href="https://skilldrunk.com">skilldrunk.com</a>
+</div>
+
+</body>
+</html>
