@@ -71,8 +71,8 @@ export function MoreSheet({
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
           />
 
-          {/* Sheet */}
-          <div className="relative glass-strong rounded-t-3xl max-h-[85vh] overflow-y-auto safe-pb">
+          {/* Sheet — fixed height so it always feels like a full drawer, not collapsing to content */}
+          <div className="relative glass-strong rounded-t-3xl h-[85vh] overflow-y-auto safe-pb">
             {/* Drag handle */}
             <div className="sticky top-0 z-10 flex justify-center pt-3 pb-2 bg-gradient-to-b from-neutral-950/95 to-transparent">
               <span className="h-1 w-10 rounded-full bg-neutral-700" />

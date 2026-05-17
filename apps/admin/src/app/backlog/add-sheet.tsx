@@ -60,7 +60,7 @@ export function AddBacklogSheet({
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
           />
 
-          <div className="relative glass-strong rounded-t-3xl max-h-[90vh] overflow-y-auto safe-pb">
+          <div className="relative glass-strong rounded-t-3xl min-h-[60vh] max-h-[90vh] overflow-y-auto safe-pb">
             <div className="sticky top-0 z-10 flex justify-center pt-3 pb-2 bg-gradient-to-b from-neutral-950/95 to-transparent">
               <span className="h-1 w-10 rounded-full bg-neutral-700" />
             </div>
