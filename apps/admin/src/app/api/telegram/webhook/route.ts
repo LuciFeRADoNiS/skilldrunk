@@ -13,14 +13,21 @@ export const maxDuration = 60;
 
 const HELP = `🤖 *Skilldrunk Bot*
 
-Komutlar:
-\`/brief\` — Bugünkü briefi tekrar at
-\`/quote\` — Rastgele günün sözü
-\`/ask <soru>\` — AI asistana sor (read-only mode)
-\`/stats\` — Hızlı ekosistem özeti
-\`/help\` — Bu mesaj
+*Backlog (havuz)*
+\`/todo <başlık> [-p proje] [-pr 1-5]\` — yeni iş
+\`/done <id>\` — bitir
+\`/open\` — devam edenler
+\`/next [proje]\` — sıradakiler
+\`/backlog [proje]\` — tüm aktif
 
-Web: admin.skilldrunk.com`;
+*Veri/AI*
+\`/brief\` — bugünkü brief
+\`/quote\` — günün sözü
+\`/ask <soru>\` — AI asistan (read-only)
+\`/stats\` — hızlı özet
+\`/help\` — bu mesaj
+
+Web: admin.skilldrunk.com/backlog`;
 
 const OWNER_USER_ID = "c17394c2-e995-4bd1-87e3-f98f4326ca12";
 
@@ -192,6 +199,157 @@ async function handleCommand(
             `📥 7g events: \`${events7d ?? 0}\`\n` +
             `🤖 7g AI: \`${calls} çağrı\` · \`$${cost.toFixed(4)}\`\n\n` +
             `🔗 admin.skilldrunk.com`,
+        );
+        return;
+      }
+
+      case "/todo": {
+        if (!args) {
+          await sendTelegramMessage(
+            chatId,
+            "Kullanım: `/todo başlık [-p proje] [-pr 1-5]`\nÖrnek: `/todo Quotes v2 swipe -p quotes-v2 -pr 1`",
+          );
+          return;
+        }
+        const supabase = adminClient();
+        if (!supabase) {
+          await sendTelegramMessage(chatId, "_(supabase config eksik)_");
+          return;
+        }
+        // Parse -p <slug> and -pr <n> out of args
+        let project = "general";
+        let priority = 3;
+        let title = args;
+        const pMatch = title.match(/\s-p\s+([\w-]+)/);
+        if (pMatch) {
+          project = pMatch[1];
+          title = title.replace(pMatch[0], "");
+        }
+        const prMatch = title.match(/\s-pr\s+([1-5])/);
+        if (prMatch) {
+          priority = parseInt(prMatch[1], 10);
+          title = title.replace(prMatch[0], "");
+        }
+        title = title.trim();
+        if (!title) {
+          await sendTelegramMessage(chatId, "Başlık boş olamaz.");
+          return;
+        }
+        const { data, error } = await supabase.rpc("sd_backlog_add", {
+          p_title: title,
+          p_project: project,
+          p_priority: priority,
+          p_source: "telegram",
+          p_status: "next",
+          p_tags: [],
+        });
+        if (error) {
+          await sendTelegramMessage(chatId, `❌ ${error.message}`);
+          return;
+        }
+        const row = data as { id: number; title: string };
+        await sendTelegramMessage(
+          chatId,
+          `✓ #${row.id} \`${row.title}\`\nproje: \`${project}\` · P${priority}`,
+          { reply_to_message_id: replyTo },
+        );
+        return;
+      }
+
+      case "/done": {
+        const id = parseInt(args, 10);
+        if (!Number.isFinite(id) || id <= 0) {
+          await sendTelegramMessage(chatId, "Kullanım: `/done <id>`");
+          return;
+        }
+        const supabase = adminClient();
+        if (!supabase) {
+          await sendTelegramMessage(chatId, "_(supabase config eksik)_");
+          return;
+        }
+        const { data, error } = await supabase.rpc("sd_backlog_set_status", {
+          p_id: id,
+          p_status: "done",
+        });
+        if (error) {
+          await sendTelegramMessage(chatId, `❌ ${error.message}`);
+          return;
+        }
+        const row = data as { title?: string } | null;
+        if (!row?.title) {
+          await sendTelegramMessage(chatId, `Kayıt #${id} bulunamadı.`);
+          return;
+        }
+        await sendTelegramMessage(
+          chatId,
+          `✅ #${id} bitti — \`${row.title}\``,
+          { reply_to_message_id: replyTo },
+        );
+        return;
+      }
+
+      case "/open":
+      case "/next":
+      case "/backlog": {
+        const supabase = adminClient();
+        if (!supabase) {
+          await sendTelegramMessage(chatId, "_(supabase config eksik)_");
+          return;
+        }
+        const projectArg = args.trim() || null;
+
+        let query = supabase
+          .from("sd_backlog")
+          .select("id, title, project, status, priority")
+          .order("priority", { ascending: true })
+          .order("updated_at", { ascending: false })
+          .limit(20);
+
+        if (cmd === "/open") query = query.eq("status", "in_progress");
+        else if (cmd === "/next") query = query.eq("status", "next");
+        else query = query.in("status", ["in_progress", "next", "blocked"]);
+
+        if (projectArg) query = query.eq("project", projectArg);
+
+        const { data: rows, error } = await query;
+        if (error) {
+          await sendTelegramMessage(chatId, `❌ ${error.message}`);
+          return;
+        }
+        const list = (rows ?? []) as Array<{
+          id: number;
+          title: string;
+          project: string;
+          status: string;
+          priority: number;
+        }>;
+        if (list.length === 0) {
+          await sendTelegramMessage(
+            chatId,
+            `_(${cmd} ${projectArg ?? ""} için kayıt yok)_`,
+          );
+          return;
+        }
+        const STATUS_ICON: Record<string, string> = {
+          in_progress: "▶",
+          next: "•",
+          blocked: "⏸",
+        };
+        const body = list
+          .map(
+            (r) =>
+              `${STATUS_ICON[r.status] ?? "·"} *#${r.id}* P${r.priority} _${r.project}_\n   ${r.title}`,
+          )
+          .join("\n\n");
+        const header =
+          cmd === "/open"
+            ? `▶ *Devam edenler*`
+            : cmd === "/next"
+              ? `• *Sıradakiler*`
+              : `📋 *Aktif backlog*`;
+        await sendTelegramMessage(
+          chatId,
+          `${header}${projectArg ? ` · \`${projectArg}\`` : ""}\n\n${body}\n\n_${list.length} kayıt — admin.skilldrunk.com/backlog_`,
         );
         return;
       }

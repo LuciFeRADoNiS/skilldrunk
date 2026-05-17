@@ -9,6 +9,7 @@ import { MoreSheet } from "./more-sheet";
  */
 const NAV = [
   { href: "/", label: "Dashboard", icon: "◉" },
+  { href: "/backlog", label: "Backlog", icon: "▤" },
   { href: "/ai", label: "AI", icon: "✦" },
   { href: "/map", label: "Map", icon: "◈" },
   { href: "/apps", label: "Apps", icon: "▦" },
@@ -25,9 +26,9 @@ const NAV = [
 /** Mobile bottom tab bar — 5 slots, last one opens MoreSheet. */
 const TABS: { href: string; label: string; icon: string }[] = [
   { href: "/", label: "Home", icon: "◉" },
+  { href: "/backlog", label: "Havuz", icon: "▤" },
   { href: "/ai", label: "AI", icon: "✦" },
   { href: "/map", label: "Map", icon: "◈" },
-  { href: "/apps", label: "Apps", icon: "▦" },
 ];
 
 type SubdomainRow = {

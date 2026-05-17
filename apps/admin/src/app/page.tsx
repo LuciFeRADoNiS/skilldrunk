@@ -174,10 +174,10 @@ export default async function AdminDashboard() {
         {/* === Quick actions === */}
         <section className="mb-6">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <QuickAction href="/backlog" icon="▤" label="Backlog" />
             <QuickAction href="/ai" icon="✦" label="AI Asistan" />
             <QuickAction href="/map" icon="◈" label="Ekosistem Map" />
             <QuickAction href="/usage" icon="$" label="AI Maliyet" />
-            <QuickAction href="/apps" icon="▦" label="Tüm Apps" />
           </div>
         </section>
 

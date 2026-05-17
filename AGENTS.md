@@ -155,29 +155,26 @@ Skilldrunk monorepo dışında kalan ve **Cowork (Claude desktop, başka session
 
 **Skilldrunk botu** (`@skilldrunk_bot`, `apps/admin/src/app/api/telegram/webhook/`) — bu repo'nun parçası, Claude Code geliştirir. Cowork tarafı sadece dokümante eder (Calliope kodadıyla, tier: brand-side).
 
-## ŞU AN — Sprint Snapshot
+## ŞU AN — Backlog DB'de
 
-> Repo'yu açar açmaz buradan başla. "Nerede kalmıştık?" sorusunun cevabı.
+> **Tek doğru kaynak artık `sd_backlog` tablosu.** Bu bölüm sadece pointer.
+>
+> Yeni session açtığında ne yapacağını öğrenmek için:
+> 1. `admin.skilldrunk.com/backlog` — mobil-öncelikli, filtreli liste
+> 2. Veya direkt SQL: `select * from sd_backlog where status in ('in_progress','blocked','next') order by priority, updated_at desc limit 20`
+> 3. Telegram: `/open` (devam) · `/next` (sıra) · `/backlog` (tümü)
+> 4. Markdown mirror: `GET admin.skilldrunk.com/api/backlog/export.md?secret=$CRON_SECRET` (Cowork bunu vault'a sync ediyor)
 
-**Son güncelleme:** 2026-04-29 (her PR/sprint sonrası bu bölümü güncelle)
+**Son güncelleme:** 2026-05-17 (PR #30 — Backlog System ship)
 
-**Son ship'ler (kronolojik, en yeni üstte — detay: `Personal Brain/Projects/Skilldrunk/build-log.md`):**
-- PR #29 — feat(admin+agents): pt_apps tabanlı dinamik subdomain nav + agents.skilldrunk.com v2 fork (7 yeni infografik, Calliope 6. bot, state schema v2 spec) — **commit edilmedi, kullanıcı/Cowork push'a bekliyor**
+**Son ship'ler (kronolojik):**
+- PR #30 — feat(backlog): sd_backlog table + admin /backlog mobile glass + Telegram /todo /done /open /next + /api/backlog/export.md (Obsidian sync için)
+- _Admin mobile-first PWA + glass redesign_ (PR yok, direct commit `c897262`) — dashboard + nav + bottom tab bar + service worker + manifest
+- PR #29 — feat(admin+agents): pt_apps tabanlı dinamik subdomain nav + agents.skilldrunk.com v2 fork
 - PR #27 — feat(map): dagre auto-layout + Layer 2 expand + public prototip/map
-- PR #26 — feat(ai): query_db tool — read-only ad-hoc SQL for admin assistant (migration 0010, RPC sd_query_readonly)
-- PR #25 — docs(agents): Cowork sınırı + ŞU AN sprint snapshot
-- PR #24 — fix(telegram): await handleCommand (Vercel serverless terminates after response)
-- PR #23 — feat(telegram): interactive bot commands `/brief` `/quote` `/ask` `/stats` `/help`
-- PR #21 — feat: AI Usage Counter (`sd_ai_usage` + `/admin/usage` page)
+- PR #26 — feat(ai): query_db tool — read-only ad-hoc SQL
+- PR #21 — feat: AI Usage Counter
 
-**Aktif:** Telegram bot canlı (`@skilldrunk_bot`), webhook OK, brief üretiyor. Skilldrunk ekosistemi `pt_apps`'ta 10 subdomain catalog'lu (agents dahil, prototip de eklendi). Admin nav 2 katmanlı: iç route'lar + dinamik ekosistem chip'leri.
+**Disiplin değişti:** Her ship sonrası ilgili `sd_backlog` row'unu `done` yap (admin UI'dan veya `/done <id>` Telegram'dan). Yeni iş çıkarsa `+ Yeni` veya `/todo "..."`. Bu dosyaya artık sadece major breaking change / yeni infra eklenir.
 
-**Cowork sınırı esnetildi (bu sprintte):** `~/Desktop/lestat-inc-agents/` repo'sunda biz fork edip `index.html` v2 + `STATE-SCHEMA-V2.md` + `state.json` v2 yazdık. Push hâlâ Cowork/kullanıcının elinde — Cowork session onaylar, push eder. Standart kural geri devreye girer: agents repo Cowork yönetir.
-
-**Sıradaki olası:** (Claude Code'un karar vereceği — son commit + Obsidian build-log + bu kullanıcı oturumundaki istekler)
-
-**Blockers:** yok (gözlemlenmiş).
-
-**Bağlantılı LesTaT Inc. ekosistemi:** Cowork tarafı 5 VPS Python botunu yönetiyor (Atlas/Hephaestus/Mnemosyne/Hermes/Apollo). Skilldrunk botu Calliope olarak kataloglanmış (Obsidian `Sistemler/LesTaT-Inc/02-Bots/Calliope.md`) ve agents v2 showcase'inde 6. bot olarak yer alıyor. Çakışma yok, ortak Supabase project (`vrgohatarieeguyyhfan`).
-
-**Disiplin:** Her ship sonrası **ŞU AN bölümünü güncelle** (yukarıdaki "ZORUNLU 3 dokümantasyon noktası"na ek).
+**Cowork sınırı (sabit):** `~/Desktop/lestat-inc-agents/` ve LesTaT Inc. VPS botları Cowork yönetir. agents.skilldrunk.com canlı, GitHub Actions otomatik 30dk sync. Ortak Supabase project (`vrgohatarieeguyyhfan`) — Cowork da `sd_backlog`'a yazabilir (`source='cowork'` field'ı).
