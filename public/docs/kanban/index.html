@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kanban System — Product Specification</title>
+<style>
+:root {
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --bg3: #21262d;
+  --border: #30363d;
+  --text: #c9d1d9;
+  --text-dim: #8b949e;
+  --accent: #58a6ff;
+  --green: #3fb950;
+  --yellow: #d29922;
+  --red: #f85149;
+  --purple: #bc8cff;
+  --orange: #f0883e;
+  --warm: #e8b86d;
+  --pink: #f778ba;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.7; max-width: 920px; margin: 0 auto; padding: 40px 24px; }
+h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+h2 { font-size: 22px; font-weight: 600; color: var(--accent); margin-top: 48px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+h3 { font-size: 16px; font-weight: 600; margin-top: 24px; margin-bottom: 8px; }
+p { margin-bottom: 12px; font-size: 14px; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.subtitle { color: var(--text-dim); font-size: 14px; margin-bottom: 32px; }
+.meta-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 32px; }
+.meta-row { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 6px; }
+.meta-label { color: var(--text-dim); min-width: 120px; font-size: 13px; }
+.meta-value { font-size: 13px; }
+.section-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 24px; margin-bottom: 16px; }
+.badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 12px; margin-right: 6px; }
+.badge-v10 { background: rgba(63,185,80,0.15); color: var(--green); }
+.badge-v11 { background: rgba(188,140,255,0.15); color: var(--purple); }
+.badge-v12 { background: rgba(88,166,255,0.15); color: var(--accent); }
+.badge-v13 { background: rgba(240,136,62,0.15); color: var(--orange); }
+.badge-v14 { background: rgba(247,120,186,0.15); color: var(--pink); }
+.badge-v15 { background: rgba(210,153,34,0.15); color: var(--yellow); }
+.badge-high { background: rgba(248,81,73,0.15); color: var(--red); }
+.badge-spec { background: rgba(63,185,80,0.15); color: var(--green); }
+.badge-ai { background: rgba(188,140,255,0.15); color: var(--purple); }
+ul { padding-left: 20px; margin-bottom: 12px; }
+li { margin-bottom: 6px; font-size: 14px; }
+code { background: var(--bg3); padding: 2px 6px; border-radius: 4px; font-size: 13px; font-family: 'SF Mono', Monaco, Consolas, monospace; }
+pre { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; margin: 12px 0; font-size: 13px; font-family: 'SF Mono', Monaco, Consolas, monospace; line-height: 1.5; color: var(--text); }
+.feature-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin: 16px 0; }
+.feature-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+.feature-card h4 { font-size: 14px; margin-bottom: 6px; }
+.feature-card p { font-size: 12px; color: var(--text-dim); margin-bottom: 0; }
+.feature-icon { font-size: 20px; margin-bottom: 8px; display: block; }
+.schema-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+.schema-table th { text-align: left; font-size: 12px; color: var(--text-dim); padding: 8px; border-bottom: 2px solid var(--border); text-transform: uppercase; }
+.schema-table td { padding: 8px; border-bottom: 1px solid var(--border); font-size: 13px; }
+.flow-diagram { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 24px; margin: 16px 0; text-align: center; font-size: 14px; }
+.flow-step { display: inline-block; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 6px 14px; margin: 4px; }
+.flow-arrow { color: var(--accent); margin: 0 8px; }
+.roadmap { margin: 20px 0; }
+.roadmap-item { display: flex; align-items: stretch; margin-bottom: 0; }
+.roadmap-line { width: 40px; display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+.roadmap-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; }
+.roadmap-dot.active { border-color: var(--green); background: var(--green); }
+.roadmap-connector { width: 2px; flex: 1; background: var(--border); }
+.roadmap-content { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin: 0 0 12px 0; flex: 1; }
+.roadmap-content h4 { font-size: 14px; margin-bottom: 4px; }
+.roadmap-content p { font-size: 12px; color: var(--text-dim); margin-bottom: 0; }
+.highlight-box { background: linear-gradient(135deg, rgba(88,166,255,0.08), rgba(188,140,255,0.05)); border: 1px solid var(--accent); border-radius: 8px; padding: 20px; margin: 16px 0; }
+.highlight-box h3 { color: var(--accent); margin-top: 0; }
+.kanban-preview { display: flex; gap: 10px; overflow-x: auto; padding: 16px 0; }
+.kanban-col { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; min-width: 150px; flex: 1; padding: 12px; }
+.kanban-col-title { font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--text-dim); margin-bottom: 10px; letter-spacing: 0.5px; }
+.kanban-card-preview { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 10px; margin-bottom: 8px; font-size: 12px; }
+.kanban-card-preview .card-title { font-weight: 600; margin-bottom: 4px; font-size: 13px; }
+.kanban-card-preview .card-meta { color: var(--text-dim); font-size: 11px; display: flex; gap: 8px; }
+.priority-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+.priority-dot.p0 { background: var(--red); }
+.priority-dot.p1 { background: var(--orange); }
+.priority-dot.p2 { background: var(--yellow); }
+.priority-dot.p3 { background: var(--text-dim); }
+.board-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin: 16px 0; }
+.board-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+.board-card h4 { font-size: 14px; margin-bottom: 4px; }
+.board-card p { font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
+.board-card .columns { font-size: 11px; color: var(--accent); }
+.api-endpoint { background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+.api-method { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; font-family: 'SF Mono', Monaco, Consolas, monospace; min-width: 52px; text-align: center; }
+.api-method.get { background: rgba(63,185,80,0.15); color: var(--green); }
+.api-method.post { background: rgba(88,166,255,0.15); color: var(--accent); }
+.api-method.patch { background: rgba(210,153,34,0.15); color: var(--yellow); }
+.api-method.delete { background: rgba(248,81,73,0.15); color: var(--red); }
+.api-path { font-family: 'SF Mono', Monaco, Consolas, monospace; font-size: 13px; }
+.api-desc { font-size: 12px; color: var(--text-dim); margin-left: auto; }
+.timestamp { text-align: center; color: var(--text-dim); font-size: 12px; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); }
+.back-link { display: inline-block; margin-bottom: 24px; font-size: 13px; color: var(--text-dim); }
+.back-link:hover { color: var(--accent); }
+.tab-nav { display: flex; gap: 0; margin-bottom: 24px; border-bottom: 1px solid var(--border); overflow-x: auto; }
+.tab-nav a { padding: 10px 16px; font-size: 13px; font-weight: 500; color: var(--text-dim); border-bottom: 2px solid transparent; white-space: nowrap; }
+.tab-nav a:hover { color: var(--text); text-decoration: none; }
+.tab-nav a.active { color: var(--accent); border-bottom-color: var(--accent); }
+@media (max-width: 768px) {
+  body { padding: 16px; }
+  .feature-grid, .board-grid { grid-template-columns: 1fr; }
+  .kanban-preview { flex-direction: column; }
+  .kanban-col { min-width: unset; }
+  .api-endpoint { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .api-desc { margin-left: 0; }
+  h1 { font-size: 24px; }
+}
+</style>
+</head>
+<body>
+
+<a href="https://skilldrunk.com" class="back-link">&larr; skilldrunk.com</a>
+
+<h1>skilldrunk Kanban System</h1>
+<p class="subtitle">Product Specification &mdash; AI-Aware Task Management for the skilldrunk Ecosystem</p>
+
+<div class="tab-nav">
+  <a href="#vision" class="active">Vision</a>
+  <a href="#features">Features</a>
+  <a href="#schema">Schema</a>
+  <a href="#api">API</a>
+  <a href="#ai">AI Integration</a>
+  <a href="#roadmap">Roadmap</a>
+</div>
+
+<div class="meta-box">
+  <div class="meta-row"><span class="meta-label">Project</span><span class="meta-value">skilldrunk Kanban &mdash; board.skilldrunk.com</span></div>
+  <div class="meta-row"><span class="meta-label">Owner</span><span class="meta-value">Ozgur GUR (ozgurgur@gmail.com)</span></div>
+  <div class="meta-row"><span class="meta-label">Status</span><span class="meta-value"><span class="badge badge-spec">SPEC READY</span> <span class="badge badge-high">HIGH PRIORITY</span></span></div>
+  <div class="meta-row"><span class="meta-label">Stack</span><span class="meta-value">Next.js + Tailwind, Supabase (Auth, Realtime, RLS), Vercel</span></div>
+  <div class="meta-row"><span class="meta-label">Target</span><span class="meta-value">Replace Notion boards by end of 2026</span></div>
+  <div class="meta-row"><span class="meta-label">Users</span><span class="meta-value">Ozgur, sales team, Claude/AI agents</span></div>
+  <div class="meta-row"><span class="meta-label">Est. Effort</span><span class="meta-value">6&ndash;8 sessions (v1.0&ndash;v1.5)</span></div>
+</div>
+
+<!-- ========== VISION ========== -->
+<h2 id="vision">Product Vision</h2>
+
+<div class="highlight-box">
+  <h3>Why build another Kanban?</h3>
+  <p>A lightweight, mobile-first Kanban board built into the skilldrunk ecosystem. Replaces Notion boards. Key difference: <strong>AI-aware</strong> &mdash; Claude (Cowork/Code) can read, create, and update tasks via API. "Assigned to Claude" means Cowork/Code will handle it.</p>
+</div>
+
+<div class="feature-grid">
+  <div class="feature-card">
+    <span class="feature-icon">&#127919;</span>
+    <h4>Ecosystem Native</h4>
+    <p>Same stack, same auth, same domain. No more context-switching to Notion.</p>
+  </div>
+  <div class="feature-card">
+    <span class="feature-icon">&#129302;</span>
+    <h4>AI-First Design</h4>
+    <p>Claude is a first-class team member. API endpoints for read/create/update. Activity log with AI badge.</p>
+  </div>
+  <div class="feature-card">
+    <span class="feature-icon">&#128241;</span>
+    <h4>Mobile-First</h4>
+    <p>Swipe to move cards, pull-to-refresh, bottom nav, PWA installable. Built for on-the-go.</p>
+  </div>
+  <div class="feature-card">
+    <span class="feature-icon">&#9889;</span>
+    <h4>Realtime</h4>
+    <p>Supabase Realtime for live updates. No refresh needed when Claude moves a card.</p>
+  </div>
+</div>
+
+<!-- ========== FEATURES ========== -->
+<h2 id="features">Core Features</h2>
+
+<h3>Boards</h3>
+<div class="section-card">
+  <ul>
+    <li>Multiple boards per project (skilldrunk, skimsoulfat, ENCO Apollo, quotes v2, etc.)</li>
+    <li>Board templates: Software Dev, Sales Pipeline, Content, Personal</li>
+    <li>Board sharing via public link</li>
+    <li>Customizable columns per board (drag to reorder)</li>
+  </ul>
+
+  <h4 style="margin-top: 16px; margin-bottom: 8px; font-size: 13px; color: var(--text-dim);">Default Column Presets</h4>
+  <div class="flow-diagram">
+    <strong style="color: var(--green); font-size: 12px;">SOFTWARE DEV</strong><br>
+    <span class="flow-step">Backlog</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step">Todo</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step">In Progress</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step">Review</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step">Done</span>
+  </div>
+  <div class="flow-diagram">
+    <strong style="color: var(--orange); font-size: 12px;">SALES PIPELINE</strong><br>
+    <span class="flow-step">Lead</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step">Contacted</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step">Meeting</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step">Proposal</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step">Won / Lost</span>
+  </div>
+  <div class="flow-diagram">
+    <strong style="color: var(--purple); font-size: 12px;">CONTENT</strong><br>
+    <span class="flow-step">Idea</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step">Draft</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step">Review</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step">Published</span>
+  </div>
+</div>
+
+<h3>Cards</h3>
+<div class="section-card">
+  <div class="feature-grid">
+    <div class="feature-card">
+      <h4>Content</h4>
+      <p>Title, description (markdown), attachments (links), related cards (dependencies)</p>
+    </div>
+    <div class="feature-card">
+      <h4>Assignment</h4>
+      <p>Assignee (person or AI), priority P0&ndash;P3 with color coding, due date</p>
+    </div>
+    <div class="feature-card">
+      <h4>Organization</h4>
+      <p>Labels/tags, checklist (subtasks), comments with @mentions</p>
+    </div>
+    <div class="feature-card">
+      <h4>Tracking</h4>
+      <p>Activity log (who moved what when), created/updated timestamps</p>
+    </div>
+  </div>
+
+  <h4 style="margin-top: 16px; margin-bottom: 8px; font-size: 13px; color: var(--text-dim);">Priority Levels</h4>
+  <table class="schema-table">
+    <tr><th>Priority</th><th>Color</th><th>Meaning</th></tr>
+    <tr><td><span class="priority-dot p0"></span> P0</td><td style="color: var(--red);">Red</td><td>Critical &mdash; drop everything</td></tr>
+    <tr><td><span class="priority-dot p1"></span> P1</td><td style="color: var(--orange);">Orange</td><td>High &mdash; this sprint</td></tr>
+    <tr><td><span class="priority-dot p2"></span> P2</td><td style="color: var(--yellow);">Yellow</td><td>Medium &mdash; next sprint (default)</td></tr>
+    <tr><td><span class="priority-dot p3"></span> P3</td><td style="color: var(--text-dim);">Gray</td><td>Low &mdash; backlog / nice-to-have</td></tr>
+  </table>
+</div>
+
+<h3>Kanban Preview</h3>
+<div class="section-card" style="padding: 16px;">
+  <div class="kanban-preview">
+    <div class="kanban-col">
+      <div class="kanban-col-title">Backlog</div>
+      <div class="kanban-card-preview">
+        <div class="card-title"><span class="priority-dot p3"></span> Notion import tool</div>
+        <div class="card-meta"><span>P3</span><span>Ozgur</span></div>
+      </div>
+    </div>
+    <div class="kanban-col">
+      <div class="kanban-col-title">Todo</div>
+      <div class="kanban-card-preview">
+        <div class="card-title"><span class="priority-dot p1"></span> Quotes v2 swipe UI</div>
+        <div class="card-meta"><span>P1</span><span>Claude</span></div>
+      </div>
+      <div class="kanban-card-preview">
+        <div class="card-title"><span class="priority-dot p2"></span> Mobile nav redesign</div>
+        <div class="card-meta"><span>P2</span><span>Ozgur</span></div>
+      </div>
+    </div>
+    <div class="kanban-col">
+      <div class="kanban-col-title">In Progress</div>
+      <div class="kanban-card-preview" style="border-left: 2px solid var(--accent);">
+        <div class="card-title"><span class="priority-dot p0"></span> Kanban spec</div>
+        <div class="card-meta"><span>P0</span><span>Claude</span></div>
+      </div>
+    </div>
+    <div class="kanban-col">
+      <div class="kanban-col-title">Review</div>
+      <div class="kanban-card-preview">
+        <div class="card-title"><span class="priority-dot p2"></span> ISR cache strategy</div>
+        <div class="card-meta"><span>P2</span><span>Ozgur</span></div>
+      </div>
+    </div>
+    <div class="kanban-col">
+      <div class="kanban-col-title">Done</div>
+      <div class="kanban-card-preview" style="opacity: 0.6;">
+        <div class="card-title"><span class="priority-dot p1"></span> Proxy 500 fix</div>
+        <div class="card-meta"><span>P1</span><span>Claude</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3>People</h3>
+<div class="section-card">
+  <ul>
+    <li>User profiles with avatars</li>
+    <li>Roles: <code>admin</code>, <code>member</code>, <code>viewer</code>, <code>ai_agent</code></li>
+    <li>AI agents as first-class "people" &mdash; Claude shows as a team member with <span class="badge badge-ai">AI</span> badge</li>
+    <li>"Assigned to Claude" = Cowork/Code will handle the task</li>
+  </ul>
+</div>
+
+<h3>Views</h3>
+<div class="feature-grid">
+  <div class="feature-card">
+    <span class="feature-icon">&#128203;</span>
+    <h4>Kanban (default)</h4>
+    <p>Drag &amp; drop columns. The classic board view.</p>
+  </div>
+  <div class="feature-card">
+    <span class="feature-icon">&#128221;</span>
+    <h4>List View</h4>
+    <p>Sortable table with filters. Power-user mode.</p>
+  </div>
+  <div class="feature-card">
+    <span class="feature-icon">&#128197;</span>
+    <h4>Calendar View</h4>
+    <p>Due date timeline. See what's coming up.</p>
+  </div>
+  <div class="feature-card">
+    <span class="feature-icon">&#128100;</span>
+    <h4>My Tasks</h4>
+    <p>Filtered to current user. Your personal focus.</p>
+  </div>
+</div>
+
+<h3>Mobile-First UX</h3>
+<div class="section-card">
+  <ul>
+    <li>Swipe card left/right to change column</li>
+    <li>Pull-to-refresh for latest state</li>
+    <li>Bottom navigation: Boards | My Tasks | Search</li>
+    <li>PWA installable &mdash; home screen icon, offline support</li>
+    <li>Responsive grid &rarr; vertical stack on mobile</li>
+  </ul>
+</div>
+
+<!-- ========== TECH STACK ========== -->
+<h2>Tech Stack</h2>
+
+<div class="section-card">
+  <table class="schema-table">
+    <tr><th>Layer</th><th>Technology</th><th>Notes</th></tr>
+    <tr><td>Frontend</td><td>Next.js + Tailwind</td><td>Consistent with ecosystem</td></tr>
+    <tr><td>Backend</td><td>Supabase</td><td>Auth, Realtime, RLS, Postgres</td></tr>
+    <tr><td>Realtime</td><td>Supabase Realtime</td><td>Live card updates, presence</td></tr>
+    <tr><td>API</td><td>Next.js API Routes</td><td>REST endpoints for Claude/external</td></tr>
+    <tr><td>Hosting</td><td>Vercel</td><td>board.skilldrunk.com or /board/</td></tr>
+    <tr><td>Drag &amp; Drop</td><td>@dnd-kit/core</td><td>Accessible, touch-friendly</td></tr>
+  </table>
+</div>
+
+<!-- ========== SCHEMA ========== -->
+<h2 id="schema">Supabase Schema</h2>
+
+<h3>kanban_boards</h3>
+<div class="section-card">
+<pre>CREATE TABLE kanban_boards (
+  id          uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  name        text NOT NULL,
+  slug        text UNIQUE NOT NULL,
+  template    text DEFAULT 'default',
+  columns     jsonb DEFAULT '["Backlog","Todo","In Progress","Review","Done"]',
+  owner_id    uuid,
+  is_public   boolean DEFAULT false,
+  created_at  timestamptz DEFAULT now()
+);</pre>
+</div>
+
+<h3>kanban_cards</h3>
+<div class="section-card">
+<pre>CREATE TABLE kanban_cards (
+  id          uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  board_id    uuid REFERENCES kanban_boards(id),
+  title       text NOT NULL,
+  description text,
+  column_name text NOT NULL DEFAULT 'Backlog',
+  position    int DEFAULT 0,
+  assignee    text,         -- person name or 'claude'
+  priority    text DEFAULT 'P2',  -- P0, P1, P2, P3
+  due_date    date,
+  labels      text[],
+  checklist   jsonb,
+  is_archived boolean DEFAULT false,
+  created_by  text,
+  created_at  timestamptz DEFAULT now(),
+  updated_at  timestamptz DEFAULT now()
+);</pre>
+</div>
+
+<h3>kanban_comments</h3>
+<div class="section-card">
+<pre>CREATE TABLE kanban_comments (
+  id          uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  card_id     uuid REFERENCES kanban_cards(id),
+  author      text NOT NULL,
+  content     text NOT NULL,
+  created_at  timestamptz DEFAULT now()
+);</pre>
+</div>
+
+<h3>kanban_activity</h3>
+<div class="section-card">
+<pre>CREATE TABLE kanban_activity (
+  id          uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  card_id     uuid REFERENCES kanban_cards(id),
+  actor       text NOT NULL,
+  action      text NOT NULL,  -- 'moved', 'assigned', 'commented', 'created', 'completed'
+  details     jsonb,
+  created_at  timestamptz DEFAULT now()
+);</pre>
+</div>
+
+<h3>kanban_people</h3>
+<div class="section-card">
+<pre>CREATE TABLE kanban_people (
+  id          uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  name        text NOT NULL,
+  avatar_url  text,
+  role        text DEFAULT 'member',  -- admin, member, viewer, ai_agent
+  is_ai       boolean DEFAULT false,
+  email       text,
+  created_at  timestamptz DEFAULT now()
+);</pre>
+</div>
+
+<!-- ========== API ========== -->
+<h2 id="api">API Endpoints</h2>
+
+<p>REST API for Claude/Cowork and external integrations. All endpoints require API key or Supabase auth.</p>
+
+<div class="section-card" style="padding: 16px;">
+  <h4 style="margin-bottom: 12px; font-size: 13px; color: var(--text-dim);">BOARDS</h4>
+  <div class="api-endpoint">
+    <span class="api-method get">GET</span>
+    <span class="api-path">/api/kanban/boards</span>
+    <span class="api-desc">List all boards</span>
+  </div>
+  <div class="api-endpoint">
+    <span class="api-method get">GET</span>
+    <span class="api-path">/api/kanban/boards/:slug</span>
+    <span class="api-desc">Get board with all cards</span>
+  </div>
+  <div class="api-endpoint">
+    <span class="api-method post">POST</span>
+    <span class="api-path">/api/kanban/boards</span>
+    <span class="api-desc">Create new board</span>
+  </div>
+
+  <h4 style="margin-top: 20px; margin-bottom: 12px; font-size: 13px; color: var(--text-dim);">CARDS</h4>
+  <div class="api-endpoint">
+    <span class="api-method post">POST</span>
+    <span class="api-path">/api/kanban/cards</span>
+    <span class="api-desc">Create card</span>
+  </div>
+  <div class="api-endpoint">
+    <span class="api-method patch">PATCH</span>
+    <span class="api-path">/api/kanban/cards/:id</span>
+    <span class="api-desc">Update card (move, assign, etc.)</span>
+  </div>
+  <div class="api-endpoint">
+    <span class="api-method delete">DEL</span>
+    <span class="api-path">/api/kanban/cards/:id</span>
+    <span class="api-desc">Archive card</span>
+  </div>
+
+  <h4 style="margin-top: 20px; margin-bottom: 12px; font-size: 13px; color: var(--text-dim);">COMMENTS &amp; ACTIVITY</h4>
+  <div class="api-endpoint">
+    <span class="api-method post">POST</span>
+    <span class="api-path">/api/kanban/cards/:id/comments</span>
+    <span class="api-desc">Add comment</span>
+  </div>
+  <div class="api-endpoint">
+    <span class="api-method get">GET</span>
+    <span class="api-path">/api/kanban/cards/:id/activity</span>
+    <span class="api-desc">Get activity log</span>
+  </div>
+</div>
+
+<h3>Example: Create Card (Claude)</h3>
+<div class="section-card">
+<pre>POST /api/kanban/cards
+Content-Type: application/json
+Authorization: Bearer SUPABASE_SERVICE_KEY
+
+{
+  "board_id": "skilldrunk-dev",
+  "title": "Fix ISR cache invalidation",
+  "description": "Cache not clearing on content update...",
+  "column_name": "Todo",
+  "assignee": "claude",
+  "priority": "P1",
+  "labels": ["bug", "performance"],
+  "created_by": "claude"
+}</pre>
+</div>
+
+<h3>Example: Move Card</h3>
+<div class="section-card">
+<pre>PATCH /api/kanban/cards/abc-123
+{
+  "column_name": "Done",
+  "assignee": "ozgur"
+}</pre>
+</div>
+
+<!-- ========== AI INTEGRATION ========== -->
+<h2 id="ai">Claude / AI Integration</h2>
+
+<div class="highlight-box">
+  <h3>AI as Team Member</h3>
+  <p>Claude isn't just a tool &mdash; it's a team member on the board. It can create, move, comment on, and complete cards. The activity log shows Claude's actions with an <span class="badge badge-ai">AI</span> badge.</p>
+</div>
+
+<div class="section-card">
+  <h3 style="margin-top: 0;">Capabilities</h3>
+  <ul>
+    <li><strong>Create cards</strong> via Supabase API &mdash; when user says "bunu yapilacaklara ekle"</li>
+    <li><strong>Move cards</strong> between columns (update <code>column_name</code>)</li>
+    <li><strong>Add comments</strong> with progress updates or questions</li>
+    <li><strong>Activity log</strong> &mdash; Claude shows as "Claude" with AI badge</li>
+    <li><strong>Cowork dispatch</strong> &mdash; "create kanban card" action from natural language</li>
+    <li><strong>Scheduled summary</strong> &mdash; daily kanban digest via Telegram/iMessage</li>
+  </ul>
+</div>
+
+<div class="flow-diagram">
+  <strong style="color: var(--purple); font-size: 12px;">COWORK FLOW</strong><br><br>
+  <span class="flow-step">User says "bunu ekle"</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Cowork parses intent</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">POST /api/kanban/cards</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Card appears on board</span>
+</div>
+
+<div class="flow-diagram">
+  <strong style="color: var(--green); font-size: 12px;">DAILY SUMMARY FLOW</strong><br><br>
+  <span class="flow-step">Cron (09:00)</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Query active cards</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Claude summarizes</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Telegram / iMessage</span>
+</div>
+
+<!-- ========== DEFAULT BOARDS ========== -->
+<h2>Pre-Populated Boards</h2>
+
+<div class="board-grid">
+  <div class="board-card">
+    <h4>Skilldrunk Development</h4>
+    <p>quotes v2, mobile-first, blog system</p>
+    <div class="columns">Backlog &rarr; Todo &rarr; In Progress &rarr; Review &rarr; Done</div>
+  </div>
+  <div class="board-card">
+    <h4>ENCO Apollo Outreach</h4>
+    <p>Lead pipeline, sales tracking</p>
+    <div class="columns">Lead &rarr; Contacted &rarr; Meeting &rarr; Proposal &rarr; Won/Lost</div>
+  </div>
+  <div class="board-card">
+    <h4>Personal Projects</h4>
+    <p>Nevra Bozok, bildirim filtresi, oyun, RFID WMS</p>
+    <div class="columns">Backlog &rarr; Todo &rarr; In Progress &rarr; Review &rarr; Done</div>
+  </div>
+  <div class="board-card">
+    <h4>Infrastructure</h4>
+    <p>VPS, Supabase, Vercel, MCP servers</p>
+    <div class="columns">Backlog &rarr; Todo &rarr; In Progress &rarr; Done</div>
+  </div>
+</div>
+
+<!-- ========== DESIGN ========== -->
+<h2>Design System</h2>
+
+<div class="section-card">
+  <ul>
+    <li><strong>Dark theme</strong> &mdash; consistent with skilldrunk ecosystem (<code>#0d1117</code> base)</li>
+    <li><strong>Gold accent</strong> (<code>#e8b86d</code>) for priority items and important actions</li>
+    <li><strong>Smooth drag-drop</strong> &mdash; spring animations via @dnd-kit</li>
+    <li><strong>Card preview on hover</strong> &mdash; description, checklist progress, assignee avatar</li>
+    <li><strong>Responsive grid</strong> &rarr; vertical stack on mobile</li>
+    <li><strong>Typography</strong> &mdash; system font stack (-apple-system, BlinkMacSystemFont)</li>
+  </ul>
+</div>
+
+<!-- ========== ROADMAP ========== -->
+<h2 id="roadmap">Version Roadmap</h2>
+
+<div class="roadmap">
+  <div class="roadmap-item">
+    <div class="roadmap-line">
+      <div class="roadmap-dot active"></div>
+      <div class="roadmap-connector"></div>
+    </div>
+    <div class="roadmap-content">
+      <h4><span class="badge badge-v10">v1.0</span> Basic Kanban</h4>
+      <p>Boards, columns, cards, drag-drop. Core CRUD. Supabase schema + RLS. Single Code session.</p>
+    </div>
+  </div>
+  <div class="roadmap-item">
+    <div class="roadmap-line">
+      <div class="roadmap-dot"></div>
+      <div class="roadmap-connector"></div>
+    </div>
+    <div class="roadmap-content">
+      <h4><span class="badge badge-v11">v1.1</span> People + Assignment</h4>
+      <p>User profiles, role-based access (admin/member/viewer/ai_agent), activity log, assignee avatars.</p>
+    </div>
+  </div>
+  <div class="roadmap-item">
+    <div class="roadmap-line">
+      <div class="roadmap-dot"></div>
+      <div class="roadmap-connector"></div>
+    </div>
+    <div class="roadmap-content">
+      <h4><span class="badge badge-v12">v1.2</span> Mobile + PWA</h4>
+      <p>Swipe gestures, pull-to-refresh, bottom nav, PWA manifest, offline support.</p>
+    </div>
+  </div>
+  <div class="roadmap-item">
+    <div class="roadmap-line">
+      <div class="roadmap-dot"></div>
+      <div class="roadmap-connector"></div>
+    </div>
+    <div class="roadmap-content">
+      <h4><span class="badge badge-v13">v1.3</span> Claude API Integration</h4>
+      <p>REST endpoints, Cowork skill, natural language card creation, daily digest via Telegram/iMessage.</p>
+    </div>
+  </div>
+  <div class="roadmap-item">
+    <div class="roadmap-line">
+      <div class="roadmap-dot"></div>
+      <div class="roadmap-connector"></div>
+    </div>
+    <div class="roadmap-content">
+      <h4><span class="badge badge-v14">v1.4</span> Calendar View + Due Dates</h4>
+      <p>Timeline view, due date reminders, overdue highlighting, week/month toggle.</p>
+    </div>
+  </div>
+  <div class="roadmap-item">
+    <div class="roadmap-line">
+      <div class="roadmap-dot"></div>
+      <div class="roadmap-connector"></div>
+    </div>
+    <div class="roadmap-content">
+      <h4><span class="badge badge-v15">v1.5</span> Notion Import</h4>
+      <p>Import boards from Notion export. Map properties to kanban fields. One-click migration.</p>
+    </div>
+  </div>
+</div>
+
+<div class="timestamp">
+  skilldrunk.com/docs/kanban &mdash; Last updated 2026-05-19 &mdash; <a href="https://skilldrunk.com/code">Code Roadmap</a> &middot; <a href="https://skilldrunk.com">skilldrunk.com</a>
+</div>
+
+</body>
+</html>
