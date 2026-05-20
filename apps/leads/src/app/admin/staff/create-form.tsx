@@ -3,7 +3,7 @@
 import { useActionState, useRef } from "react";
 import { createStaff } from "./actions";
 
-type State = { error?: string; success?: boolean } | undefined;
+type State = { error?: string; success?: boolean; message?: string } | undefined;
 
 export function StaffCreateForm() {
   const formRef = useRef<HTMLFormElement>(null);
@@ -48,6 +48,17 @@ export function StaffCreateForm() {
       >
         {pending ? "Ekleniyor..." : "Personel ekle"}
       </button>
+
+      <label className="sm:col-span-5 flex items-center gap-2 text-xs text-neutral-400">
+        <input
+          type="checkbox"
+          name="send_invite"
+          defaultChecked
+          className="rounded border-neutral-700 bg-neutral-900"
+        />
+        Supabase auth kullanıcısı yarat + davet maili gönder (önerilen — yeni satışçı için)
+      </label>
+
       {state?.error && (
         <p className="sm:col-span-5 rounded-md border border-red-900 bg-red-950/30 px-3 py-2 text-sm text-red-300">
           {state.error}
@@ -55,7 +66,7 @@ export function StaffCreateForm() {
       )}
       {state?.success && (
         <p className="sm:col-span-5 rounded-md border border-emerald-900 bg-emerald-950/30 px-3 py-2 text-sm text-emerald-300">
-          Eklendi.
+          {state.message ?? "Eklendi."}
         </p>
       )}
     </form>
