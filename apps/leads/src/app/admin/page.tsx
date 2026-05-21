@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
@@ -10,6 +11,7 @@ export default async function AdminDashboardPage() {
     { count: staffCount },
     { count: taskCount },
     { count: pendingApprovals },
+    { data: pendingTasks },
   ] = await Promise.all([
     supabase.from("sd_lead_prospects").select("*", { count: "exact", head: true }),
     supabase.from("sd_lead_staff").select("*", { count: "exact", head: true }).eq("active", true),
@@ -18,6 +20,13 @@ export default async function AdminDashboardPage() {
       .from("sd_lead_tasks")
       .select("*", { count: "exact", head: true })
       .in("status", ["email_sent", "submitted"]),
+    supabase
+      .from("sd_lead_tasks")
+      .select("id, title, status, submitted_at, updated_at")
+      .in("status", ["email_sent", "submitted"])
+      .order("submitted_at", { ascending: false, nullsFirst: false })
+      .order("updated_at", { ascending: false })
+      .limit(20),
   ]);
 
   return (
@@ -36,13 +45,31 @@ export default async function AdminDashboardPage() {
         <Stat label="Onay bekleyen" value={pendingApprovals ?? 0} highlight />
       </div>
 
-      <div className="rounded-lg border border-neutral-900 bg-neutral-950 p-6 text-sm text-neutral-400">
-        <p className="font-medium text-neutral-200">M2 scaffold — hazır.</p>
-        <p className="mt-2">
-          Bir sonraki adım (M3): /admin/new ile görev oluştur, /admin/templates ile Day 0/3/7
-          şablonlarını yönet, /api/leads/import-apollo ile Cowork prospect besler.
-        </p>
-      </div>
+      {pendingTasks && pendingTasks.length > 0 && (
+        <section>
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-neutral-400">
+            Onay bekleyenler
+          </h2>
+          <ul className="space-y-2">
+            {pendingTasks.map((t) => (
+              <li key={t.id}>
+                <Link
+                  href={`/admin/tasks/${t.id}`}
+                  className="flex items-center justify-between rounded-lg border border-orange-900/60 bg-orange-950/10 p-3 hover:border-orange-700"
+                >
+                  <span className="truncate text-sm">{t.title}</span>
+                  <span className="shrink-0 text-xs text-orange-300">
+                    {t.submitted_at
+                      ? new Date(t.submitted_at).toLocaleString("tr-TR", { dateStyle: "short", timeStyle: "short" })
+                      : "—"}
+                    →
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
   );
 }

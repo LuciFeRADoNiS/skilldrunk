@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/auth";
 import { createServiceRoleClient } from "@/lib/supabase-admin";
+import { notifyTaskAssigned } from "@/lib/task-notify";
 
 const newTaskSchema = z.object({
   prospect_id: z.coerce.number().int().positive(),
@@ -72,6 +73,8 @@ export async function createTask(formData: FormData) {
     event_type: "task_assigned",
     meta: { template_id: data.template_id, created_by_user_id: user.id },
   });
+
+  await notifyTaskAssigned(task.id);
 
   revalidatePath("/admin");
   revalidatePath("/admin/new");

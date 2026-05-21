@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { checkIngestAuth } from "@/lib/ingest-auth";
 import { createServiceRoleClient } from "@/lib/supabase-admin";
+import { notifyTaskAssigned } from "@/lib/task-notify";
 
 const newTaskSchema = z.object({
   prospect_id: z.number().int().positive().optional(),
@@ -96,6 +97,8 @@ export async function POST(request: Request) {
     event_type: "task_assigned",
     meta: { template_id: template.id, source: auth.source },
   });
+
+  await notifyTaskAssigned(task.id);
 
   return NextResponse.json({
     ok: true,

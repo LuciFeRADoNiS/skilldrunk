@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireStaff } from "@/lib/auth";
 import { createServiceRoleClient } from "@/lib/supabase-admin";
+import { notifyTaskSubmitted } from "@/lib/task-notify";
 
 const submitSchema = z.object({
   sent_at: z.string().min(1),
@@ -102,7 +103,10 @@ export async function POST(
     .eq("staff_id", staffId)
     .is("ended_at", null);
 
-  // M5: notifyApolloBot(taskId) — Telegram notification
+  await notifyTaskSubmitted(taskId, {
+    hasPersonalization: Boolean(data.personalization_notes?.trim().length),
+    sentAtIso: data.sent_at,
+  });
 
   return NextResponse.json({ ok: true, status: "email_sent" });
 }
