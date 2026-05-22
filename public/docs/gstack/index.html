@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GStack Reference — 23-Agent AI Engineering Team</title>
+<meta name="description" content="Garry Tan's GStack: 23 AI specialist agents for Claude Code. Complete reference for skilldrunk.com ecosystem.">
+<style>
+:root {
+  --bg: #0a0c10;
+  --bg2: #12151c;
+  --bg3: #1a1e28;
+  --border: #262d3a;
+  --border-hover: #3d4663;
+  --text: #d0d5e0;
+  --text-dim: #7a8299;
+  --text-bright: #eef0f5;
+  --gold: #e8b94a;
+  --gold-dim: rgba(232,185,74,0.12);
+  --gold-glow: rgba(232,185,74,0.25);
+  --accent: #58a6ff;
+  --green: #3fb950;
+  --yellow: #d29922;
+  --red: #f85149;
+  --purple: #bc8cff;
+  --orange: #f0883e;
+  --cyan: #39d3b0;
+  --pink: #e879a6;
+  --radius: 10px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.6; }
+
+/* Hero */
+.hero {
+  background: linear-gradient(135deg, #12151c 0%, #1a1520 50%, #12151c 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 48px 32px 40px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 50% 80%, var(--gold-dim) 0%, transparent 50%);
+  pointer-events: none;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--gold-dim);
+  border: 1px solid rgba(232,185,74,0.25);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 16px;
+  position: relative;
+}
+.hero h1 {
+  font-size: 40px;
+  font-weight: 800;
+  color: var(--text-bright);
+  margin-bottom: 10px;
+  position: relative;
+  letter-spacing: -0.5px;
+}
+.hero h1 span { color: var(--gold); }
+.hero-sub {
+  font-size: 16px;
+  color: var(--text-dim);
+  max-width: 640px;
+  margin: 0 auto 24px;
+  position: relative;
+}
+.hero-stats {
+  display: flex;
+  gap: 32px;
+  justify-content: center;
+  flex-wrap: wrap;
+  position: relative;
+}
+.hero-stat {
+  text-align: center;
+}
+.hero-stat-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--gold);
+}
+.hero-stat-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Navigation */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+}
+.nav a {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 12px 14px;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+.nav a:hover, .nav a.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
+/* Container */
+.container { max-width: 1280px; margin: 0 auto; padding: 32px; }
+
+/* Section */
+.section { margin-bottom: 48px; }
+.section-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-desc {
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-bottom: 20px;
+}
+
+/* Search */
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 16px;
+  margin-bottom: 24px;
+  gap: 10px;
+  transition: border-color 0.2s;
+}
+.search-bar:focus-within { border-color: var(--gold); }
+.search-bar svg { width: 18px; height: 18px; color: var(--text-dim); flex-shrink: 0; }
+.search-bar input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: 14px;
+}
+.search-bar input::placeholder { color: var(--text-dim); }
+.search-bar .count {
+  font-size: 12px;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+/* Filter */
+.filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.filter-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.filter-btn:hover { border-color: var(--gold); color: var(--text); }
+.filter-btn.active { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
+
+/* Cards Grid */
+.agents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 14px;
+}
+
+/* Agent Card */
+.agent-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  transition: all 0.25s;
+  cursor: default;
+}
+.agent-card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.agent-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+.agent-icon {
+  font-size: 22px;
+  margin-right: 10px;
+  line-height: 1;
+}
+.agent-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-bright);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.agent-cmd {
+  font-size: 12px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  color: var(--gold);
+  background: var(--gold-dim);
+  padding: 2px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.agent-role {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.agent-desc {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+.agent-when {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-style: italic;
+}
+.agent-when strong {
+  color: var(--text);
+  font-style: normal;
+  font-weight: 500;
+}
+.cat-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+.cat-leadership { background: rgba(232,185,74,0.12); color: var(--gold); }
+.cat-engineering { background: rgba(88,166,255,0.12); color: var(--accent); }
+.cat-design { background: rgba(188,140,255,0.12); color: var(--purple); }
+.cat-qa { background: rgba(63,185,80,0.12); color: var(--green); }
+.cat-release { background: rgba(240,136,62,0.12); color: var(--orange); }
+.cat-operations { background: rgba(57,211,176,0.12); color: var(--cyan); }
+.cat-security { background: rgba(248,81,73,0.12); color: var(--red); }
+.cat-browser { background: rgba(232,121,166,0.12); color: var(--pink); }
+
+/* Quick Start */
+.quickstart {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.quickstart code {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  display: block;
+  padding: 14px 18px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 13px;
+  color: var(--gold);
+  overflow-x: auto;
+  margin: 10px 0;
+  white-space: pre;
+  line-height: 1.6;
+}
+.quickstart p { font-size: 14px; color: var(--text); margin-bottom: 10px; }
+.step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: var(--gold);
+  color: var(--bg);
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+  margin-right: 8px;
+}
+
+/* Workflow */
+.workflow {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  padding: 12px 0;
+  margin-bottom: 24px;
+}
+.wf-step {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.wf-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 16px;
+  text-align: center;
+  min-width: 100px;
+}
+.wf-box-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.4px; }
+.wf-box-cmd { font-size: 13px; font-weight: 600; color: var(--gold); font-family: 'SF Mono', 'Fira Code', monospace; }
+.wf-arrow {
+  color: var(--text-dim);
+  font-size: 18px;
+  padding: 0 6px;
+  flex-shrink: 0;
+}
+
+/* Cheat Sheet */
+.cheat-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.cheat-table th {
+  text-align: left;
+  padding: 10px 14px;
+  background: var(--bg3);
+  color: var(--text-dim);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border);
+}
+.cheat-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.cheat-table tr:hover td { background: rgba(255,255,255,0.02); }
+.cheat-table .cmd { color: var(--gold); font-family: 'SF Mono', 'Fira Code', monospace; font-weight: 500; }
+
+/* Comparison */
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.compare-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.compare-card h4 {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.compare-card ul {
+  list-style: none;
+  font-size: 13px;
+}
+.compare-card li {
+  padding: 4px 0;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.compare-card li::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.compare-before li::before { background: var(--text-dim); }
+.compare-after li::before { background: var(--gold); }
+
+/* Integration */
+.integration-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+.int-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+}
+.int-card h4 { font-size: 14px; font-weight: 600; color: var(--text-bright); margin-bottom: 6px; }
+.int-card p { font-size: 13px; color: var(--text-dim); }
+
+.footer {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 12px;
+  padding: 32px;
+  border-top: 1px solid var(--border);
+}
+.footer a { color: var(--gold); text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
+
+@media (max-width: 768px) {
+  .hero { padding: 32px 20px; }
+  .hero h1 { font-size: 28px; }
+  .container { padding: 20px; }
+  .agents-grid { grid-template-columns: 1fr; }
+  .compare-grid { grid-template-columns: 1fr; }
+  .nav { padding: 0 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-badge">⚡ Garry Tan's Open Source Factory</div>
+  <h1><span>GStack</span> Reference</h1>
+  <p class="hero-sub">23 AI specialist agents that turn Claude Code into a virtual engineering team. CEO who rethinks the product, eng manager who locks architecture, designer who catches AI slop, QA lead who opens a real browser.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="hero-stat-value">30+</div><div class="hero-stat-label">Skills</div></div>
+    <div class="hero-stat"><div class="hero-stat-value">8</div><div class="hero-stat-label">Categories</div></div>
+    <div class="hero-stat"><div class="hero-stat-value">810×</div><div class="hero-stat-label">Productivity Gain</div></div>
+    <div class="hero-stat"><div class="hero-stat-value">MIT</div><div class="hero-stat-label">License</div></div>
+  </div>
+</div>
+
+<!-- Nav -->
+<nav class="nav" id="nav">
+  <a href="#quickstart" class="active">Quick Start</a>
+  <a href="#agents">All Agents</a>
+  <a href="#workflow">Daily Workflow</a>
+  <a href="#cheatsheet">Cheat Sheet</a>
+  <a href="#integration">Integration</a>
+  <a href="#comparison">Before / After</a>
+</nav>
+
+<div class="container">
+
+<!-- Quick Start -->
+<section class="section" id="quickstart">
+  <div class="section-title">🚀 Quick Start</div>
+  <div class="section-desc">Get GStack running in 30 seconds. Paste the install command into Claude Code.</div>
+
+  <div class="quickstart">
+    <p><span class="step-num">1</span> <strong>Install GStack</strong> — open Claude Code and paste:</p>
+    <code>git clone --single-branch --depth 1 https://github.com/garrytan/gstack.git ~/.claude/skills/gstack
+cd ~/.claude/skills/gstack && ./setup</code>
+
+    <p><span class="step-num">2</span> <strong>Try it out</strong> — run your first command:</p>
+    <code>/office-hours    → describe what you're building
+/plan-ceo-review → challenge your plan
+/review          → review your branch
+/qa              → test your staging URL
+/ship            → push and open PR</code>
+
+    <p><span class="step-num">3</span> <strong>Team mode</strong> (optional) — share with teammates:</p>
+    <code>(cd ~/.claude/skills/gstack && ./setup --team) && \
+~/.claude/skills/gstack/bin/gstack-team-init required && \
+git add .claude/ CLAUDE.md && git commit -m "require gstack for AI-assisted work"</code>
+  </div>
+</section>
+
+<!-- Workflow -->
+<section class="section" id="workflow">
+  <div class="section-title">🔄 The Sprint Workflow</div>
+  <div class="section-desc">GStack is a process, not a collection of tools. Skills run in the order a sprint runs.</div>
+
+  <div class="workflow">
+    <div class="wf-step">
+      <div class="wf-box"><div class="wf-box-label">Think</div><div class="wf-box-cmd">/office-hours</div></div>
+      <span class="wf-arrow">→</span>
+    </div>
+    <div class="wf-step">
+      <div class="wf-box"><div class="wf-box-label">Plan</div><div class="wf-box-cmd">/plan-*-review</div></div>
+      <span class="wf-arrow">→</span>
+    </div>
+    <div class="wf-step">
+      <div class="wf-box"><div class="wf-box-label">Design</div><div class="wf-box-cmd">/design-*</div></div>
+      <span class="wf-arrow">→</span>
+    </div>
+    <div class="wf-step">
+      <div class="wf-box"><div class="wf-box-label">Build</div><div class="wf-box-cmd">implement</div></div>
+      <span class="wf-arrow">→</span>
+    </div>
+    <div class="wf-step">
+      <div class="wf-box"><div class="wf-box-label">Review</div><div class="wf-box-cmd">/review</div></div>
+      <span class="wf-arrow">→</span>
+    </div>
+    <div class="wf-step">
+      <div class="wf-box"><div class="wf-box-label">Test</div><div class="wf-box-cmd">/qa</div></div>
+      <span class="wf-arrow">→</span>
+    </div>
+    <div class="wf-step">
+      <div class="wf-box"><div class="wf-box-label">Ship</div><div class="wf-box-cmd">/ship</div></div>
+      <span class="wf-arrow">→</span>
+    </div>
+    <div class="wf-step">
+      <div class="wf-box"><div class="wf-box-label">Deploy</div><div class="wf-box-cmd">/land-and-deploy</div></div>
+      <span class="wf-arrow">→</span>
+    </div>
+    <div class="wf-step">
+      <div class="wf-box"><div class="wf-box-label">Monitor</div><div class="wf-box-cmd">/canary</div></div>
+    </div>
+  </div>
+  <p style="font-size:13px;color:var(--text-dim);">Each skill feeds into the next. <code style="background:var(--bg3);padding:2px 6px;border-radius:3px;font-size:12px;color:var(--gold)">/office-hours</code> writes a design doc that <code style="background:var(--bg3);padding:2px 6px;border-radius:3px;font-size:12px;color:var(--gold)">/plan-ceo-review</code> reads. Nothing falls through the cracks because every step knows what came before it.</p>
+</section>
+
+<!-- All Agents -->
+<section class="section" id="agents">
+  <div class="section-title">🤖 All Agents</div>
+  <div class="section-desc">Filter and search across all GStack specialist agents.</div>
+
+  <div class="search-bar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="search" placeholder="Search agents by name, command, or description..." oninput="filterAgents()">
+    <span class="count" id="agent-count">30 agents</span>
+  </div>
+
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-cat="all" onclick="setFilter('all')">All</button>
+    <button class="filter-btn" data-cat="leadership" onclick="setFilter('leadership')">Leadership</button>
+    <button class="filter-btn" data-cat="engineering" onclick="setFilter('engineering')">Engineering</button>
+    <button class="filter-btn" data-cat="design" onclick="setFilter('design')">Design</button>
+    <button class="filter-btn" data-cat="qa" onclick="setFilter('qa')">QA & Testing</button>
+    <button class="filter-btn" data-cat="release" onclick="setFilter('release')">Release & Deploy</button>
+    <button class="filter-btn" data-cat="operations" onclick="setFilter('operations')">Operations</button>
+    <button class="filter-btn" data-cat="security" onclick="setFilter('security')">Security</button>
+    <button class="filter-btn" data-cat="browser" onclick="setFilter('browser')">Browser & Agent</button>
+  </div>
+
+  <div class="agents-grid" id="agents-grid"></div>
+</section>
+
+<!-- Cheat Sheet -->
+<section class="section" id="cheatsheet">
+  <div class="section-title">📋 Cheat Sheet</div>
+  <div class="section-desc">Quick reference — every command at a glance.</div>
+
+  <div style="overflow-x:auto;">
+    <table class="cheat-table" id="cheat-table">
+      <thead>
+        <tr><th>Command</th><th>Role</th><th>One-liner</th><th>Category</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Integration -->
+<section class="section" id="integration">
+  <div class="section-title">🔗 Integration with Our Ecosystem</div>
+  <div class="section-desc">How GStack works alongside skilldrunk.com's existing infrastructure.</div>
+
+  <div class="integration-cards">
+    <div class="int-card">
+      <h4>🌐 skilldrunk.com</h4>
+      <p>GStack skills complement our AI Skills Marketplace. Use /office-hours before building new skills, /review before publishing, /qa to test skill endpoints.</p>
+    </div>
+    <div class="int-card">
+      <h4>🗃️ Supabase + RLS</h4>
+      <p>/cso runs security audits including RLS policy validation. /plan-eng-review catches missing RLS on new tables. /investigate debugs Supabase edge function failures.</p>
+    </div>
+    <div class="int-card">
+      <h4>📅 Scheduled Tasks</h4>
+      <p>Combine with Cowork scheduled tasks: nightly /health checks, weekly /retro reports, automated /canary monitoring after deploys.</p>
+    </div>
+    <div class="int-card">
+      <h4>🧠 Obsidian Vault</h4>
+      <p>Feed meeting notes from Personal Brain into /office-hours for context. /document-generate creates Diataxis docs that sync to the vault.</p>
+    </div>
+    <div class="int-card">
+      <h4>🚀 Vercel Deploys</h4>
+      <p>/ship opens PRs, /land-and-deploy merges and waits for Vercel CI, /canary monitors production health post-deploy.</p>
+    </div>
+    <div class="int-card">
+      <h4>🤖 Atlas Bot + Hermes</h4>
+      <p>Use /review and /cso before deploying bot updates. /benchmark tracks response times. /investigate for systematic debugging of bot issues.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Comparison -->
+<section class="section" id="comparison">
+  <div class="section-title">⚡ Before / After</div>
+  <div class="section-desc">What changes when you go from generic AI prompting to GStack's specialist agents.</div>
+
+  <div class="compare-grid">
+    <div class="compare-card compare-before">
+      <h4 style="color:var(--text-dim)">❌ Before GStack</h4>
+      <ul>
+        <li>Single prompt, single persona</li>
+        <li>No structured review process</li>
+        <li>Manual QA in browser</li>
+        <li>Copy-paste PR descriptions</li>
+        <li>No security audit pipeline</li>
+        <li>Design review = visual inspection</li>
+        <li>No cross-session memory</li>
+        <li>Ship when it "looks right"</li>
+      </ul>
+    </div>
+    <div class="compare-card compare-after" style="border-color: rgba(232,185,74,0.25);">
+      <h4 style="color:var(--gold)">✅ After GStack</h4>
+      <ul>
+        <li>23 specialist agents, each with a role</li>
+        <li>/review catches bugs CI misses</li>
+        <li>/qa opens real Chromium, clicks through flows</li>
+        <li>/ship runs tests, audits coverage, opens PR</li>
+        <li>/cso runs OWASP + STRIDE threat models</li>
+        <li>/design-review rates dimensions 0-10, fixes issues</li>
+        <li>/context-save + /context-restore across sessions</li>
+        <li>Think → Plan → Build → Review → Test → Ship → Reflect</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<div class="footer">
+  <a href="https://github.com/garrytan/gstack" target="_blank">github.com/garrytan/gstack</a> · MIT License · By Garry Tan<br>
+  Reference page for <a href="https://skilldrunk.com/ecosystem" target="_blank">skilldrunk.com ecosystem</a> · Updated 2026-05-22
+</div>
+
+<script>
+const agents = [
+  // Leadership
+  { name: "YC Office Hours", cmd: "/office-hours", icon: "🎯", role: "Product Strategist", cat: "leadership",
+    desc: "Start here. Six forcing questions that reframe your product before you write code. Pushes back on framing, challenges premises, generates implementation alternatives.",
+    when: "Beginning any new feature or product idea" },
+  { name: "CEO / Founder Review", cmd: "/plan-ceo-review", icon: "👑", role: "CEO / Founder", cat: "leadership",
+    desc: "Rethink the problem. Find the 10-star product hiding inside the request. Four modes: Expansion, Selective Expansion, Hold Scope, Reduction.",
+    when: "Before approving any feature plan or scope" },
+  { name: "Autoplan", cmd: "/autoplan", icon: "⚙️", role: "Sprint Planner", cat: "leadership",
+    desc: "One command runs CEO → design → eng → DX review pipeline. Full plan in one shot.",
+    when: "When you want the complete review pipeline in one go" },
+  { name: "Retrospective", cmd: "/retro", icon: "📊", role: "Scrum Master", cat: "leadership",
+    desc: "Weekly retro with per-person breakdowns and shipping streaks. Reflect on what shipped and what to improve.",
+    when: "End of sprint / weekly reflection" },
+
+  // Engineering
+  { name: "Eng Manager", cmd: "/plan-eng-review", icon: "🏗️", role: "Engineering Manager", cat: "engineering",
+    desc: "Lock in architecture, data flow, ASCII diagrams, edge cases, and tests. Forces hidden assumptions into the open.",
+    when: "After CEO review, before implementation" },
+  { name: "Staff Engineer", cmd: "/review", icon: "🔍", role: "Staff Engineer", cat: "engineering",
+    desc: "Find bugs that pass CI but blow up in production. Auto-fixes obvious issues. Flags completeness gaps.",
+    when: "Before merging any PR or branch" },
+  { name: "Debugger", cmd: "/investigate", icon: "🔬", role: "Debugger", cat: "engineering",
+    desc: "Systematic root-cause debugging. Iron Law: no fixes without investigation. Traces data flow, tests hypotheses, stops after 3 failed fixes.",
+    when: "When a bug is reproducible but cause is unknown" },
+  { name: "Codex Second Opinion", cmd: "/codex", icon: "🧠", role: "Second Opinion", cat: "engineering",
+    desc: "Second opinion via OpenAI Codex. Review, challenge, or consult modes for cross-model validation.",
+    when: "When you want a different AI model's perspective" },
+  { name: "Plan Tune", cmd: "/plan-tune", icon: "🎛️", role: "Sensitivity Tuner", cat: "engineering",
+    desc: "Self-tune AskUserQuestion sensitivity per question. Fine-tune the interactive review experience.",
+    when: "When review questions feel too aggressive or too passive" },
+  { name: "Performance Engineer", cmd: "/benchmark", icon: "⏱️", role: "Performance Engineer", cat: "engineering",
+    desc: "Baseline page load times, Core Web Vitals, and resource sizes. Compare before/after on every PR.",
+    when: "Before/after any performance-sensitive change" },
+  { name: "Health Dashboard", cmd: "/health", icon: "💊", role: "Code Health Monitor", cat: "engineering",
+    desc: "Code quality dashboard — type checker, linter, tests, dead code analysis. Instant pulse on project health.",
+    when: "Regular code quality checkups" },
+
+  // Design
+  { name: "Senior Designer", cmd: "/plan-design-review", icon: "🎨", role: "Senior Designer", cat: "design",
+    desc: "Rates each design dimension 0-10, explains what a 10 looks like, then edits the plan. AI Slop detection. Interactive per design choice.",
+    when: "After engineering review, before implementation" },
+  { name: "Designer Who Codes", cmd: "/design-review", icon: "🖌️", role: "Designer Who Codes", cat: "design",
+    desc: "Same audit as /plan-design-review, then fixes what it finds. Atomic commits, before/after screenshots.",
+    when: "After implementation, reviewing live design" },
+  { name: "Design Partner", cmd: "/design-consultation", icon: "💎", role: "Design Partner", cat: "design",
+    desc: "Build a complete design system from scratch. Researches the landscape, proposes creative risks, generates realistic product mockups.",
+    when: "Starting a new product or major redesign" },
+  { name: "Design Explorer", cmd: "/design-shotgun", icon: "🎲", role: "Design Explorer", cat: "design",
+    desc: "Show me options. Generates 4-6 AI mockup variants, opens comparison board in browser, collects feedback, iterates. Taste memory learns what you like.",
+    when: "When exploring visual directions" },
+  { name: "Design Engineer", cmd: "/design-html", icon: "🏛️", role: "Design Engineer", cat: "design",
+    desc: "Turn a mockup into production HTML that actually works. Pretext computed layout — 30KB, zero deps. Detects React/Svelte/Vue.",
+    when: "Converting approved design into shippable HTML" },
+  { name: "DX Lead", cmd: "/plan-devex-review", icon: "🧑‍💻", role: "Developer Experience Lead", cat: "design",
+    desc: "Interactive DX review: developer personas, TTHW benchmarks, magical moment design, friction points. Three modes: Expansion, Polish, Triage.",
+    when: "Building developer-facing features or APIs" },
+  { name: "DX Tester", cmd: "/devex-review", icon: "🧪", role: "DX Tester", cat: "design",
+    desc: "Live developer experience audit. Actually tests onboarding: navigates docs, tries getting started, times TTHW, screenshots errors.",
+    when: "Verifying DX after implementation" },
+
+  // QA & Testing
+  { name: "QA Lead", cmd: "/qa", icon: "🧑‍🔬", role: "QA Lead", cat: "qa",
+    desc: "Test your app, find bugs, fix them with atomic commits, re-verify. Auto-generates regression tests for every fix. Opens a real browser.",
+    when: "After implementation, test on staging URL" },
+  { name: "QA Reporter", cmd: "/qa-only", icon: "📝", role: "QA Reporter", cat: "qa",
+    desc: "Same methodology as /qa but report only. Pure bug report without code changes — for when you want to fix manually.",
+    when: "When you want bug reports without auto-fixes" },
+  { name: "iOS QA", cmd: "/ios-qa", icon: "📱", role: "Mobile QA", cat: "qa",
+    desc: "Live-device iOS QA via USB CoreDevice tunnel. Optionally exposes device over Tailscale so remote agents can drive it.",
+    when: "Testing iOS apps on real devices" },
+
+  // Release & Deploy
+  { name: "Release Engineer", cmd: "/ship", icon: "🚢", role: "Release Engineer", cat: "release",
+    desc: "Sync main, run tests, audit coverage, push, open PR. Bootstraps test frameworks if you don't have one. Workspace-aware version queue.",
+    when: "Code is reviewed and ready to push" },
+  { name: "Deploy Engineer", cmd: "/land-and-deploy", icon: "🛬", role: "Deploy Engineer", cat: "release",
+    desc: "Merge the PR, wait for CI and deploy, verify production health. One command from 'approved' to 'verified in production.'",
+    when: "After PR is approved, ready for production" },
+  { name: "SRE / Canary", cmd: "/canary", icon: "🐤", role: "SRE", cat: "release",
+    desc: "Post-deploy monitoring loop. Watches for console errors, performance regressions, and page failures using the browse daemon.",
+    when: "Immediately after deploying to production" },
+  { name: "Docs Writer", cmd: "/document-release", icon: "📄", role: "Technical Writer", cat: "release",
+    desc: "Update all docs to match what you just shipped. Keeps README, changelog, and API docs in sync with code.",
+    when: "After shipping a feature or release" },
+  { name: "Docs Generator", cmd: "/document-generate", icon: "📚", role: "Documentation Engineer", cat: "release",
+    desc: "Generate Diataxis docs (tutorial / how-to / reference / explanation) from code. Structured documentation framework.",
+    when: "Creating comprehensive docs from scratch" },
+
+  // Operations
+  { name: "Context Save", cmd: "/context-save", icon: "💾", role: "Session Manager", cat: "operations",
+    desc: "Save working context — git state, decisions, remaining work. Resume later without losing your place.",
+    when: "Ending a session, need to pick up later" },
+  { name: "Context Restore", cmd: "/context-restore", icon: "🔄", role: "Session Manager", cat: "operations",
+    desc: "Resume from a saved context, even across Conductor workspaces. Seamless continuity between sessions.",
+    when: "Starting a new session, continuing prior work" },
+  { name: "Learn", cmd: "/learn", icon: "📖", role: "Knowledge Manager", cat: "operations",
+    desc: "Manage what GStack learned across sessions. Persistent memory for patterns, preferences, and project context.",
+    when: "After learning something reusable" },
+  { name: "Scraper", cmd: "/scrape", icon: "🕸️", role: "Data Extractor", cat: "operations",
+    desc: "Pull data from a web page. First call prototypes; codified call runs in ~200ms. Use /skillify to save as permanent skill.",
+    when: "Extracting structured data from websites" },
+
+  // Security
+  { name: "Chief Security Officer", cmd: "/cso", icon: "🛡️", role: "Chief Security Officer", cat: "security",
+    desc: "OWASP Top 10 + STRIDE threat model. Zero-noise: 17 false positive exclusions, 8/10+ confidence gate, independent finding verification.",
+    when: "Before any production deploy, especially auth changes" },
+  { name: "Careful Mode", cmd: "/careful", icon: "⚠️", role: "Safety Guard", cat: "security",
+    desc: "Warn before destructive commands (rm -rf, DROP TABLE, force-push). Prevents accidental damage.",
+    when: "Working with production data or critical ops" },
+  { name: "Freeze", cmd: "/freeze", icon: "🧊", role: "Scope Lock", cat: "security",
+    desc: "Lock edits to one directory. Hard block, not just a warning. Prevents accidental changes outside scope.",
+    when: "When you want to protect files outside your work area" },
+  { name: "Guard", cmd: "/guard", icon: "🏰", role: "Full Protection", cat: "security",
+    desc: "Activate both careful + freeze at once. Maximum safety mode.",
+    when: "High-stakes production work" },
+
+  // Browser & Agent
+  { name: "Browser", cmd: "/browse", icon: "🌐", role: "Headless Browser", cat: "browser",
+    desc: "Headless browser — real Chromium, real clicks, ~100ms/command. The engine behind /qa and /canary.",
+    when: "Any task requiring real browser interaction" },
+  { name: "Pair Agent", cmd: "/pair-agent", icon: "🤝", role: "Multi-Agent Coordinator", cat: "browser",
+    desc: "Share your browser with any AI agent. One command, one paste, connected. Works with OpenClaw, Hermes, Codex, Cursor.",
+    when: "Multi-agent collaboration on a single codebase" },
+  { name: "GStack Browser", cmd: "/open-gstack-browser", icon: "🖥️", role: "Visual Browser", cat: "browser",
+    desc: "Launch the visible GStack Browser with sidebar + stealth mode. See what the agent sees.",
+    when: "When you need to visually monitor browser actions" },
+];
+
+let currentFilter = 'all';
+let searchQuery = '';
+
+function renderAgents() {
+  const grid = document.getElementById('agents-grid');
+  const filtered = agents.filter(a => {
+    const matchCat = currentFilter === 'all' || a.cat === currentFilter;
+    const matchSearch = !searchQuery ||
+      a.name.toLowerCase().includes(searchQuery) ||
+      a.cmd.toLowerCase().includes(searchQuery) ||
+      a.desc.toLowerCase().includes(searchQuery) ||
+      a.role.toLowerCase().includes(searchQuery);
+    return matchCat && matchSearch;
+  });
+
+  document.getElementById('agent-count').textContent = filtered.length + ' agent' + (filtered.length !== 1 ? 's' : '');
+
+  grid.innerHTML = filtered.map(a => `
+    <div class="agent-card" data-cat="${a.cat}">
+      <div class="agent-card-head">
+        <div class="agent-name">
+          <span class="agent-icon">${a.icon}</span>
+          ${a.name}
+        </div>
+        <span class="cat-badge cat-${a.cat}">${a.cat}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span class="agent-cmd">${a.cmd}</span>
+        <span class="agent-role">${a.role}</span>
+      </div>
+      <div class="agent-desc">${a.desc}</div>
+      <div class="agent-when"><strong>When:</strong> ${a.when}</div>
+    </div>
+  `).join('');
+}
+
+function setFilter(cat) {
+  currentFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === cat));
+  renderAgents();
+}
+
+function filterAgents() {
+  searchQuery = document.getElementById('search').value.toLowerCase().trim();
+  renderAgents();
+}
+
+// Cheat Sheet
+function renderCheatSheet() {
+  const tbody = document.querySelector('#cheat-table tbody');
+  tbody.innerHTML = agents.map(a => `
+    <tr>
+      <td class="cmd">${a.cmd}</td>
+      <td>${a.icon} ${a.role}</td>
+      <td>${a.desc.split('.')[0]}.</td>
+      <td><span class="cat-badge cat-${a.cat}">${a.cat}</span></td>
+    </tr>
+  `).join('');
+}
+
+// Smooth scroll
+document.querySelectorAll('.nav a').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.querySelectorAll('.nav a').forEach(l => l.classList.remove('active'));
+    link.classList.add('active');
+  });
+});
+
+// Scroll spy
+const sections = document.querySelectorAll('.section');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 100) current = s.id;
+  });
+  document.querySelectorAll('.nav a').forEach(l => {
+    l.classList.toggle('active', l.getAttribute('href') === '#' + current);
+  });
+});
+
+renderAgents();
+renderCheatSheet();
+</script>
+
+</body>
+</html>
