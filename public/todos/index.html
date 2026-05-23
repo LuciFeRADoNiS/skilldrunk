@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tÖdÜs — Özgür's Brain System</title>
+<meta name="description" content="tÖdÜs — centralized task management, project tracking, and brain dump system.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👑</text></svg>">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@700;800;900&display=swap');
+
+:root {
+  --bg: #07090f;
+  --bg2: #0d1117;
+  --bg3: #151b25;
+  --bg4: #1a2030;
+  --border: #1e2a3a;
+  --text: #e0d8c8;
+  --text-dim: #8a7e6a;
+  --text-bright: #fff8e7;
+  --amber: #f0a030;
+  --amber-bright: #ffbf40;
+  --amber-dim: #c48820;
+  --amber-glow: rgba(240,160,48,0.4);
+  --gold: #ffd700;
+  --gold-dim: #b8960f;
+  --fire: #ff4444;
+  --fire-glow: rgba(255,68,68,0.3);
+  --green: #40c057;
+  --green-dim: #2b8a3e;
+  --blue: #4dabf7;
+  --purple: #9775fa;
+  --card-bg: rgba(13,17,23,0.85);
+  --card-border: rgba(240,160,48,0.15);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ── Animated BG ── */
+.bg-grid {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(240,160,48,0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255,215,0,0.02) 0%, transparent 50%),
+    linear-gradient(rgba(240,160,48,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(240,160,48,0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+}
+
+.amber-orb {
+  position: fixed; border-radius: 50%; pointer-events: none; z-index: 0;
+  filter: blur(80px); animation: float-orb 20s ease-in-out infinite;
+}
+.amber-orb-1 { width: 400px; height: 400px; top: -100px; right: -100px; background: rgba(240,160,48,0.06); }
+.amber-orb-2 { width: 300px; height: 300px; bottom: -50px; left: -50px; background: rgba(255,215,0,0.04); animation-delay: -10s; }
+
+@keyframes float-orb {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.1); }
+  66% { transform: translate(-20px, 30px) scale(0.95); }
+}
+
+/* ── Layout ── */
+.app { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+
+/* ── Header ── */
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 0; border-bottom: 1px solid var(--card-border);
+  flex-wrap: wrap; gap: 12px;
+}
+.logo { display: flex; align-items: center; gap: 12px; }
+.logo-crown { font-size: 32px; filter: drop-shadow(0 0 12px var(--amber-glow)); }
+.logo-text {
+  font-family: 'Playfair Display', serif; font-weight: 900; font-size: 28px;
+  background: linear-gradient(135deg, var(--gold), var(--amber), var(--amber-bright));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  text-shadow: none; letter-spacing: 2px;
+}
+.logo-sub { font-size: 11px; color: var(--text-dim); letter-spacing: 3px; text-transform: uppercase; }
+
+.header-stats {
+  display: flex; gap: 20px; flex-wrap: wrap;
+}
+.stat-box {
+  text-align: center; padding: 8px 16px;
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: 10px;
+}
+.stat-num {
+  font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700;
+  color: var(--amber-bright);
+}
+.stat-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+
+/* ── Controls ── */
+.controls {
+  display: flex; gap: 10px; padding: 16px 0; flex-wrap: wrap; align-items: center;
+}
+.search-box {
+  flex: 1; min-width: 200px; padding: 10px 16px; padding-left: 40px;
+  background: var(--bg2); border: 1px solid var(--card-border);
+  border-radius: 10px; color: var(--text); font-size: 14px;
+  outline: none; transition: border-color 0.3s;
+}
+.search-box:focus { border-color: var(--amber); box-shadow: 0 0 20px rgba(240,160,48,0.1); }
+.search-wrap { position: relative; flex: 1; min-width: 200px; }
+.search-icon {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  color: var(--text-dim); font-size: 14px; pointer-events: none;
+}
+
+.filter-btn, .view-btn {
+  padding: 10px 16px; background: var(--bg2); border: 1px solid var(--card-border);
+  border-radius: 10px; color: var(--text-dim); font-size: 13px; cursor: pointer;
+  transition: all 0.3s; white-space: nowrap;
+}
+.filter-btn:hover, .view-btn:hover { border-color: var(--amber); color: var(--amber); }
+.filter-btn.active, .view-btn.active {
+  background: rgba(240,160,48,0.1); border-color: var(--amber); color: var(--amber);
+}
+
+/* ── Category Tabs ── */
+.cat-tabs {
+  display: flex; gap: 8px; padding: 12px 0; overflow-x: auto;
+  scrollbar-width: none; -ms-overflow-style: none;
+}
+.cat-tabs::-webkit-scrollbar { display: none; }
+.cat-tab {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: 20px;
+  background: var(--bg2); border: 1px solid var(--card-border);
+  color: var(--text-dim); font-size: 13px; cursor: pointer;
+  transition: all 0.3s; white-space: nowrap; user-select: none;
+}
+.cat-tab:hover { border-color: var(--amber-dim); color: var(--text); }
+.cat-tab.active {
+  background: linear-gradient(135deg, rgba(240,160,48,0.15), rgba(255,215,0,0.08));
+  border-color: var(--amber); color: var(--amber-bright);
+  box-shadow: 0 0 20px rgba(240,160,48,0.1);
+}
+.cat-tab .count {
+  background: var(--bg3); padding: 2px 7px; border-radius: 10px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+}
+.cat-tab.active .count { background: rgba(240,160,48,0.2); }
+
+/* ── Kanban Board ── */
+.board {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px; padding: 16px 0;
+  min-height: 60vh;
+}
+
+.column {
+  background: var(--bg2); border: 1px solid var(--card-border);
+  border-radius: 14px; padding: 12px; min-height: 300px;
+  display: flex; flex-direction: column;
+}
+.col-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 4px; margin-bottom: 8px;
+  border-bottom: 2px solid transparent;
+}
+.col-header.backlog { border-bottom-color: #6e7a8a; }
+.col-header.active { border-bottom-color: var(--blue); }
+.col-header.progress { border-bottom-color: var(--amber); }
+.col-header.review { border-bottom-color: var(--purple); }
+.col-header.done { border-bottom-color: var(--green); }
+
+.col-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+.col-count {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  background: var(--bg3); padding: 2px 8px; border-radius: 8px; color: var(--text-dim);
+}
+.col-cards { flex: 1; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
+
+/* ── Task Cards ── */
+.card {
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: 10px; padding: 12px; cursor: pointer;
+  transition: all 0.3s; position: relative;
+  animation: card-in 0.4s ease-out backwards;
+}
+.card:hover {
+  border-color: var(--amber-dim);
+  box-shadow: 0 4px 20px rgba(240,160,48,0.08);
+  transform: translateY(-1px);
+}
+
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(10px); }
+}
+
+.card-priority {
+  position: absolute; top: 8px; right: 8px;
+  width: 8px; height: 8px; border-radius: 50%;
+}
+.card-priority.p0 { background: var(--fire); box-shadow: 0 0 8px var(--fire-glow); animation: pulse-fire 1.5s infinite; }
+.card-priority.p1 { background: var(--amber); box-shadow: 0 0 6px var(--amber-glow); }
+.card-priority.p2 { background: var(--blue); }
+.card-priority.p3 { background: var(--text-dim); }
+
+@keyframes pulse-fire {
+  0%, 100% { box-shadow: 0 0 6px var(--fire-glow); }
+  50% { box-shadow: 0 0 14px var(--fire-glow); }
+}
+
+.card-title { font-size: 13px; font-weight: 600; color: var(--text-bright); margin-bottom: 6px; padding-right: 16px; }
+.card-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.card-tag {
+  font-size: 10px; padding: 2px 8px; border-radius: 6px;
+  background: var(--bg3); color: var(--text-dim); font-weight: 500;
+}
+.card-tag.enco { background: rgba(77,171,247,0.12); color: var(--blue); }
+.card-tag.movetech { background: rgba(64,192,87,0.12); color: var(--green); }
+.card-tag.ai { background: rgba(151,117,250,0.12); color: var(--purple); }
+.card-tag.marketing { background: rgba(240,160,48,0.12); color: var(--amber); }
+.card-tag.personal { background: rgba(255,107,107,0.12); color: #ff6b6b; }
+.card-tag.hukuk { background: rgba(255,255,255,0.08); color: #ccc; }
+.card-tag.greenx { background: rgba(64,192,87,0.15); color: #51cf66; }
+.card-tag.futurecode { background: rgba(77,171,247,0.15); color: #74c0fc; }
+
+.card-assignee {
+  font-size: 10px; color: var(--text-dim); margin-left: auto;
+  display: flex; align-items: center; gap: 4px;
+}
+.card-due { font-size: 10px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+.card-due.overdue { color: var(--fire); }
+.card-due.soon { color: var(--amber); }
+
+/* ── Add Card ── */
+.add-card-btn {
+  width: 100%; padding: 8px; margin-top: 4px;
+  background: transparent; border: 1px dashed var(--card-border);
+  border-radius: 8px; color: var(--text-dim); font-size: 12px;
+  cursor: pointer; transition: all 0.3s;
+}
+.add-card-btn:hover { border-color: var(--amber-dim); color: var(--amber); }
+
+/* ── FAB ── */
+.fab {
+  position: fixed; bottom: 28px; right: 28px; z-index: 100;
+  width: 56px; height: 56px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--amber), var(--gold));
+  border: none; color: var(--bg); font-size: 28px; font-weight: 300;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 24px var(--amber-glow), 0 0 40px rgba(240,160,48,0.15);
+  transition: all 0.3s;
+}
+.fab:hover { transform: scale(1.1); box-shadow: 0 6px 32px var(--amber-glow); }
+
+/* ── Modal ── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+  display: none; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--bg2); border: 1px solid var(--card-border);
+  border-radius: 16px; padding: 28px; width: 100%; max-width: 500px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(240,160,48,0.05);
+  animation: modal-in 0.3s ease-out;
+}
+@keyframes modal-in { from { opacity: 0; transform: translateY(20px) scale(0.95); } }
+
+.modal h2 {
+  font-family: 'Playfair Display', serif; font-size: 22px; color: var(--amber-bright);
+  margin-bottom: 20px;
+}
+.modal label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; }
+.modal input, .modal select, .modal textarea {
+  width: 100%; padding: 10px 14px; margin-bottom: 14px;
+  background: var(--bg3); border: 1px solid var(--card-border);
+  border-radius: 8px; color: var(--text); font-size: 14px;
+  font-family: 'Inter', sans-serif; outline: none;
+  transition: border-color 0.3s;
+}
+.modal input:focus, .modal select:focus, .modal textarea:focus { border-color: var(--amber); }
+.modal textarea { resize: vertical; min-height: 60px; }
+
+.modal-actions { display: flex; gap: 10px; margin-top: 8px; }
+.btn-primary {
+  flex: 1; padding: 12px; border: none; border-radius: 10px;
+  background: linear-gradient(135deg, var(--amber), var(--amber-bright));
+  color: var(--bg); font-weight: 700; font-size: 14px; cursor: pointer;
+  transition: all 0.3s;
+}
+.btn-primary:hover { box-shadow: 0 4px 20px var(--amber-glow); }
+.btn-secondary {
+  padding: 12px 20px; border: 1px solid var(--card-border); border-radius: 10px;
+  background: transparent; color: var(--text-dim); cursor: pointer;
+  transition: all 0.3s;
+}
+.btn-secondary:hover { border-color: var(--text-dim); color: var(--text); }
+
+/* ── Timeline View ── */
+.timeline { display: none; padding: 20px 0; }
+.timeline.active { display: block; }
+.timeline-item {
+  display: flex; gap: 16px; padding: 12px 0;
+  border-left: 2px solid var(--card-border); margin-left: 8px; padding-left: 20px;
+  position: relative;
+}
+.timeline-item::before {
+  content: ''; position: absolute; left: -5px; top: 16px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--amber); box-shadow: 0 0 8px var(--amber-glow);
+}
+.timeline-date { min-width: 80px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--amber-dim); }
+.timeline-content { flex: 1; }
+.timeline-title { font-size: 14px; font-weight: 600; color: var(--text-bright); }
+.timeline-sub { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+
+/* ── Stats Section ── */
+.stats-row {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px; padding: 16px 0;
+}
+.stats-card {
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: 12px; padding: 16px; text-align: center;
+}
+.stats-card .num {
+  font-family: 'JetBrains Mono', monospace; font-size: 32px; font-weight: 700;
+  background: linear-gradient(135deg, var(--amber), var(--gold));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.stats-card .lbl { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+/* ── Detail Panel ── */
+.detail-panel {
+  position: fixed; top: 0; right: -420px; width: 400px; height: 100vh;
+  background: var(--bg2); border-left: 1px solid var(--card-border);
+  z-index: 150; padding: 24px; overflow-y: auto;
+  transition: right 0.3s ease;
+}
+.detail-panel.open { right: 0; box-shadow: -10px 0 40px rgba(0,0,0,0.4); }
+.detail-close {
+  position: absolute; top: 16px; right: 16px;
+  background: none; border: none; color: var(--text-dim); font-size: 20px; cursor: pointer;
+}
+.detail-title { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--amber-bright); margin-bottom: 16px; }
+.detail-field { margin-bottom: 14px; }
+.detail-field label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 4px; }
+.detail-field .value { font-size: 14px; color: var(--text); }
+.detail-actions { display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
+.detail-btn {
+  padding: 8px 14px; border-radius: 8px; font-size: 12px; cursor: pointer;
+  border: 1px solid var(--card-border); background: var(--bg3); color: var(--text-dim);
+  transition: all 0.3s;
+}
+.detail-btn:hover { border-color: var(--amber); color: var(--amber); }
+.detail-btn.move { background: rgba(240,160,48,0.1); border-color: var(--amber-dim); color: var(--amber); }
+
+/* ── Responsive ── */
+@media (max-width: 1100px) {
+  .board { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 768px) {
+  .board { grid-template-columns: 1fr 1fr; }
+  .header { padding: 16px 0; }
+  .logo-text { font-size: 22px; }
+  .header-stats { gap: 10px; }
+  .detail-panel { width: 100%; right: -100%; }
+}
+@media (max-width: 480px) {
+  .board { grid-template-columns: 1fr; }
+  .header-stats { display: none; }
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--amber-dim); }
+
+/* ── Neon border animation ── */
+.neon-border {
+  position: relative;
+}
+.neon-border::before {
+  content: ''; position: absolute; inset: -1px; border-radius: inherit;
+  background: linear-gradient(135deg, var(--amber), var(--gold), var(--amber-dim), var(--amber));
+  background-size: 300% 300%;
+  animation: neon-shift 4s ease-in-out infinite;
+  z-index: -1; opacity: 0.5;
+}
+@keyframes neon-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ── Glow text ── */
+.glow-amber {
+  text-shadow: 0 0 10px var(--amber-glow), 0 0 30px rgba(240,160,48,0.15);
+}
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="amber-orb amber-orb-1"></div>
+<div class="amber-orb amber-orb-2"></div>
+
+<div class="app">
+
+  <!-- ── Header ── -->
+  <header class="header">
+    <div class="logo">
+      <span class="logo-crown">👑</span>
+      <div>
+        <div class="logo-text glow-amber">tÖdÜs</div>
+        <div class="logo-sub">brain system v1.0</div>
+      </div>
+    </div>
+    <div class="header-stats" id="headerStats">
+      <div class="stat-box"><div class="stat-num" id="statTotal">0</div><div class="stat-label">Toplam</div></div>
+      <div class="stat-box"><div class="stat-num" id="statActive">0</div><div class="stat-label">Aktif</div></div>
+      <div class="stat-box"><div class="stat-num" id="statDone">0</div><div class="stat-label">Tamamlanan</div></div>
+      <div class="stat-box"><div class="stat-num" id="statP0">0</div><div class="stat-label">🔥 P0</div></div>
+    </div>
+  </header>
+
+  <!-- ── Controls ── -->
+  <div class="controls">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" class="search-box" id="searchInput" placeholder="Ara... (görev, tag, kişi)">
+    </div>
+    <button class="view-btn active" onclick="setView('board')" id="viewBoard">📋 Kanban</button>
+    <button class="view-btn" onclick="setView('timeline')" id="viewTimeline">📅 Timeline</button>
+    <button class="filter-btn" onclick="togglePriorityFilter()" id="filterP0">🔥 P0/P1</button>
+  </div>
+
+  <!-- ── Category Tabs ── -->
+  <div class="cat-tabs" id="catTabs"></div>
+
+  <!-- ── Stats Row ── -->
+  <div class="stats-row" id="statsRow">
+    <div class="stats-card"><div class="num" id="statToday">0</div><div class="lbl">Bugün</div></div>
+    <div class="stats-card"><div class="num" id="statWeek">0</div><div class="lbl">Bu Hafta</div></div>
+    <div class="stats-card"><div class="num" id="statMonth">0</div><div class="lbl">Bu Ay</div></div>
+    <div class="stats-card"><div class="num" id="statBacklog">0</div><div class="lbl">Backlog</div></div>
+    <div class="stats-card"><div class="num" id="statInProgress">0</div><div class="lbl">In Progress</div></div>
+  </div>
+
+  <!-- ── Kanban Board ── -->
+  <div class="board" id="boardView">
+    <div class="column">
+      <div class="col-header backlog"><span class="col-title">📥 Backlog</span><span class="col-count" id="countBacklog">0</span></div>
+      <div class="col-cards" id="colBacklog"></div>
+      <button class="add-card-btn" onclick="openModal('backlog')">+ Ekle</button>
+    </div>
+    <div class="column">
+      <div class="col-header active"><span class="col-title">⚡ Active</span><span class="col-count" id="countActive">0</span></div>
+      <div class="col-cards" id="colActive"></div>
+      <button class="add-card-btn" onclick="openModal('active')">+ Ekle</button>
+    </div>
+    <div class="column">
+      <div class="col-header progress"><span class="col-title">🔧 In Progress</span><span class="col-count" id="countProgress">0</span></div>
+      <div class="col-cards" id="colProgress"></div>
+      <button class="add-card-btn" onclick="openModal('progress')">+ Ekle</button>
+    </div>
+    <div class="column">
+      <div class="col-header review"><span class="col-title">👁 Review</span><span class="col-count" id="countReview">0</span></div>
+      <div class="col-cards" id="colReview"></div>
+      <button class="add-card-btn" onclick="openModal('review')">+ Ekle</button>
+    </div>
+    <div class="column">
+      <div class="col-header done"><span class="col-title">✅ Done</span><span class="col-count" id="countDone">0</span></div>
+      <div class="col-cards" id="colDone"></div>
+    </div>
+  </div>
+
+  <!-- ── Timeline View ── -->
+  <div class="timeline" id="timelineView"></div>
+
+</div>
+
+<!-- ── FAB ── -->
+<button class="fab" onclick="openModal('backlog')" title="Hızlı ekle">+</button>
+
+<!-- ── Add Modal ── -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <h2>👑 Yeni Görev</h2>
+    <label>Başlık</label>
+    <input type="text" id="modalTitle" placeholder="Ne yapılacak?">
+    <label>Kategori</label>
+    <select id="modalCat">
+      <option value="enco">🚛 ENCO</option>
+      <option value="movetech">📦 MoveTech</option>
+      <option value="ai">🤖 AI/Tech</option>
+      <option value="marketing">📣 Marketing</option>
+      <option value="personal">🎮 Kişisel</option>
+      <option value="futurecode">💻 FutureCode</option>
+      <option value="greenx">🌱 GreenX</option>
+      <option value="hukuk">⚖️ Hukuk</option>
+    </select>
+    <label>Öncelik</label>
+    <select id="modalPriority">
+      <option value="p0">🔥 P0 — Kritik</option>
+      <option value="p1">🔴 P1 — Yüksek</option>
+      <option value="p2" selected>🟡 P2 — Orta</option>
+      <option value="p3">⚪ P3 — Düşük</option>
+    </select>
+    <label>Atanan</label>
+    <select id="modalAssignee">
+      <option value="ozgur">Özgür</option>
+      <option value="zeux">ZeuX / Claude</option>
+      <option value="team">Team</option>
+    </select>
+    <label>Bitiş Tarihi</label>
+    <input type="date" id="modalDue">
+    <label>Notlar</label>
+    <textarea id="modalNotes" placeholder="Detaylar..."></textarea>
+    <input type="hidden" id="modalStatus" value="backlog">
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">İptal</button>
+      <button class="btn-primary" onclick="addTask()">✨ Ekle</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Detail Panel ── -->
+<div class="detail-panel" id="detailPanel">
+  <button class="detail-close" onclick="closeDetail()">✕</button>
+  <h3 class="detail-title" id="detailTitle"></h3>
+  <div class="detail-field"><label>Kategori</label><div class="value" id="detailCat"></div></div>
+  <div class="detail-field"><label>Öncelik</label><div class="value" id="detailPriority"></div></div>
+  <div class="detail-field"><label>Atanan</label><div class="value" id="detailAssignee"></div></div>
+  <div class="detail-field"><label>Bitiş Tarihi</label><div class="value" id="detailDue"></div></div>
+  <div class="detail-field"><label>Durum</label><div class="value" id="detailStatus"></div></div>
+  <div class="detail-field"><label>Notlar</label><div class="value" id="detailNotes"></div></div>
+  <div class="detail-field"><label>Oluşturulma</label><div class="value" id="detailCreated"></div></div>
+  <div class="detail-actions" id="detailActions"></div>
+</div>
+
+<script>
+// ── Data Store ──
+const STORAGE_KEY = 'todos_v1';
+const CAT_CONFIG = {
+  all: { icon: '👑', label: 'Tümü' },
+  enco: { icon: '🚛', label: 'ENCO' },
+  movetech: { icon: '📦', label: 'MoveTech' },
+  ai: { icon: '🤖', label: 'AI/Tech' },
+  marketing: { icon: '📣', label: 'Marketing' },
+  personal: { icon: '🎮', label: 'Kişisel' },
+  futurecode: { icon: '💻', label: 'FutureCode' },
+  greenx: { icon: '🌱', label: 'GreenX' },
+  hukuk: { icon: '⚖️', label: 'Hukuk' }
+};
+
+const STATUS_COLS = { backlog: 'colBacklog', active: 'colActive', progress: 'colProgress', review: 'colReview', done: 'colDone' };
+const STATUS_ORDER = ['backlog', 'active', 'progress', 'review', 'done'];
+const STATUS_LABELS = { backlog: '📥 Backlog', active: '⚡ Active', progress: '🔧 In Progress', review: '👁 Review', done: '✅ Done' };
+const PRIORITY_LABELS = { p0: '🔥 P0 Kritik', p1: '🔴 P1 Yüksek', p2: '🟡 P2 Orta', p3: '⚪ P3 Düşük' };
+const ASSIGNEE_LABELS = { ozgur: 'Özgür', zeux: 'ZeuX', team: 'Team' };
+
+let tasks = [];
+let activeCategory = 'all';
+let activeView = 'board';
+let priorityFilter = false;
+let selectedTaskId = null;
+
+// ── Seed Data ──
+const SEED_DATA = [
+  // ENCO
+  { title: 'Filo yönetimi + sürücü uygulaması', cat: 'enco', priority: 'p0', assignee: 'ozgur', status: 'active' },
+  { title: 'CRM yapısını düzelt, müşterileri gir', cat: 'enco', priority: 'p1', assignee: 'ozgur', status: 'active' },
+  { title: 'Fatura onay mekanizması', cat: 'enco', priority: 'p1', assignee: 'team', status: 'backlog' },
+  { title: 'Departman subları oluştur', cat: 'enco', priority: 'p2', assignee: 'ozgur', status: 'backlog' },
+  { title: 'ExtraNet konsol', cat: 'enco', priority: 'p1', assignee: 'ozgur', status: 'backlog' },
+  { title: 'Satış/Marketing — Apollo outreach', cat: 'enco', priority: 'p1', assignee: 'zeux', status: 'active' },
+  { title: 'Hukuk takip sistemi', cat: 'enco', priority: 'p0', assignee: 'ozgur', status: 'progress' },
+  { title: 'SGK ve transden bilgi çalışması', cat: 'enco', priority: 'p2', assignee: 'team', status: 'backlog' },
+  { title: 'Sürücü hesaplarını dijitale dönüştür', cat: 'enco', priority: 'p2', assignee: 'team', status: 'backlog' },
+  { title: 'Excel kullanımını kaldır', cat: 'enco', priority: 'p1', assignee: 'ozgur', status: 'active' },
+  // MoveTech
+  { title: 'WMS (Depo Modülü) geliştirme', cat: 'movetech', priority: 'p0', assignee: 'ozgur', status: 'progress' },
+  { title: 'Web sitesi güncelleme', cat: 'movetech', priority: 'p2', assignee: 'zeux', status: 'backlog' },
+  { title: 'Fuar hazırlıkları (video, catering, hostes)', cat: 'movetech', priority: 'p0', assignee: 'ozgur', status: 'active' },
+  { title: 'CRM kültürü oluşturma', cat: 'movetech', priority: 'p1', assignee: 'ozgur', status: 'backlog' },
+  { title: 'Tahsilat otomatikleştirme', cat: 'movetech', priority: 'p1', assignee: 'team', status: 'backlog' },
+  { title: 'A Plus Test detayları', cat: 'movetech', priority: 'p2', assignee: 'team', status: 'backlog' },
+  { title: 'Subdomain onay/geliştirme portali', cat: 'movetech', priority: 'p2', assignee: 'zeux', status: 'backlog' },
+  // AI/Tech
+  { title: 'Bot ekosistemi (Atlas, Hermes, Apollo, KlauX, Hephaestus, Calliope, JaX)', cat: 'ai', priority: 'p0', assignee: 'zeux', status: 'progress' },
+  { title: 'MCP Server geliştirme', cat: 'ai', priority: 'p0', assignee: 'zeux', status: 'active' },
+  { title: 'Skilldrunk marketplace', cat: 'ai', priority: 'p1', assignee: 'zeux', status: 'active' },
+  { title: 'Skimsoulfat platform', cat: 'ai', priority: 'p1', assignee: 'zeux', status: 'active' },
+  { title: 'Quotes v2', cat: 'ai', priority: 'p2', assignee: 'zeux', status: 'backlog' },
+  { title: 'Kanban system', cat: 'ai', priority: 'p2', assignee: 'zeux', status: 'done' },
+  { title: 'Notification filter', cat: 'ai', priority: 'p2', assignee: 'zeux', status: 'backlog' },
+  { title: 'Nevra Bozok platform', cat: 'ai', priority: 'p2', assignee: 'zeux', status: 'backlog' },
+  // Marketing
+  { title: 'Apollo.io lead generation', cat: 'marketing', priority: 'p1', assignee: 'zeux', status: 'active' },
+  { title: 'LinkedIn takvimleri ve içerik', cat: 'marketing', priority: 'p2', assignee: 'ozgur', status: 'backlog' },
+  { title: 'Google Ads yönetimi', cat: 'marketing', priority: 'p2', assignee: 'team', status: 'backlog' },
+  { title: 'Fuar katılımları', cat: 'marketing', priority: 'p1', assignee: 'ozgur', status: 'active' },
+  { title: 'İçerik üretimi', cat: 'marketing', priority: 'p2', assignee: 'zeux', status: 'backlog' },
+  // Kişisel
+  { title: 'SimRacing setup', cat: 'personal', priority: 'p3', assignee: 'ozgur', status: 'backlog' },
+  { title: 'Raspberry Pi projesi', cat: 'personal', priority: 'p3', assignee: 'ozgur', status: 'backlog' },
+  { title: 'RFID ev WMS', cat: 'personal', priority: 'p3', assignee: 'ozgur', status: 'backlog' },
+  { title: 'Dijital kartvizit', cat: 'personal', priority: 'p2', assignee: 'zeux', status: 'done' },
+  { title: 'Suno müzik', cat: 'personal', priority: 'p3', assignee: 'ozgur', status: 'backlog' },
+  // Hukuk
+  { title: 'Hukuk takip — dava süreçleri', cat: 'hukuk', priority: 'p1', assignee: 'ozgur', status: 'active' },
+  { title: 'Sözleşme şablonları', cat: 'hukuk', priority: 'p2', assignee: 'zeux', status: 'backlog' },
+];
+
+function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 5); }
+
+function initData() {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored) {
+    tasks = JSON.parse(stored);
+  } else {
+    tasks = SEED_DATA.map(t => ({
+      id: generateId(),
+      title: t.title,
+      cat: t.cat,
+      priority: t.priority,
+      assignee: t.assignee,
+      status: t.status,
+      due: '',
+      notes: '',
+      created: new Date().toISOString(),
+      completedAt: t.status === 'done' ? new Date().toISOString() : null
+    }));
+    save();
+  }
+}
+
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+}
+
+// ── Render ──
+function render() {
+  renderCatTabs();
+  renderBoard();
+  renderStats();
+  renderTimeline();
+}
+
+function renderCatTabs() {
+  const el = document.getElementById('catTabs');
+  el.innerHTML = '';
+  Object.entries(CAT_CONFIG).forEach(([key, cfg]) => {
+    const count = key === 'all' ? tasks.length : tasks.filter(t => t.cat === key).length;
+    const tab = document.createElement('div');
+    tab.className = 'cat-tab' + (activeCategory === key ? ' active' : '');
+    tab.innerHTML = `${cfg.icon} ${cfg.label} <span class="count">${count}</span>`;
+    tab.onclick = () => { activeCategory = key; render(); };
+    el.appendChild(tab);
+  });
+}
+
+function getFilteredTasks() {
+  let filtered = tasks;
+  if (activeCategory !== 'all') filtered = filtered.filter(t => t.cat === activeCategory);
+  if (priorityFilter) filtered = filtered.filter(t => t.priority === 'p0' || t.priority === 'p1');
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  if (q) filtered = filtered.filter(t =>
+    t.title.toLowerCase().includes(q) ||
+    t.cat.includes(q) ||
+    (t.notes && t.notes.toLowerCase().includes(q)) ||
+    ASSIGNEE_LABELS[t.assignee]?.toLowerCase().includes(q)
+  );
+  return filtered;
+}
+
+function renderBoard() {
+  const filtered = getFilteredTasks();
+  Object.values(STATUS_COLS).forEach(id => document.getElementById(id).innerHTML = '');
+
+  const counts = { backlog: 0, active: 0, progress: 0, review: 0, done: 0 };
+
+  // Sort by priority within each column
+  const priorityOrder = { p0: 0, p1: 1, p2: 2, p3: 3 };
+  const sorted = [...filtered].sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+
+  sorted.forEach((task, i) => {
+    const col = document.getElementById(STATUS_COLS[task.status]);
+    if (!col) return;
+    counts[task.status]++;
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.animationDelay = (i * 0.03) + 's';
+    card.onclick = () => openDetail(task.id);
+
+    const dueClass = task.due ? getDueClass(task.due) : '';
+    const dueText = task.due ? formatDate(task.due) : '';
+
+    card.innerHTML = `
+      <div class="card-priority ${task.priority}"></div>
+      <div class="card-title">${escHtml(task.title)}</div>
+      <div class="card-meta">
+        <span class="card-tag ${task.cat}">${CAT_CONFIG[task.cat]?.icon || ''} ${CAT_CONFIG[task.cat]?.label || task.cat}</span>
+        ${dueText ? `<span class="card-due ${dueClass}">${dueText}</span>` : ''}
+        <span class="card-assignee">👤 ${ASSIGNEE_LABELS[task.assignee] || task.assignee}</span>
+      </div>
+    `;
+    col.appendChild(card);
+  });
+
+  document.getElementById('countBacklog').textContent = counts.backlog;
+  document.getElementById('countActive').textContent = counts.active;
+  document.getElementById('countProgress').textContent = counts.progress;
+  document.getElementById('countReview').textContent = counts.review;
+  document.getElementById('countDone').textContent = counts.done;
+}
+
+function renderStats() {
+  const now = new Date();
+  const today = now.toISOString().slice(0, 10);
+  const weekAgo = new Date(now - 7 * 86400000).toISOString();
+  const monthAgo = new Date(now - 30 * 86400000).toISOString();
+
+  const done = tasks.filter(t => t.status === 'done');
+  document.getElementById('statToday').textContent = done.filter(t => t.completedAt && t.completedAt.slice(0, 10) === today).length;
+  document.getElementById('statWeek').textContent = done.filter(t => t.completedAt && t.completedAt >= weekAgo).length;
+  document.getElementById('statMonth').textContent = done.filter(t => t.completedAt && t.completedAt >= monthAgo).length;
+  document.getElementById('statBacklog').textContent = tasks.filter(t => t.status === 'backlog').length;
+  document.getElementById('statInProgress').textContent = tasks.filter(t => t.status === 'progress').length;
+
+  document.getElementById('statTotal').textContent = tasks.length;
+  document.getElementById('statActive').textContent = tasks.filter(t => t.status !== 'done' && t.status !== 'backlog').length;
+  document.getElementById('statDone').textContent = done.length;
+  document.getElementById('statP0').textContent = tasks.filter(t => t.priority === 'p0' && t.status !== 'done').length;
+}
+
+function renderTimeline() {
+  const el = document.getElementById('timelineView');
+  const sorted = [...getFilteredTasks()].filter(t => t.due).sort((a, b) => a.due.localeCompare(b.due));
+  if (!sorted.length) {
+    el.innerHTML = '<p style="color:var(--text-dim);padding:40px;text-align:center;">Tarihli görev yok. Görevlere bitiş tarihi ekleyin.</p>';
+    return;
+  }
+  el.innerHTML = sorted.map(t => `
+    <div class="timeline-item">
+      <div class="timeline-date">${formatDate(t.due)}</div>
+      <div class="timeline-content">
+        <div class="timeline-title">${escHtml(t.title)}</div>
+        <div class="timeline-sub">${CAT_CONFIG[t.cat]?.icon || ''} ${CAT_CONFIG[t.cat]?.label || ''} · ${ASSIGNEE_LABELS[t.assignee] || ''} · ${PRIORITY_LABELS[t.priority]}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── Helpers ──
+function escHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function formatDate(d) {
+  if (!d) return '';
+  const dt = new Date(d + 'T00:00:00');
+  return dt.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
+}
+function getDueClass(d) {
+  const diff = (new Date(d + 'T00:00:00') - new Date()) / 86400000;
+  if (diff < 0) return 'overdue';
+  if (diff < 3) return 'soon';
+  return '';
+}
+
+// ── Modal ──
+function openModal(status) {
+  document.getElementById('modalStatus').value = status || 'backlog';
+  document.getElementById('addModal').classList.add('open');
+  setTimeout(() => document.getElementById('modalTitle').focus(), 100);
+}
+function closeModal() {
+  document.getElementById('addModal').classList.remove('open');
+  document.getElementById('modalTitle').value = '';
+  document.getElementById('modalNotes').value = '';
+  document.getElementById('modalDue').value = '';
+}
+
+function addTask() {
+  const title = document.getElementById('modalTitle').value.trim();
+  if (!title) return;
+  tasks.push({
+    id: generateId(),
+    title,
+    cat: document.getElementById('modalCat').value,
+    priority: document.getElementById('modalPriority').value,
+    assignee: document.getElementById('modalAssignee').value,
+    status: document.getElementById('modalStatus').value,
+    due: document.getElementById('modalDue').value,
+    notes: document.getElementById('modalNotes').value.trim(),
+    created: new Date().toISOString(),
+    completedAt: null
+  });
+  save();
+  closeModal();
+  render();
+}
+
+// ── Detail Panel ──
+function openDetail(id) {
+  selectedTaskId = id;
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+  document.getElementById('detailTitle').textContent = t.title;
+  document.getElementById('detailCat').textContent = `${CAT_CONFIG[t.cat]?.icon || ''} ${CAT_CONFIG[t.cat]?.label || t.cat}`;
+  document.getElementById('detailPriority').textContent = PRIORITY_LABELS[t.priority] || t.priority;
+  document.getElementById('detailAssignee').textContent = ASSIGNEE_LABELS[t.assignee] || t.assignee;
+  document.getElementById('detailDue').textContent = t.due ? formatDate(t.due) : '—';
+  document.getElementById('detailStatus').textContent = STATUS_LABELS[t.status] || t.status;
+  document.getElementById('detailNotes').textContent = t.notes || '—';
+  document.getElementById('detailCreated').textContent = new Date(t.created).toLocaleDateString('tr-TR');
+
+  // Build move actions
+  const acts = document.getElementById('detailActions');
+  acts.innerHTML = '';
+  STATUS_ORDER.forEach(s => {
+    if (s === t.status) return;
+    const btn = document.createElement('button');
+    btn.className = 'detail-btn move';
+    btn.textContent = `→ ${STATUS_LABELS[s]}`;
+    btn.onclick = () => moveTask(id, s);
+    acts.appendChild(btn);
+  });
+  const delBtn = document.createElement('button');
+  delBtn.className = 'detail-btn';
+  delBtn.textContent = '🗑 Sil';
+  delBtn.style.color = 'var(--fire)';
+  delBtn.style.borderColor = 'var(--fire)';
+  delBtn.onclick = () => { if (confirm('Bu görevi silmek istediğine emin misin?')) { tasks = tasks.filter(x => x.id !== id); save(); closeDetail(); render(); } };
+  acts.appendChild(delBtn);
+
+  document.getElementById('detailPanel').classList.add('open');
+}
+function closeDetail() { document.getElementById('detailPanel').classList.remove('open'); selectedTaskId = null; }
+
+function moveTask(id, newStatus) {
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+  t.status = newStatus;
+  if (newStatus === 'done') t.completedAt = new Date().toISOString();
+  else t.completedAt = null;
+  save();
+  closeDetail();
+  render();
+}
+
+// ── View Toggle ──
+function setView(v) {
+  activeView = v;
+  document.getElementById('boardView').style.display = v === 'board' ? 'grid' : 'none';
+  document.getElementById('timelineView').className = 'timeline' + (v === 'timeline' ? ' active' : '');
+  document.getElementById('viewBoard').classList.toggle('active', v === 'board');
+  document.getElementById('viewTimeline').classList.toggle('active', v === 'timeline');
+}
+
+function togglePriorityFilter() {
+  priorityFilter = !priorityFilter;
+  document.getElementById('filterP0').classList.toggle('active', priorityFilter);
+  render();
+}
+
+// ── Search ──
+document.getElementById('searchInput').addEventListener('input', () => render());
+
+// ── Keyboard ──
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(); closeDetail(); }
+  if (e.key === 'n' && !e.metaKey && !e.ctrlKey && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA' && document.activeElement.tagName !== 'SELECT') openModal('backlog');
+});
+
+// ── Init ──
+initData();
+render();
+</script>
+</body>
+</html>

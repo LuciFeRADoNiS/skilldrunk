@@ -23,6 +23,13 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 **Monorepo**: `/Users/ozgurgur/Documents/skilldrunk/` — pnpm workspaces + Next.js 16 (Turbopack) + React 19 + Supabase + Tailwind 4.
 
+**Static pages** (public/ dizini):
+```
+/zeux/           ZeuX profile page
+/todos/          tÖdÜs — centralized brain/task management (amber/gold, localStorage, kanban+timeline)
+/card/           Digital business card
+```
+
 **Live subdomains** (9 tane — pt_apps tablosundan canlı veri):
 ```
 skilldrunk.com           PUBLIC   Marketplace + MCP HTTP + AI Finder
