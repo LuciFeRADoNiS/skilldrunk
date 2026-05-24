@@ -197,6 +197,95 @@ const TOOLS = [
       required: ["quote_text", "author"],
     },
   },
+  {
+    name: "query_oz_notes",
+    description:
+      "Özgür'ün el yazısı PDF notlarından (oznotes1-8.pdf) parse edilmiş içerikleri sorgular. Filter: source_pdf, page_number, kişi (people array içinde), kategori (categories array), label, organizasyon. Tipik kullanım: 'şu kişinin notlarını göster', 'Movetech ile ilgili sayfalarda ne var', 'Greenix geçen tüm notları getir'.",
+    input_schema: {
+      type: "object",
+      properties: {
+        search_term: { type: "string", description: "Title/summary/transcription içinde arama (ILIKE %term%)" },
+        person: { type: "string", description: "Bu kişinin geçtiği notlar (people array)" },
+        organization: { type: "string", description: "Bu org/marka geçen notlar (organizations array)" },
+        category: { type: "string", description: "Categories array içinde tam eşleşme" },
+        source_pdf: { type: "string", description: "oznotes1.pdf vb." },
+        limit: { type: "integer", default: 10, minimum: 1, maximum: 50 },
+      },
+      required: [],
+    },
+  },
+  {
+    name: "query_kanban_cards",
+    description:
+      "tÖdÜs kanban kartlarını (kanban_cards tablosu — oz_notes'tan üretildi) sorgular. Filter: column_name (Backlog/Todo/Review/Done), priority (P0-P3), assignee, due_date aralığı, label. Tipik: 'Erdinç'e atanmış P0 işler', 'bu hafta deadline'lı kartlar', '\"karbon\" geçen tüm kartlar'.",
+    input_schema: {
+      type: "object",
+      properties: {
+        search_term: { type: "string", description: "Title/description içinde arama" },
+        column_name: { type: "string", enum: ["Backlog","Todo","In Progress","Review","Done"] },
+        priority: { type: "string", enum: ["P0","P1","P2","P3"] },
+        assignee: { type: "string", description: "ozgur, Erdinç, Sefa, Cihad, Eyüp, claude vb." },
+        label: { type: "string", description: "Label tek tam eşleşme" },
+        due_within_days: { type: "integer", description: "Bugünden sonraki N gün içinde deadline'lı (örn: 7)" },
+        limit: { type: "integer", default: 20, minimum: 1, maximum: 100 },
+      },
+      required: [],
+    },
+  },
+  {
+    name: "update_kanban_card",
+    description:
+      "Bir kanban kartını günceller (taşı, atama değiştir, priority değiştir, done yap, archive et). Card_id zorunlu. Bu WRITE tool — Telegram path'inde KAPALI.",
+    input_schema: {
+      type: "object",
+      properties: {
+        card_id: { type: "string", description: "kanban_cards.id (uuid)" },
+        column_name: { type: "string", enum: ["Backlog","Todo","In Progress","Review","Done"] },
+        priority: { type: "string", enum: ["P0","P1","P2","P3"] },
+        assignee: { type: "string" },
+        due_date: { type: "string", description: "YYYY-MM-DD veya null" },
+        is_archived: { type: "boolean" },
+      },
+      required: ["card_id"],
+    },
+  },
+  {
+    name: "list_oz_secrets_preview",
+    description:
+      "oz_secrets tablosundaki hassas verilerin SADECE önizlemesini listeler (label, kategori, vendor, maskeli preview, kaynak PDF). Asla gerçek şifre/değer dönmez — bu güvenli liste. Henüz boş olabilir; eğer kullanıcı 'şifrelerim nerede' sorarsa burayı kontrol et.",
+    input_schema: {
+      type: "object",
+      properties: {
+        category: { type: "string", description: "login/api_key/bank/corporate_email/phone/subscription_code" },
+        vendor: { type: "string" },
+      },
+      required: [],
+    },
+  },
+  {
+    name: "get_cowork_context",
+    description:
+      "cowork_context_notes tablosundan ilgili context'i getirir. Kullanıcı bir konu sorduğunda (özellikle hassas veri, güvenlik, PDF, secrets gibi) önce bu tool'u çağırıp Cowork'ten gelen plan/note var mı bak. show_on_keywords ile filtrelenebilir.",
+    input_schema: {
+      type: "object",
+      properties: {
+        keyword: { type: "string", description: "Kullanıcı sorusundan extract edilen anahtar (örn: 'şifre', 'pdf')" },
+      },
+      required: [],
+    },
+  },
+  {
+    name: "list_my_meetings",
+    description:
+      "Kanban kartlarından yaklaşan toplantıları/randevuları çıkarır (title'da saat formatı 'HH:MM' geçenler veya 'toplantı/meeting/randevu' geçenler) + due_date'i bugünden ileride olanlar.",
+    input_schema: {
+      type: "object",
+      properties: {
+        days_ahead: { type: "integer", default: 14, minimum: 1, maximum: 90 },
+      },
+      required: [],
+    },
+  },
 ];
 
 /* ────────────────────────  Tool execution ──────────────────────── */
@@ -208,6 +297,12 @@ const READ_ONLY_TOOLS = new Set([
   "list_apps",
   "get_recent_audit",
   "query_db",
+  // oz_notes / kanban / secrets / cowork — okunur
+  "query_oz_notes",
+  "query_kanban_cards",
+  "list_oz_secrets_preview",
+  "get_cowork_context",
+  "list_my_meetings",
 ]);
 
 // query_db allowlist — tables exposed to ad-hoc SQL. Anything outside this
@@ -223,6 +318,18 @@ const QUERY_DB_TABLES = [
   "br_briefings",
   "qt_quotes",
   "pt_apps",
+  // tÖdÜs + oz_notes ekosistemi (read-only via query_db)
+  "oz_notes",
+  "oz_notes_archive",
+  "kanban_cards",
+  "kanban_boards",
+  "kanban_activity",
+  "kanban_people",
+  "kanban_comments",
+  "oz_secrets_preview", // VIEW — gerçek değerleri YOK, sadece preview
+  "cowork_context_notes",
+  "sd_backlog",
+  "vault_embeddings",
 ] as const;
 
 // Words that immediately disqualify a query. We rely on the RPC's
@@ -441,6 +548,145 @@ async function executeTool(
       return data;
     }
 
+    /* ────  tÖdÜs / oz_notes  ──── */
+
+    case "query_oz_notes": {
+      const limit = Math.min((input.limit as number) ?? 10, 50);
+      let q = supabase
+        .from("oz_notes")
+        .select(
+          "id, source_pdf, page_number, summary, people, organizations, categories, labels, priority, status, todos, questions",
+        )
+        .eq("status", "parsed")
+        .limit(limit);
+      if (input.search_term) {
+        const term = String(input.search_term);
+        q = q.or(
+          `summary.ilike.%${term}%,raw_transcription.ilike.%${term}%`,
+        );
+      }
+      if (input.person) q = q.contains("people", [String(input.person)]);
+      if (input.organization)
+        q = q.contains("organizations", [String(input.organization)]);
+      if (input.category)
+        q = q.contains("categories", [String(input.category)]);
+      if (input.source_pdf) q = q.eq("source_pdf", String(input.source_pdf));
+      const { data, error } = await q;
+      if (error) throw new Error(error.message);
+      return { count: (data ?? []).length, rows: data ?? [] };
+    }
+
+    case "query_kanban_cards": {
+      const limit = Math.min((input.limit as number) ?? 20, 100);
+      let q = supabase
+        .from("kanban_cards")
+        .select(
+          "id, title, description, column_name, priority, assignee, due_date, labels, source_pdf, source_page_number, is_archived",
+        )
+        .eq("is_archived", false)
+        .order("priority")
+        .order("due_date", { ascending: true, nullsFirst: false })
+        .limit(limit);
+      if (input.search_term) {
+        const term = String(input.search_term);
+        q = q.or(`title.ilike.%${term}%,description.ilike.%${term}%`);
+      }
+      if (input.column_name) q = q.eq("column_name", String(input.column_name));
+      if (input.priority) q = q.eq("priority", String(input.priority));
+      if (input.assignee) q = q.eq("assignee", String(input.assignee));
+      if (input.label) q = q.contains("labels", [String(input.label)]);
+      if (input.due_within_days) {
+        const today = new Date().toISOString().slice(0, 10);
+        const until = new Date(
+          Date.now() + Number(input.due_within_days) * 86_400_000,
+        )
+          .toISOString()
+          .slice(0, 10);
+        q = q.gte("due_date", today).lte("due_date", until);
+      }
+      const { data, error } = await q;
+      if (error) throw new Error(error.message);
+      return { count: (data ?? []).length, rows: data ?? [] };
+    }
+
+    case "update_kanban_card": {
+      const cardId = String(input.card_id);
+      const patch: Record<string, unknown> = {};
+      if (input.column_name) patch.column_name = String(input.column_name);
+      if (input.priority) patch.priority = String(input.priority);
+      if (input.assignee) patch.assignee = String(input.assignee);
+      if (input.due_date !== undefined)
+        patch.due_date = input.due_date === null ? null : String(input.due_date);
+      if (typeof input.is_archived === "boolean")
+        patch.is_archived = input.is_archived;
+      if (Object.keys(patch).length === 0)
+        throw new Error("update_kanban_card: hiçbir alan verilmedi");
+      const { data, error } = await supabase
+        .from("kanban_cards")
+        .update(patch)
+        .eq("id", cardId)
+        .select("id, title, column_name, priority, assignee, due_date, is_archived")
+        .single();
+      if (error) throw new Error(error.message);
+      return data;
+    }
+
+    case "list_oz_secrets_preview": {
+      let q = supabase
+        .from("oz_secrets_preview")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (input.category) q = q.eq("category", String(input.category));
+      if (input.vendor) q = q.eq("vendor", String(input.vendor));
+      const { data, error } = await q;
+      if (error) throw new Error(error.message);
+      return { count: (data ?? []).length, rows: data ?? [] };
+    }
+
+    case "get_cowork_context": {
+      const kw = (input.keyword as string | undefined)?.toLowerCase();
+      let q = supabase
+        .from("cowork_context_notes")
+        .select("topic, content, priority, show_on_keywords, created_at")
+        .order("priority")
+        .limit(20);
+      const { data, error } = await q;
+      if (error) throw new Error(error.message);
+      // Eğer keyword verilmişse, show_on_keywords'tan match olanları filtrele
+      const rows = (data ?? []).filter((r) => {
+        if (!kw) return true;
+        const arr = (r as { show_on_keywords?: string[] }).show_on_keywords ?? [];
+        return arr.some((k) => kw.includes(k.toLowerCase()) || k.toLowerCase().includes(kw));
+      });
+      return { count: rows.length, rows };
+    }
+
+    case "list_my_meetings": {
+      const daysAhead = Number(input.days_ahead ?? 14);
+      const today = new Date().toISOString().slice(0, 10);
+      const until = new Date(Date.now() + daysAhead * 86_400_000)
+        .toISOString()
+        .slice(0, 10);
+      const { data, error } = await supabase
+        .from("kanban_cards")
+        .select("id, title, column_name, priority, assignee, due_date, source_pdf, source_page_number")
+        .eq("is_archived", false)
+        .neq("column_name", "Done")
+        .gte("due_date", today)
+        .lte("due_date", until)
+        .order("due_date", { ascending: true });
+      if (error) throw new Error(error.message);
+      // Title'da saat veya toplantı anahtar kelimesi olanlara öncelik ver
+      const rows = (data ?? []).map((r) => ({
+        ...r,
+        looks_like_meeting:
+          /\d{1,2}:\d{2}|toplantı|meeting|yemek|sunum|randevu|görüş/i.test(
+            (r as { title: string }).title,
+          ),
+      }));
+      return { count: rows.length, rows };
+    }
+
     default:
       throw new Error(`unknown tool: ${name}`);
   }
@@ -521,7 +767,17 @@ Sana verilen araçları gerektiğinde KULLAN. Soru sorarken araçla doğrula. Ku
 - set_skill_status → marketplace skill yönetimi (publish/archive/draft)
 - get_recent_audit → "son ne yaptım" sorularına
 - add_quote → quotes.skilldrunk.com'a yeni söz ekleme
-- query_db → "son 30g günlük pageview", "en aktif app" gibi ad-hoc SELECT sorgular. Hazır tool'lardan biri yoksa bunu kullan. **Allowlist**: sd_skills, sd_profiles, sd_pageviews, sd_ai_usage, sd_audit_log, az_events, br_briefings, qt_quotes, pt_apps. LIMIT zorunlu (otomatik 100'e cap). Sadece SELECT.
+- query_db → "son 30g günlük pageview", "en aktif app" gibi ad-hoc SELECT sorgular. Hazır tool'lardan biri yoksa bunu kullan. **Allowlist**: sd_skills, sd_profiles, sd_pageviews, sd_ai_usage, sd_audit_log, az_events, br_briefings, qt_quotes, pt_apps, oz_notes, oz_notes_archive, kanban_cards, kanban_boards, kanban_activity, kanban_people, kanban_comments, oz_secrets_preview (view, gerçek değer YOK), cowork_context_notes, sd_backlog, vault_embeddings. LIMIT zorunlu (otomatik 100'e cap). Sadece SELECT.
+
+### tÖdÜs / Özgür'ün el yazısı notları:
+- query_oz_notes → Özgür'ün PDF notlarından parse edilmiş içerik (oznotes1-8.pdf, /Users/ozgurgur/Documents/todos/). 30 parsed sayfa, 44 duplicate ARŞİVDE. Kişi/org/kategori/PDF filtreli.
+- query_kanban_cards → tÖdÜs kanban'daki 579 kart. Column (Backlog/Todo/Review/Done), priority (P0-P3), assignee (ozgur/Erdinç/Sefa/Cihad/Eyüp/claude vb), label, deadline filtreli.
+- update_kanban_card → kartı taşı, atama değiştir, done yap. WRITE.
+- list_my_meetings → yaklaşan toplantı/randevu kartları (saat formatı veya 'toplantı/yemek/sunum' geçenler).
+
+### Güvenlik:
+- list_oz_secrets_preview → sadece MASKELİ önizleme (gerçek şifre asla dönmez). Şu an boş — Özgür henüz secrets eklemedi.
+- get_cowork_context → kullanıcı 'şifre/secret/hassas/kvkk/pdf/oznotes' gibi konuları sorduğunda ÖNCE BUNU çağır. Cowork'ten gelen plan/uyarı varsa kullanıcıya aktar.
 
 ## Kurallar
 - URL ver: admin.skilldrunk.com/apps, https://skilldrunk.com/arena, vs (absolute)
@@ -623,14 +879,15 @@ export async function runAskAssistantCore(opts: {
 
     const traces: ToolCallTrace[] = [];
     let finalText = "";
-    let modelUsed = "claude-haiku-4-5";
+    // Max kabiliyet için Sonnet 4.5 — Haiku'ya göre ~3x daha akıllı, oz_notes/kanban toolları için gerekli
+    let modelUsed = "claude-sonnet-4-5";
     const { callClaude } = await import("@skilldrunk/llm");
 
     for (let turn = 0; turn < MAX_TURNS; turn++) {
       const callRes = await callClaude({
         apiKey,
-        model: "claude-haiku-4-5",
-        max_tokens: 2048,
+        model: "claude-sonnet-4-5",
+        max_tokens: 4096,
         system,
         tools: enabledTools as Array<Record<string, unknown>>,
         messages: messages as unknown as import("@skilldrunk/llm").AnthropicMessage[],
