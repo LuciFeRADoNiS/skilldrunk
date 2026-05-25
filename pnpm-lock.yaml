@@ -11,6 +11,9 @@ importers:
       '@skilldrunk/analytics':
         specifier: workspace:*
         version: link:packages/analytics
+      '@skilldrunk/brain-client':
+        specifier: workspace:*
+        version: link:packages/brain-client
       '@skilldrunk/llm':
         specifier: workspace:*
         version: link:packages/llm
@@ -573,6 +576,15 @@ importers:
       react:
         specifier: 19.2.4
         version: 19.2.4
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  packages/brain-client:
+    devDependencies:
+      '@supabase/supabase-js':
+        specifier: ^2.103.0
+        version: 2.104.0
       typescript:
         specifier: ^5
         version: 5.9.3
