@@ -27,7 +27,12 @@ const HELP = `🤖 *Skilldrunk Bot*
 \`/stats\` — hızlı özet
 \`/help\` — bu mesaj
 
-Web: admin.skilldrunk.com/backlog`;
+*Rasyotek (MoveTech × Rasyotek partnership)*
+\`/rasyotek\` veya \`/rasyotek brief\` — son brief
+\`/rasyotek risk\` — yüksek risk listesi
+\`/rasyotek <metin>\` — not kaydet
+
+Web: admin.skilldrunk.com/backlog · rasyotek.skilldrunk.com`;
 
 const OWNER_USER_ID = "c17394c2-e995-4bd1-87e3-f98f4326ca12";
 
@@ -396,6 +401,93 @@ async function handleCommand(
           answer = `${toolSummary}\n\n${answer}`;
         }
         await sendTelegramMessage(chatId, answer, { reply_to_message_id: replyTo });
+        return;
+      }
+
+      case "/rasyotek": {
+        await sendChatAction(chatId, "typing");
+        const supabase = adminClient();
+        if (!supabase) {
+          await sendTelegramMessage(chatId, "_(supabase config eksik)_");
+          return;
+        }
+        const sub = (args || "").trim().toLowerCase();
+
+        if (sub === "" || sub === "brief") {
+          const { data: brief } = await supabase
+            .from("rt_briefs")
+            .select("title,summary,body_md,created_at,brief_type")
+            .eq("user_id", OWNER_USER_ID)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          if (!brief) {
+            await sendTelegramMessage(
+              chatId,
+              "🎯 *Rasyotek*\nHenüz brief üretilmedi. rasyotek.skilldrunk.com/brief üzerinden oluşturabilirsin.",
+            );
+            return;
+          }
+          await sendTelegramMessage(
+            chatId,
+            `🎯 *${brief.title}* (${brief.brief_type})\n_${new Date(brief.created_at).toLocaleDateString("tr-TR")}_\n\n${brief.body_md.slice(0, 3500)}\n\n🔗 rasyotek.skilldrunk.com/brief`,
+          );
+          return;
+        }
+
+        if (sub === "risk" || sub === "riskler") {
+          const { data: risks } = await supabase
+            .from("rt_risks")
+            .select("risk_key,scenario_title,score,priority,status")
+            .gte("score", 10)
+            .order("score", { ascending: false })
+            .limit(6);
+          if (!risks?.length) {
+            await sendTelegramMessage(chatId, "🎯 Aktif yüksek risk yok.");
+            return;
+          }
+          const lines = risks.map(
+            (r) =>
+              `${r.priority === "red" ? "🔴" : r.priority === "orange" ? "🟠" : "🟡"} *${r.risk_key}* (${r.score}) — ${r.scenario_title}`,
+          );
+          await sendTelegramMessage(
+            chatId,
+            `🎯 *Yüksek Riskler (skor ≥10)*\n\n${lines.join("\n")}\n\n🔗 rasyotek.skilldrunk.com/risks`,
+          );
+          return;
+        }
+
+        if (sub === "help") {
+          await sendTelegramMessage(
+            chatId,
+            `🎯 *Rasyotek Komutları*\n\n` +
+              `\`/rasyotek\` veya \`/rasyotek brief\` — son brief\n` +
+              `\`/rasyotek risk\` — yüksek risk listesi\n` +
+              `\`/rasyotek <not metni>\` — yeni not kaydet\n\n` +
+              `🔗 rasyotek.skilldrunk.com`,
+          );
+          return;
+        }
+
+        // Free text → save as note
+        const { data: note, error: noteErr } = await supabase
+          .from("rt_notes")
+          .insert({
+            user_id: OWNER_USER_ID,
+            note_type: "observation",
+            body_md: args,
+            source: "telegram",
+          })
+          .select("id,created_at")
+          .single();
+        if (noteErr) {
+          await sendTelegramMessage(chatId, `Hata: ${noteErr.message}`);
+          return;
+        }
+        await sendTelegramMessage(
+          chatId,
+          `📝 Not kaydedildi (\`${note.id.slice(0, 8)}\`)\n_${new Date(note.created_at).toLocaleString("tr-TR")}_\n\n${args.slice(0, 200)}${args.length > 200 ? "..." : ""}\n\n🔗 rasyotek.skilldrunk.com/notes`,
+        );
         return;
       }
 

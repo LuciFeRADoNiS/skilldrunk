@@ -1,0 +1,7 @@
+@import "tailwindcss";
+@import "@skilldrunk/sd-ui/tokens.css";
+
+:root {
+  --background: 10 10 10;
+  --foreground: 245 245 245;
+}

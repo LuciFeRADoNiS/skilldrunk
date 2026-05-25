@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/risk-monitor",
+      "schedule": "0 7 * * *"
+    }
+  ]
+}
