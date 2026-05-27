@@ -14,6 +14,9 @@ importers:
       '@skilldrunk/brain-client':
         specifier: workspace:*
         version: link:packages/brain-client
+      '@skilldrunk/brain-ui':
+        specifier: workspace:*
+        version: link:packages/brain-ui
       '@skilldrunk/llm':
         specifier: workspace:*
         version: link:packages/llm
@@ -585,6 +588,28 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.103.0
         version: 2.104.0
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  packages/brain-ui:
+    dependencies:
+      '@skilldrunk/brain-client':
+        specifier: workspace:*
+        version: link:../brain-client
+      react-dom:
+        specifier: ^19
+        version: 19.2.4(react@19.2.4)
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      next:
+        specifier: 16.2.3
+        version: 16.2.3(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react:
+        specifier: 19.2.4
+        version: 19.2.4
       typescript:
         specifier: ^5
         version: 5.9.3

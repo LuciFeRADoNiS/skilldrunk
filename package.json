@@ -30,6 +30,7 @@
     "zod": "^4.3.6",
     "@skilldrunk/analytics": "workspace:*",
     "@skilldrunk/brain-client": "workspace:*",
+    "@skilldrunk/brain-ui": "workspace:*",
     "@skilldrunk/llm": "workspace:*"
   },
   "devDependencies": {

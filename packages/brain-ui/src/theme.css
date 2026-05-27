@@ -1,0 +1,99 @@
+/* @skilldrunk/brain-ui — theme reset (D-010, D-011 per 02-skilldrunk-spec §2).
+ *
+ * Each tenant (skilldrunk = corporate, skimsoulfat = glassmorphic) sets
+ * its own theme class on <body>. brain-ui components read the CSS variables
+ * below — never hardcoded colors.
+ *
+ * Tokens are the contract. Don't add component-specific colors here.
+ */
+
+/* ─── Default theme (used if no tenant class set) ──────────────────── */
+:root {
+  --bd-bg: #0a0a0f;
+  --bd-bg-2: #12121a;
+  --bd-surface: #1a1a26;
+  --bd-surface-2: #21212e;
+  --bd-border: #26263a;
+  --bd-border-strong: #353548;
+  --bd-text: #e4e4e7;
+  --bd-text-2: #a1a1aa;
+  --bd-text-3: #6b6b78;
+  --bd-accent: #8b5cf6;
+  --bd-accent-2: #a78bfa;
+  --bd-accent-bg: rgba(139, 92, 246, 0.10);
+  --bd-accent-bg-strong: rgba(139, 92, 246, 0.18);
+  --bd-success: #22c55e;
+  --bd-warn: #f59e0b;
+  --bd-danger: #ef4444;
+  --bd-radius: 12px;
+  --bd-radius-sm: 8px;
+  --bd-radius-lg: 16px;
+  --bd-sidebar-w: 256px;
+  --bd-topbar-h: 56px;
+  --bd-font-display: ui-sans-serif, -apple-system, system-ui, sans-serif;
+  --bd-font-mono: ui-monospace, SF Mono, Menlo, monospace;
+}
+
+/* ─── skilldrunk corporate (D-010) ─────────────────────────────────── */
+.theme-skilldrunk-corporate {
+  --bd-bg: #0a0a0f;
+  --bd-bg-2: #12121a;
+  --bd-surface: #1a1a26;
+  --bd-surface-2: #21212e;
+  --bd-border: #26263a;
+  --bd-border-strong: #353548;
+  --bd-text: #e4e4e7;
+  --bd-text-2: #a1a1aa;
+  --bd-text-3: #6b6b78;
+  --bd-accent: #8b5cf6;
+  --bd-accent-2: #a78bfa;
+  --bd-accent-bg: rgba(139, 92, 246, 0.10);
+  --bd-accent-bg-strong: rgba(139, 92, 246, 0.18);
+  --bd-radius: 12px;
+}
+
+/* ─── skimsoulfat glassmorphic (Faz 3 — placeholder so devs see API) ── */
+.theme-skimsoulfat-glassmorphic {
+  --bd-bg: #0c0a18;
+  --bd-bg-2: #1a0e2e;
+  --bd-surface: rgba(255, 255, 255, 0.04);
+  --bd-surface-2: rgba(255, 255, 255, 0.06);
+  --bd-border: rgba(255, 255, 255, 0.08);
+  --bd-border-strong: rgba(255, 255, 255, 0.14);
+  --bd-text: #f0f0f5;
+  --bd-text-2: #a8a8b8;
+  --bd-accent: #06b6d4;
+  --bd-accent-2: #67e8f9;
+  --bd-accent-bg: rgba(6, 182, 212, 0.10);
+  --bd-radius: 16px;
+}
+
+/* ─── primitive utility classes used by brain-ui components ─────────── */
+.bd-surface {
+  background: var(--bd-surface);
+  border: 1px solid var(--bd-border);
+  border-radius: var(--bd-radius);
+}
+.bd-surface-2 {
+  background: var(--bd-surface-2);
+  border: 1px solid var(--bd-border-strong);
+  border-radius: var(--bd-radius);
+}
+.bd-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  background: var(--bd-accent-bg);
+  color: var(--bd-accent-2);
+  border: 1px solid var(--bd-accent-bg-strong);
+}
+.bd-link {
+  color: var(--bd-text);
+  text-decoration: none;
+}
+.bd-link:hover {
+  color: var(--bd-accent-2);
+}
