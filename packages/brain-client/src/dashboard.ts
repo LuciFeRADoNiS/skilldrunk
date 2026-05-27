@@ -1,4 +1,4 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { BrainSupabase as SupabaseClient } from "./supabase-shim";
 import type { DashboardPayload, Realm } from "./types";
 
 /**

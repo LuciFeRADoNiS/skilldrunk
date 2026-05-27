@@ -3,8 +3,25 @@
 // into brain_items via service-role Supabase client. On Cowork scheduled task
 // rails — see Projects/Dual-Brain-Web/04-catalog-strategy.md §2.
 
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+// D-027: Node v25 + tsx 4.21 named-import interop crash workaround.
+// `import { createClient } from "@supabase/supabase-js"` resolves to undefined
+// at runtime (named call against a CJS default-export namespace). Pull through
+// namespace + fall back to .default for ESM-style exposure.
+import * as supabaseJs from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type { BrainKind, BrainSource, Realm } from "@skilldrunk/brain-client";
+
+type CreateClientFn = typeof supabaseJs.createClient;
+const createClient: CreateClientFn =
+  ((supabaseJs as unknown as { createClient?: CreateClientFn }).createClient ??
+    (supabaseJs as unknown as { default?: { createClient?: CreateClientFn } })
+      .default?.createClient) as CreateClientFn;
+
+if (!createClient) {
+  throw new Error(
+    "supabase-js createClient interop broken — check @supabase/supabase-js version",
+  );
+}
 
 export interface Env {
   SUPABASE_URL: string;
