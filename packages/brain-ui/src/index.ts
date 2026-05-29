@@ -12,7 +12,11 @@ export { ActivityFeed } from "./ActivityFeed";
 export { ShuffleGrid } from "./ShuffleGrid";
 export { ProductCard } from "./ProductCard";
 export { EmptyStateCoach } from "./EmptyStateCoach";
+export { MoodStrip } from "./MoodStrip";
+export { AskPanel } from "./AskPanel";
 
 export type { MenuItem, MenuConfig, OwnerLayoutProps } from "./types";
 export type { CalendarEvent } from "./CalendarPanel";
 export type { BacklogRow } from "./BacklogPanel";
+export type { MoodPoint } from "./MoodStrip";
+export type { AskPanelProps, AskPanelSource } from "./AskPanel";
