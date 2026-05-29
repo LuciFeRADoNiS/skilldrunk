@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { createAnonClient } from "@/lib/supabase/anon";
 
+// D-040 candidate: dynamic instead of static prerender — Vercel preview
+// scope does not always carry NEXT_PUBLIC_SUPABASE_URL, and static export
+// crashes with "supabaseUrl is required". Runtime render is safe + still
+// cached by clients via revalidate.
+export const dynamic = "force-dynamic";
 export const revalidate = 3600;
 
 export async function GET() {
