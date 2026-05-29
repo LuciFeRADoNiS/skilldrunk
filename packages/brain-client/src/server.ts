@@ -1,3 +1,7 @@
-// Server-only re-exports (Faz 4 will add openai client + Claude synthesis here).
-// Split entry so client bundles don't pull in server-only deps when the time comes.
+// Server-only exports — Faz 4 brain pipeline.
+// Adds askBrainServer (real impl: OpenAI embed → vector search → Haiku stream)
+// alongside the public client wrappers.
+
 export * from "./index";
+export { askBrainServer } from "./ask-brain-server";
+export type { AskBrainServerOpts, AskBrainStreamChunk } from "./ask-brain-server";
