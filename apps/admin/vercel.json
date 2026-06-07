@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    {
+      "path": "/api/custodian/cron/ga4",
+      "schedule": "0 5 * * *"
+    }
+  ]
+}
