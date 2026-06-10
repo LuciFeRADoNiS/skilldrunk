@@ -58,9 +58,14 @@ export function ChatPanel({
   const [budget, setBudget] = useState<Budget | null>(null);
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const sessionId = useRef<string>(
-    `cst-${Math.floor(Date.now() / 1000)}-${Math.floor(performance.now())}`,
-  );
+  // Impure (Date.now/Math.random) — initialize in effect, not during render.
+  const sessionId = useRef<string>("");
+
+  useEffect(() => {
+    if (!sessionId.current) {
+      sessionId.current = `cst-${Math.floor(Date.now() / 1000)}-${Math.floor(Math.random() * 1_000_000)}`;
+    }
+  }, []);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -174,8 +179,9 @@ export function ChatPanel({
       >
         {turns.length === 0 && (
           <p className="text-sm text-neutral-500 text-center mt-8">
-            skilldrunk.com hakkında soru sor: &quot;son deploy'lar&quot;, &quot;dün kaç ziyaretçi&quot;,
-            &quot;son commit'ler&quot;. Aksiyon istersen önerip onayını bekler.
+            skilldrunk.com hakkında soru sor: &quot;son deploy&apos;lar&quot;, &quot;dün kaç
+            ziyaretçi&quot;, &quot;son commit&apos;ler&quot;. Aksiyon istersen önerip onayını
+            bekler.
           </p>
         )}
         {turns.map((t, i) => (
