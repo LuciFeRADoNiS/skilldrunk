@@ -26,9 +26,11 @@ This version has breaking changes — APIs, conventions, and file structure may 
 **Static pages** (public/ dizini):
 ```
 /zeux/           ZeuX profile page
-/todos/          tÖdÜs — centralized brain/task management (amber/gold, localStorage, kanban+timeline)
+/todos/          tÖdÜs v1 — ESKİ localStorage sürüm (banner → /todus'a yönlendirir)
 /card/           Digital business card
 ```
+
+**tÖdÜs v2 (CANLI)**: `src/app/todus/` — kanban_cards tablosundan 579 kart (oz_notes pipeline'ından). Orijinal taç/altın tasarım `.todus` scope'lu CSS ile port edildi. Admin: kart taşıma + yeni görev (moveCard/addCard server actions). ZeuX tool'ları: query_oz_notes, query_kanban_cards, update_kanban_card, list_my_meetings, list_oz_secrets_preview, get_cowork_context. Schema: oz_notes, oz_notes_archive, oz_secrets(+preview view), cowork_context_notes, kanban_* (boards/cards/people/activity/comments).
 
 **Live subdomains** (9 tane — pt_apps tablosundan canlı veri):
 ```
