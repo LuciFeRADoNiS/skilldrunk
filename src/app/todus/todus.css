@@ -1,0 +1,335 @@
+/* tÖdÜs — orijinal brain system tasarımı (public/todos/index.html'den port)
+   .todus scope'u: marketplace temasıyla çakışmaması için tüm seçiciler kapsamlı. */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@700;800;900&display=swap");
+
+.todus {
+  --bg: #07090f;
+  --bg2: #0d1117;
+  --bg3: #151b25;
+  --bg4: #1a2030;
+  --border: #1e2a3a;
+  --text: #e0d8c8;
+  --text-dim: #8a7e6a;
+  --text-bright: #fff8e7;
+  --amber: #f0a030;
+  --amber-bright: #ffbf40;
+  --amber-dim: #c48820;
+  --amber-glow: rgba(240, 160, 48, 0.4);
+  --gold: #ffd700;
+  --gold-dim: #b8960f;
+  --fire: #ff4444;
+  --fire-glow: rgba(255, 68, 68, 0.3);
+  --green: #40c057;
+  --green-dim: #2b8a3e;
+  --blue: #4dabf7;
+  --purple: #9775fa;
+  --card-bg: rgba(13, 17, 23, 0.85);
+  --card-border: rgba(240, 160, 48, 0.15);
+
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", -apple-system, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Animated BG ── */
+.todus .bg-grid {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(240, 160, 48, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.02) 0%, transparent 50%),
+    linear-gradient(rgba(240, 160, 48, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(240, 160, 48, 0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+}
+.todus .amber-orb {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(80px);
+  animation: td-float-orb 20s ease-in-out infinite;
+}
+.todus .amber-orb-1 { width: 400px; height: 400px; top: -100px; right: -100px; background: rgba(240, 160, 48, 0.06); }
+.todus .amber-orb-2 { width: 300px; height: 300px; bottom: -50px; left: -50px; background: rgba(255, 215, 0, 0.04); animation-delay: -10s; }
+@keyframes td-float-orb {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.1); }
+  66% { transform: translate(-20px, 30px) scale(0.95); }
+}
+
+.todus .app { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+
+/* ── Header ── */
+.todus .header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--card-border);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.todus .logo { display: flex; align-items: center; gap: 12px; }
+.todus .logo-crown { font-size: 32px; filter: drop-shadow(0 0 12px var(--amber-glow)); }
+.todus .logo-text {
+  font-family: "Playfair Display", serif;
+  font-weight: 900;
+  font-size: 28px;
+  background: linear-gradient(135deg, var(--gold), var(--amber), var(--amber-bright));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 2px;
+}
+.todus .logo-sub { font-size: 11px; color: var(--text-dim); letter-spacing: 3px; text-transform: uppercase; }
+.todus .glow-amber { text-shadow: 0 0 10px var(--amber-glow), 0 0 30px rgba(240, 160, 48, 0.15); }
+
+.todus .header-stats { display: flex; gap: 20px; flex-wrap: wrap; }
+.todus .stat-box {
+  text-align: center;
+  padding: 8px 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+}
+.todus .stat-num { font-family: "JetBrains Mono", monospace; font-size: 22px; font-weight: 700; color: var(--amber-bright); }
+.todus .stat-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+
+/* ── Controls ── */
+.todus .controls { display: flex; gap: 10px; padding: 16px 0; flex-wrap: wrap; align-items: center; }
+.todus .search-wrap { position: relative; flex: 1; min-width: 200px; }
+.todus .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 14px; pointer-events: none; }
+.todus .search-box {
+  width: 100%;
+  padding: 10px 16px 10px 40px;
+  background: var(--bg2);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+.todus .search-box:focus { border-color: var(--amber); box-shadow: 0 0 20px rgba(240, 160, 48, 0.1); }
+.todus .filter-btn,
+.todus .view-btn {
+  padding: 10px 16px;
+  background: var(--bg2);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  color: var(--text-dim);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+.todus .filter-btn:hover,
+.todus .view-btn:hover { border-color: var(--amber); color: var(--amber); }
+.todus .filter-btn.active,
+.todus .view-btn.active { background: rgba(240, 160, 48, 0.1); border-color: var(--amber); color: var(--amber); }
+
+/* ── Category Tabs ── */
+.todus .cat-tabs { display: flex; gap: 8px; padding: 12px 0; overflow-x: auto; scrollbar-width: none; }
+.todus .cat-tabs::-webkit-scrollbar { display: none; }
+.todus .cat-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: var(--bg2);
+  border: 1px solid var(--card-border);
+  color: var(--text-dim);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+  user-select: none;
+}
+.todus .cat-tab:hover { border-color: var(--amber-dim); color: var(--text); }
+.todus .cat-tab.active {
+  background: linear-gradient(135deg, rgba(240, 160, 48, 0.15), rgba(255, 215, 0, 0.08));
+  border-color: var(--amber);
+  color: var(--amber-bright);
+  box-shadow: 0 0 20px rgba(240, 160, 48, 0.1);
+}
+.todus .cat-tab .count { background: var(--bg3); padding: 2px 7px; border-radius: 10px; font-family: "JetBrains Mono", monospace; font-size: 11px; }
+.todus .cat-tab.active .count { background: rgba(240, 160, 48, 0.2); }
+
+/* ── Stats Row ── */
+.todus .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; padding: 16px 0; }
+.todus .stats-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 16px; text-align: center; }
+.todus .stats-card .num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 32px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--amber), var(--gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.todus .stats-card .lbl { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+/* ── Kanban Board ── */
+.todus .board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; padding: 16px 0; min-height: 60vh; }
+.todus .column {
+  background: var(--bg2);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 12px;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+}
+.todus .col-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 4px; margin-bottom: 8px; border-bottom: 2px solid transparent; }
+.todus .col-header.backlog { border-bottom-color: #6e7a8a; }
+.todus .col-header.active { border-bottom-color: var(--blue); }
+.todus .col-header.progress { border-bottom-color: var(--amber); }
+.todus .col-header.review { border-bottom-color: var(--purple); }
+.todus .col-header.done { border-bottom-color: var(--green); }
+.todus .col-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+.todus .col-count { font-family: "JetBrains Mono", monospace; font-size: 11px; background: var(--bg3); padding: 2px 8px; border-radius: 8px; color: var(--text-dim); }
+.todus .col-cards { flex: 1; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; max-height: 72vh; }
+.todus .col-more { text-align: center; font-size: 11px; color: var(--text-dim); padding: 6px 0; }
+
+/* ── Task Cards ── */
+.todus .card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  animation: td-card-in 0.4s ease-out backwards;
+}
+.todus .card:hover { border-color: var(--amber-dim); box-shadow: 0 4px 20px rgba(240, 160, 48, 0.08); transform: translateY(-1px); }
+@keyframes td-card-in { from { opacity: 0; transform: translateY(10px); } }
+.todus .card-priority { position: absolute; top: 8px; right: 8px; width: 8px; height: 8px; border-radius: 50%; }
+.todus .card-priority.p0 { background: var(--fire); box-shadow: 0 0 8px var(--fire-glow); animation: td-pulse-fire 1.5s infinite; }
+.todus .card-priority.p1 { background: var(--amber); box-shadow: 0 0 6px var(--amber-glow); }
+.todus .card-priority.p2 { background: var(--blue); }
+.todus .card-priority.p3 { background: var(--text-dim); }
+@keyframes td-pulse-fire {
+  0%, 100% { box-shadow: 0 0 6px var(--fire-glow); }
+  50% { box-shadow: 0 0 14px var(--fire-glow); }
+}
+.todus .card-title { font-size: 13px; font-weight: 600; color: var(--text-bright); margin-bottom: 6px; padding-right: 16px; }
+.todus .card-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.todus .card-tag { font-size: 10px; padding: 2px 8px; border-radius: 6px; background: var(--bg3); color: var(--text-dim); font-weight: 500; }
+.todus .card-tag.enco { background: rgba(77, 171, 247, 0.12); color: var(--blue); }
+.todus .card-tag.movetech { background: rgba(64, 192, 87, 0.12); color: var(--green); }
+.todus .card-tag.ai { background: rgba(151, 117, 250, 0.12); color: var(--purple); }
+.todus .card-tag.marketing { background: rgba(240, 160, 48, 0.12); color: var(--amber); }
+.todus .card-tag.personal { background: rgba(255, 107, 107, 0.12); color: #ff6b6b; }
+.todus .card-tag.hukuk { background: rgba(255, 255, 255, 0.08); color: #ccc; }
+.todus .card-tag.greenx { background: rgba(64, 192, 87, 0.15); color: #51cf66; }
+.todus .card-tag.futurecode { background: rgba(77, 171, 247, 0.15); color: #74c0fc; }
+.todus .card-assignee { font-size: 10px; color: var(--text-dim); margin-left: auto; display: flex; align-items: center; gap: 4px; }
+.todus .card-due { font-size: 10px; color: var(--text-dim); font-family: "JetBrains Mono", monospace; }
+.todus .card-due.overdue { color: var(--fire); }
+.todus .card-due.soon { color: var(--amber); }
+.todus .card-source { font-size: 9px; color: var(--text-dim); opacity: 0.7; margin-top: 4px; font-family: "JetBrains Mono", monospace; }
+
+/* ── Timeline View ── */
+.todus .timeline { padding: 20px 0; }
+.todus .timeline-item {
+  display: flex;
+  gap: 16px;
+  padding: 12px 0;
+  border-left: 2px solid var(--card-border);
+  margin-left: 8px;
+  padding-left: 20px;
+  position: relative;
+  cursor: pointer;
+}
+.todus .timeline-item::before {
+  content: "";
+  position: absolute;
+  left: -5px;
+  top: 16px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--amber);
+  box-shadow: 0 0 8px var(--amber-glow);
+}
+.todus .timeline-date { min-width: 90px; font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--amber-dim); }
+.todus .timeline-content { flex: 1; }
+.todus .timeline-title { font-size: 14px; font-weight: 600; color: var(--text-bright); }
+.todus .timeline-sub { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+
+/* ── Detail Panel ── */
+.todus .detail-panel {
+  position: fixed;
+  top: 0;
+  right: -440px;
+  width: 420px;
+  height: 100vh;
+  background: var(--bg2);
+  border-left: 1px solid var(--card-border);
+  z-index: 150;
+  padding: 24px;
+  overflow-y: auto;
+  transition: right 0.3s ease;
+}
+.todus .detail-panel.open { right: 0; box-shadow: -10px 0 40px rgba(0, 0, 0, 0.4); }
+.todus .detail-close { position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--text-dim); font-size: 20px; cursor: pointer; }
+.todus .detail-title { font-family: "Playfair Display", serif; font-size: 20px; color: var(--amber-bright); margin-bottom: 16px; padding-right: 24px; }
+.todus .detail-field { margin-bottom: 14px; }
+.todus .detail-field label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 4px; }
+.todus .detail-field .value { font-size: 14px; color: var(--text); white-space: pre-wrap; }
+.todus .detail-actions { display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
+.todus .detail-btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  border: 1px solid var(--card-border);
+  background: var(--bg3);
+  color: var(--text-dim);
+  transition: all 0.3s;
+}
+.todus .detail-btn:hover { border-color: var(--amber); color: var(--amber); }
+.todus .detail-btn.move { background: rgba(240, 160, 48, 0.1); border-color: var(--amber-dim); color: var(--amber); }
+.todus .detail-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Notice ── */
+.todus .notice {
+  margin: 24px 0;
+  padding: 16px 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  font-size: 14px;
+  color: var(--text-dim);
+}
+.todus .notice a { color: var(--amber); }
+
+/* ── Responsive ── */
+@media (max-width: 1100px) {
+  .todus .board { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 768px) {
+  .todus .board { grid-template-columns: 1fr 1fr; }
+  .todus .header { padding: 16px 0; }
+  .todus .logo-text { font-size: 22px; }
+  .todus .header-stats { gap: 10px; }
+  .todus .detail-panel { width: 100%; right: -100%; }
+}
+@media (max-width: 480px) {
+  .todus .board { grid-template-columns: 1fr; }
+  .todus .header-stats { display: none; }
+}
+
+/* ── Scrollbar ── */
+.todus ::-webkit-scrollbar { width: 4px; }
+.todus ::-webkit-scrollbar-track { background: transparent; }
+.todus ::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 4px; }
+.todus ::-webkit-scrollbar-thumb:hover { background: var(--amber-dim); }
