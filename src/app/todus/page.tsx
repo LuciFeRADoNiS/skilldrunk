@@ -46,14 +46,18 @@ export default async function TodusPage() {
 
   // Admin ise kart taşıma/ekleme açık
   let canEdit = false;
+  let userName = "Ziyaretçi";
+  let userRole = "guest";
   const user = authState.data.user;
   if (user) {
     const { data: profile } = await supabase
       .from("sd_profiles")
-      .select("role")
+      .select("role, username, display_name")
       .eq("id", user.id)
       .single();
     canEdit = profile?.role === "admin";
+    userName = profile?.display_name ?? profile?.username ?? "Özgür";
+    userRole = profile?.role ?? "user";
   }
 
   return (
@@ -62,6 +66,8 @@ export default async function TodusPage() {
       canEdit={canEdit}
       isLoggedIn={!!user}
       loadError={error?.message ?? null}
+      userName={userName}
+      userRole={userRole}
     />
   );
 }
