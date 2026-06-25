@@ -1,8 +1,10 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import type { TodusCard } from "./page";
 import { moveCard, addCard } from "./actions";
+import { SagkolPanel } from "@/components/sagkol/sagkol-panel";
+import type { TodusUiCommand } from "@/lib/sagkol/types";
 
 /* ── Sabitler (orijinal public/todos tasarımından) ── */
 
@@ -68,11 +70,15 @@ export function TodusApp({
   canEdit,
   isLoggedIn,
   loadError,
+  userName = "Ziyaretçi",
+  userRole = "guest",
 }: {
   cards: TodusCard[];
   canEdit: boolean;
   isLoggedIn: boolean;
   loadError: string | null;
+  userName?: string;
+  userRole?: string;
 }) {
   const [cards, setCards] = useState(initialCards);
   const [search, setSearch] = useState("");
@@ -82,6 +88,11 @@ export function TodusApp({
   const [selected, setSelected] = useState<TodusCard | null>(null);
   const [showAdd, setShowAdd] = useState(false);
   const [pending, startTransition] = useTransition();
+  // Sağkol komut köprüsü için ek filtreler + vurgu
+  const [assigneeFilter, setAssigneeFilter] = useState<string | null>(null);
+  const [columnFilter, setColumnFilter] = useState<string | null>(null);
+  const [priorityExact, setPriorityExact] = useState<string | null>(null);
+  const [highlightId, setHighlightId] = useState<string | null>(null);
 
   const withCat = useMemo(
     () => cards.map((c) => ({ ...c, cat: deriveCategory(c.labels) })),
@@ -101,9 +112,55 @@ export function TodusApp({
         return false;
       if (priorityFilter && !["P0", "P1"].includes(c.priority)) return false;
       if (activeCat !== "all" && c.cat !== activeCat) return false;
+      if (assigneeFilter && c.assignee.toLowerCase() !== assigneeFilter.toLowerCase()) return false;
+      if (columnFilter && c.column_name !== columnFilter) return false;
+      if (priorityExact && c.priority !== priorityExact) return false;
       return true;
     });
-  }, [withCat, search, priorityFilter, activeCat]);
+  }, [withCat, search, priorityFilter, activeCat, assigneeFilter, columnFilter, priorityExact]);
+
+  /* ── Sağkol komut köprüsü: ZeuX board'u sürer (filter/highlight/set_view) ── */
+  useEffect(() => {
+    function onCmd(e: Event) {
+      const cmd = (e as CustomEvent<TodusUiCommand>).detail;
+      if (!cmd) return;
+      if (cmd.command === "filter") {
+        if (cmd.search !== undefined) setSearch(cmd.search);
+        if (cmd.assignee !== undefined) setAssigneeFilter(cmd.assignee || null);
+        if (cmd.column !== undefined) setColumnFilter(cmd.column || null);
+        if (cmd.priority !== undefined) setPriorityExact(cmd.priority || null);
+        if (cmd.label !== undefined) setSearch(cmd.label || "");
+        setView("board");
+      } else if (cmd.command === "clear_filter") {
+        setSearch(""); setAssigneeFilter(null); setColumnFilter(null);
+        setPriorityExact(null); setPriorityFilter(false); setActiveCat("all");
+      } else if (cmd.command === "set_view") {
+        if (cmd.view) setView(cmd.view);
+      } else if (cmd.command === "highlight_card" && cmd.cardId) {
+        setHighlightId(cmd.cardId);
+        const card = cards.find((c) => c.id === cmd.cardId);
+        if (card) setSelected(card);
+        setTimeout(() => setHighlightId(null), 3500);
+      }
+    }
+    window.addEventListener("sagkol:todus", onCmd as EventListener);
+    return () => window.removeEventListener("sagkol:todus", onCmd as EventListener);
+  }, [cards]);
+
+  /* Ekran durumunu Sağkol'a aç (turn context için) */
+  useEffect(() => {
+    (window as unknown as { __todusScreen?: unknown }).__todusScreen = {
+      view,
+      filter: {
+        ...(search ? { search } : {}),
+        ...(assigneeFilter ? { assignee: assigneeFilter } : {}),
+        ...(columnFilter ? { column: columnFilter } : {}),
+        ...(priorityExact ? { priority: priorityExact } : {}),
+        ...(priorityFilter ? { p0p1: true } : {}),
+        ...(activeCat !== "all" ? { category: activeCat } : {}),
+      },
+    };
+  }, [view, search, assigneeFilter, columnFilter, priorityExact, priorityFilter, activeCat]);
 
   /* Header istatistikleri */
   const stats = useMemo(() => {
@@ -233,7 +290,12 @@ export function TodusApp({
                   </div>
                   <div className="col-cards">
                     {colCards.slice(0, PER_COLUMN_CAP).map((c) => (
-                      <div className="card" key={c.id} onClick={() => setSelected(c)}>
+                      <div
+                        className="card"
+                        key={c.id}
+                        onClick={() => setSelected(c)}
+                        style={highlightId === c.id ? { outline: "2px solid var(--amber-bright)", boxShadow: "0 0 24px var(--amber-glow)" } : undefined}
+                      >
                         <div className={`card-priority ${c.priority.toLowerCase()}`} />
                         <div className="card-title">{c.title}</div>
                         <div className="card-meta">
@@ -356,6 +418,9 @@ export function TodusApp({
           }}
         />
       )}
+
+      {/* ── Sağkol copilot — kişisel pano, sadece admin (veri/maliyet koruması) ── */}
+      {userRole === "admin" && <SagkolPanel userName={userName} userRole={userRole} />}
     </div>
   );
 }
