@@ -1,6 +1,9 @@
 import type { MetadataRoute } from "next";
 import { createAnonClient } from "@/lib/supabase/anon";
 
+// D-040 candidate (same as llms.txt): force dynamic; Vercel preview env
+// scope can be missing NEXT_PUBLIC_SUPABASE_URL, breaking static export.
+export const dynamic = "force-dynamic";
 export const revalidate = 3600; // regenerate hourly
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

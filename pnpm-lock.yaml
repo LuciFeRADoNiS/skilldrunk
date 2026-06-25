@@ -17,6 +17,12 @@ importers:
       '@skilldrunk/analytics':
         specifier: workspace:*
         version: link:packages/analytics
+      '@skilldrunk/brain-client':
+        specifier: workspace:*
+        version: link:packages/brain-client
+      '@skilldrunk/brain-ui':
+        specifier: workspace:*
+        version: link:packages/brain-ui
       '@skilldrunk/llm':
         specifier: workspace:*
         version: link:packages/llm
@@ -99,6 +105,9 @@ importers:
       eslint-config-next:
         specifier: 16.2.3
         version: 16.2.3(@typescript-eslint/parser@8.59.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
+      js-yaml:
+        specifier: ^3.14.2
+        version: 3.14.2
       tailwindcss:
         specifier: ^4
         version: 4.2.4
@@ -573,6 +582,37 @@ importers:
         specifier: ^2.103.0
         version: 2.104.0
     devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      next:
+        specifier: 16.2.3
+        version: 16.2.3(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react:
+        specifier: 19.2.4
+        version: 19.2.4
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  packages/brain-client:
+    devDependencies:
+      '@supabase/supabase-js':
+        specifier: ^2.103.0
+        version: 2.104.0
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  packages/brain-ui:
+    dependencies:
+      react-dom:
+        specifier: ^19
+        version: 19.2.4(react@19.2.4)
+    devDependencies:
+      '@skilldrunk/brain-client':
+        specifier: workspace:*
+        version: link:../brain-client
       '@types/react':
         specifier: ^19
         version: 19.2.14
