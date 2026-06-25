@@ -27,5 +27,20 @@ export async function GET(request: Request) {
     console.error("sd_ensure_profile rpc error (non-fatal)", rpcError);
   }
 
+  // Private apex (D6 / G10): allowlist = admin only. Anyone else is signed OUT —
+  // clearing the shared .skilldrunk.com cookie so a rejected user can't hold a
+  // session on any sibling subdomain — then bounced. Runs after sd_ensure_profile
+  // so the role row is readable.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const { data: profile } = user
+    ? await supabase.from("sd_profiles").select("role").eq("id", user.id).single()
+    : { data: null };
+  if (profile?.role !== "admin") {
+    await supabase.auth.signOut();
+    return NextResponse.redirect(`${origin}/login?error=access_denied`);
+  }
+
   return NextResponse.redirect(`${origin}${next}`);
 }
