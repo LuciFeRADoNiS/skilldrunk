@@ -23,6 +23,7 @@ export const SKILLDRUNK_MENU: MenuConfig = {
       key: "library",
       label: "Library",
       items: [
+        { key: "skills", label: "Skills", href: "/skills", icon: "❖" },
         { key: "catalog", label: "Catalog", href: "/catalog", icon: "▦" },
         {
           key: "refs",
