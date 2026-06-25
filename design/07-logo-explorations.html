@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en" data-mode="dark">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>skilldrunk — Wordmark & mark explorations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Geist:wght@300..700&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
+<style>
+[data-mode="dark"]{--bg:#0d0b07;--bg-elevated:#17130c;--line:#2b2417;--ink:#f3ece0;--ink-soft:#b3a890;--ink-faint:#756b58;--accent:#e8b54a;--accent-2:#b8801f}
+[data-mode="light"]{--bg:#f3ece0;--bg-elevated:#faf4e9;--line:#ddd2bd;--ink:#181208;--ink-soft:#5a4f3d;--ink-faint:#9a8d76;--accent:#b8801f;--accent-2:#8a5e14}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:"Geist",system-ui,sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:46px 28px 90px}
+.kicker{font-family:"Geist Mono",monospace;text-transform:uppercase;letter-spacing:.14em;font-size:.66rem;color:var(--ink-faint)}
+h1{font-family:"Fraunces",serif;font-weight:400;font-size:2.4rem;letter-spacing:-.02em}
+.sub{color:var(--ink-soft);margin-top:8px}
+.modetog{position:fixed;top:22px;right:24px;border:1px solid var(--line);background:transparent;color:var(--ink-soft);width:38px;height:38px;border-radius:999px;cursor:pointer}
+.sect{margin-top:46px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:18px}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+.cell{background:var(--bg-elevated);border:1px solid var(--line);border-radius:16px;padding:34px 28px;min-height:170px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.cap{margin-top:18px}
+.cap b{font-size:.9rem}.cap span{display:block;color:var(--ink-faint);font-size:.78rem;margin-top:3px}
+
+/* ---- Wordmarks ---- */
+.wm{font-size:2.1rem;line-height:1}
+.wm-a{font-family:"Fraunces",serif;font-weight:400;letter-spacing:-.01em}
+.wm-a .ll{letter-spacing:.12em;border-bottom:2px solid var(--accent);padding-bottom:2px}
+.wm-a .drunk{font-style:italic;color:var(--accent)}
+.wm-b{font-family:"Geist",sans-serif;font-weight:600;letter-spacing:-.02em}
+.wm-b .u{display:inline-block;transform:rotate(11deg) translateY(2px);color:var(--accent)}
+.wm-c{font-family:"Geist",sans-serif;font-weight:600;letter-spacing:-.01em;position:relative;padding-bottom:10px}
+.wm-c svg{position:absolute;left:0;bottom:0;width:100%;height:8px}
+
+/* ---- Marks ---- */
+.mark{width:84px;height:84px}
+.lock{display:flex;align-items:center;gap:14px;font-family:"Fraunces",serif;font-size:1.7rem}
+.lock b{color:var(--accent);font-weight:400}
+.favs{display:flex;gap:16px;align-items:flex-end;margin-top:8px}
+.favs .f{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--ink-faint);font-family:"Geist Mono",monospace;font-size:.6rem}
+</style>
+</head>
+<body>
+<button class="modetog" id="modetog">◐</button>
+<div class="wrap">
+  <div class="kicker">skilldrunk · identity exploration · left to design</div>
+  <h1>Wordmarks &amp; marks.</h1>
+  <p class="sub">Three wordmark directions, three marks. Pick one of each — or tell me to push one further. Gold = the through-line. Toggle light/dark top-right.</p>
+
+  <!-- WORDMARKS -->
+  <div class="sect">
+    <div class="kicker">Wordmarks</div>
+    <div class="grid">
+      <div class="cell">
+        <div class="wm wm-a">ski<span class="ll">ll</span><span class="drunk">drunk</span></div>
+        <div class="cap"><b>A · Editorial</b><span>Fraunces, extended "ll", italic tail. Rare-book spine.</span></div>
+      </div>
+      <div class="cell">
+        <div class="wm wm-b">skilldr<span class="u">u</span>nk</div>
+        <div class="cap"><b>B · Tipsy</b><span>Geist, one letter tilted. Witty, modern, restrained.</span></div>
+      </div>
+      <div class="cell">
+        <div class="wm wm-c">skilldrunk
+          <svg viewBox="0 0 200 8" preserveAspectRatio="none"><line x1="0" y1="4" x2="88" y2="4" stroke="var(--accent)" stroke-width="3"/><line x1="104" y1="4" x2="200" y2="4" stroke="var(--accent)" stroke-width="3"/></svg>
+        </div>
+        <div class="cap"><b>C · Seam</b><span>A gold underline that breaks — a vein of ore.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MARKS -->
+  <div class="sect">
+    <div class="kicker">Marks</div>
+    <div class="grid">
+      <div class="cell">
+        <svg class="mark" viewBox="0 0 84 84" fill="none">
+          <defs><radialGradient id="g1" cx="50%" cy="40%" r="60%"><stop offset="0" stop-color="var(--accent)"/><stop offset="1" stop-color="var(--accent-2)"/></radialGradient></defs>
+          <rect x="2" y="2" width="80" height="80" rx="20" stroke="var(--line)" stroke-width="2"/>
+          <circle cx="42" cy="34" r="13" fill="url(#g1)"/>
+          <path d="M38 44 L46 44 L50 64 L34 64 Z" fill="url(#g1)"/>
+        </svg>
+        <div class="cap"><b>Keyhole → gold</b><span>The Door into the Mine.</span></div>
+      </div>
+      <div class="cell">
+        <svg class="mark" viewBox="0 0 84 84" fill="none">
+          <rect x="2" y="2" width="80" height="80" rx="20" stroke="var(--line)" stroke-width="2"/>
+          <path d="M36 16 H48 V26 C48 30 56 34 56 46 V60 C56 66 52 68 46 68 H38 C32 68 28 66 28 60 V46 C28 34 36 30 36 26 Z" stroke="var(--accent)" stroke-width="2.5"/>
+          <path d="M28 52 H56 V60 C56 66 52 68 46 68 H38 C32 68 28 66 28 60 Z" fill="var(--accent)" opacity=".9"/>
+        </svg>
+        <div class="cap"><b>Decanter</b><span>Spirit in the glass — gold fill rising.</span></div>
+      </div>
+      <div class="cell">
+        <svg class="mark" viewBox="0 0 84 84" fill="none">
+          <defs><linearGradient id="g2" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="var(--accent-2)"/><stop offset="1" stop-color="var(--accent)"/></linearGradient></defs>
+          <rect x="2" y="2" width="80" height="80" rx="20" stroke="var(--line)" stroke-width="2"/>
+          <path d="M52 22 L34 62" stroke="url(#g2)" stroke-width="9" stroke-linecap="round"/>
+        </svg>
+        <div class="cap"><b>Gold seam "/"</b><span>One struck stroke / a pour. Scales to 16px.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOCKUP + FAVICON (recommended default) -->
+  <div class="sect">
+    <div class="kicker">Default lockup &amp; favicon (recommended: A + seam)</div>
+    <div class="grid">
+      <div class="cell">
+        <div class="lock">
+          <svg width="40" height="40" viewBox="0 0 84 84" fill="none"><rect x="2" y="2" width="80" height="80" rx="20" stroke="var(--line)" stroke-width="2"/><path d="M52 22 L34 62" stroke="var(--accent)" stroke-width="9" stroke-linecap="round"/></svg>
+          ski<span style="letter-spacing:.1em;border-bottom:2px solid var(--accent)">ll</span><b style="font-style:italic">drunk</b>
+        </div>
+        <div class="cap"><b>Horizontal lockup</b><span>mark + editorial wordmark</span></div>
+      </div>
+      <div class="cell">
+        <div class="favs">
+          <div class="f"><svg width="32" height="32" viewBox="0 0 84 84"><rect x="2" y="2" width="80" height="80" rx="20" fill="var(--accent)"/><path d="M52 22 L34 62" stroke="var(--bg)" stroke-width="9" stroke-linecap="round"/></svg>32</div>
+          <div class="f"><svg width="24" height="24" viewBox="0 0 84 84"><rect x="2" y="2" width="80" height="80" rx="20" fill="var(--accent)"/><path d="M52 22 L34 62" stroke="var(--bg)" stroke-width="10" stroke-linecap="round"/></svg>24</div>
+          <div class="f"><svg width="16" height="16" viewBox="0 0 84 84"><rect x="2" y="2" width="80" height="80" rx="22" fill="var(--accent)"/><path d="M52 22 L34 62" stroke="var(--bg)" stroke-width="12" stroke-linecap="round"/></svg>16</div>
+        </div>
+        <div class="cap"><b>Favicon / app icon</b><span>seam holds at 16px</span></div>
+      </div>
+      <div class="cell" style="background:var(--accent)">
+        <div style="font-family:Fraunces,serif;font-size:1.8rem;color:var(--bg)">ski<span style="font-style:italic">lldrunk</span></div>
+        <div class="cap"><b style="color:var(--bg)">Inverse</b><span style="color:rgba(0,0,0,.5)">on gold</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+document.getElementById('modetog').addEventListener('click',function(){var r=document.documentElement;r.setAttribute('data-mode',r.getAttribute('data-mode')==='dark'?'light':'dark');});
+</script>
+</body>
+</html>

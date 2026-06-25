@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en" data-palette="cellar" data-mode="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>skilldrunk — The Window (concept)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Geist:wght@300..700&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
+<style>
+/* ---- Cellar tokens (trimmed for mockup) ---- */
+:root[data-mode="dark"]{
+  --bg:#0d0b07; --bg-elevated:#17130c; --bg-soft:#211b10; --line:#2b2417;
+  --ink:#f3ece0; --ink-soft:#b3a890; --ink-faint:#756b58;
+  --accent:#e8b54a; --accent-soft:rgba(232,181,74,.14); --accent-contrast:#1a1305;
+  --wine:#cf5563; --glow:0 0 0 1px rgba(232,181,74,.30), 0 10px 40px rgba(232,181,74,.18);
+}
+:root[data-mode="light"]{
+  --bg:#f3ece0; --bg-elevated:#faf4e9; --bg-soft:#e9e0d0; --line:#ddd2bd;
+  --ink:#181208; --ink-soft:#5a4f3d; --ink-faint:#9a8d76;
+  --accent:#b8801f; --accent-soft:#f0e0bf; --accent-contrast:#faf4e9;
+  --wine:#7a1f2b; --glow:0 0 0 1px rgba(184,128,31,.25), 0 8px 30px rgba(184,128,31,.16);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"Geist",system-ui,sans-serif; line-height:1.55;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+/* paper / candlelight grain */
+body::before{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:1; opacity:.05; mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+.kicker{font-family:"Geist Mono",monospace;text-transform:uppercase;letter-spacing:.16em;font-size:.72rem;color:var(--ink-faint)}
+.display{font-family:"Fraunces",serif;font-weight:400;line-height:1.0;letter-spacing:-.015em}
+.serif-i{font-family:"Fraunces",serif;font-style:italic;font-weight:400}
+.mono{font-family:"Geist Mono",monospace}
+
+/* scroll progress (gold seam) */
+#seam{position:fixed;top:0;left:0;height:2px;width:0;background:linear-gradient(90deg,transparent,var(--accent));z-index:60;box-shadow:0 0 12px var(--accent)}
+
+/* nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
+  padding:18px 28px;transition:background .4s,backdrop-filter .4s,border-color .4s;border-bottom:1px solid transparent}
+nav.solid{background:color-mix(in oklab,var(--bg) 78%,transparent);backdrop-filter:blur(10px);border-color:var(--line)}
+.brand{font-family:"Fraunces",serif;font-size:1.35rem;letter-spacing:-.02em}
+.brand b{color:var(--accent);font-weight:400}
+.navlinks{display:flex;gap:26px;align-items:center}
+.navlinks a{color:var(--ink-soft);text-decoration:none;font-size:.9rem;transition:color .2s}
+.navlinks a:hover{color:var(--ink)}
+.btn{font-family:"Geist Mono",monospace;font-size:.8rem;letter-spacing:.04em;text-transform:uppercase;
+  padding:10px 18px;border-radius:999px;border:1px solid var(--accent);color:var(--accent-contrast);
+  background:var(--accent);text-decoration:none;display:inline-block;transition:transform .2s,box-shadow .3s}
+.btn:hover{transform:translateY(-2px);box-shadow:var(--glow)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
+.modetog{cursor:pointer;background:transparent;border:1px solid var(--line);color:var(--ink-soft);
+  width:34px;height:34px;border-radius:999px;font-size:.9rem;display:grid;place-items:center}
+@media(max-width:760px){.navlinks .hidem{display:none}}
+
+/* sections */
+section{position:relative;z-index:2}
+.pad{padding:120px 0}
+.eyebrow{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.eyebrow::before{content:"";width:30px;height:1px;background:var(--accent)}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;overflow:hidden}
+.hero .glow{position:absolute;width:80vw;height:80vw;max-width:900px;max-height:900px;border-radius:50%;
+  left:50%;top:42%;transform:translate(-50%,-50%);z-index:0;
+  background:radial-gradient(circle,color-mix(in oklab,var(--accent) 38%,transparent),transparent 62%);
+  filter:blur(20px);animation:breathe 8s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.5;transform:translate(-50%,-50%) scale(1)}50%{opacity:.9;transform:translate(-50%,-50%) scale(1.08)}}
+.hero .wrap{position:relative;z-index:2}
+.hero h1{font-size:clamp(3rem,11vw,8.4rem);margin:10px 0 0}
+.hero h1 .line2{color:var(--accent)}
+.hero p.sub{max-width:540px;margin:30px 0 0;color:var(--ink-soft);font-size:1.18rem}
+.hero .count{margin-top:40px;display:flex;gap:34px;align-items:baseline}
+.hero .count b{font-family:"Fraunces",serif;font-size:2.6rem;font-weight:400}
+.scrollcue{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);z-index:3;color:var(--ink-faint);
+  font-family:"Geist Mono",monospace;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(28px);transition:opacity .9s var(--ease,cubic-bezier(.2,.7,.2,1)),transform .9s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+.rv.d1{transition-delay:.08s}.rv.d2{transition-delay:.16s}.rv.d3{transition-delay:.24s}
+
+/* THE LIBRARY — editorial plates */
+.sec-h{font-size:clamp(2rem,5vw,3.4rem);margin:8px 0 0}
+.plates{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:54px}
+@media(max-width:860px){.plates{grid-template-columns:1fr}}
+.plate{background:var(--bg-elevated);border:1px solid var(--line);border-radius:16px;padding:28px;
+  min-height:280px;display:flex;flex-direction:column;transition:transform .35s,box-shadow .4s,border-color .35s;position:relative;overflow:hidden}
+.plate:hover{transform:translateY(-6px);box-shadow:var(--glow);border-color:color-mix(in oklab,var(--accent) 40%,var(--line))}
+.plate .num{position:absolute;top:20px;right:24px;font-family:"Geist Mono",monospace;color:var(--accent);font-size:.85rem}
+.plate .type{margin-bottom:auto}
+.plate h3{font-family:"Fraunces",serif;font-weight:400;font-size:1.9rem;line-height:1.05;margin:14px 0 10px}
+.plate p{color:var(--ink-soft);font-size:.98rem}
+.plate .pick{margin-top:20px;font-family:"Geist Mono",monospace;font-size:.72rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-faint)}
+.plate .pick b{color:var(--accent)}
+
+/* THE ARENA */
+.arena{background:var(--bg-elevated);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.versus{display:grid;grid-template-columns:1fr auto 1fr;gap:24px;align-items:center;margin-top:50px}
+@media(max-width:760px){.versus{grid-template-columns:1fr;text-align:center}}
+.fighter{background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:30px}
+.fighter h4{font-family:"Fraunces",serif;font-weight:400;font-size:1.7rem;margin:10px 0 6px}
+.fighter p{color:var(--ink-soft);font-size:.92rem;min-height:42px}
+.fighter .elo{margin-top:18px;font-family:"Geist Mono",monospace;font-size:1.5rem;color:var(--accent)}
+.fighter .elo span{font-size:.72rem;color:var(--ink-faint);letter-spacing:.1em}
+.vs{font-family:"Fraunces",serif;font-style:italic;font-size:2rem;color:var(--ink-faint)}
+.live{display:inline-flex;align-items:center;gap:8px;color:var(--wine);font-family:"Geist Mono",monospace;
+  font-size:.72rem;letter-spacing:.14em;text-transform:uppercase}
+.live .dot{width:8px;height:8px;border-radius:50%;background:var(--wine);box-shadow:0 0 0 0 var(--wine);animation:pulse 1.8s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in oklab,var(--wine) 70%,transparent)}70%{box-shadow:0 0 0 12px transparent}100%{box-shadow:0 0 0 0 transparent}}
+
+/* LIVE marquee */
+.marq{overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:26px 0;white-space:nowrap;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.marq .track{display:inline-flex;gap:48px;animation:scrollx 26s linear infinite}
+.marq:hover .track{animation-play-state:paused}
+@keyframes scrollx{to{transform:translateX(-50%)}}
+.marq .item{font-family:"Fraunces",serif;font-size:1.7rem;color:var(--ink-soft);display:inline-flex;align-items:center;gap:18px}
+.marq .item b{color:var(--accent);font-style:italic}
+.marq .item::after{content:"·";color:var(--ink-faint)}
+
+/* THE DOOR */
+.door{min-height:88vh;display:flex;align-items:center;text-align:center;position:relative;overflow:hidden}
+.door .glow{position:absolute;width:70vw;height:70vw;max-width:760px;max-height:760px;border-radius:50%;left:50%;bottom:-30%;
+  transform:translateX(-50%);background:radial-gradient(circle,color-mix(in oklab,var(--accent) 30%,transparent),transparent 60%);filter:blur(30px);z-index:0}
+.door .wrap{position:relative;z-index:2;width:100%}
+.door h2{font-size:clamp(2.6rem,8vw,6rem);margin:14px 0 0}
+.door p{color:var(--ink-soft);max-width:480px;margin:24px auto 0;font-size:1.15rem}
+.door .actions{margin-top:40px;display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.door .actions .btn{padding:14px 30px;font-size:.85rem}
+
+footer{border-top:1px solid var(--line);padding:40px 0;color:var(--ink-faint)}
+footer .wrap{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;font-size:.85rem}
+.tag{display:inline-block;background:var(--accent-soft);color:var(--accent);font-family:"Geist Mono",monospace;
+  font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;padding:5px 10px;border-radius:999px;margin-bottom:8px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div id="seam"></div>
+
+<nav id="nav">
+  <div class="brand">skill<b>drunk</b></div>
+  <div class="navlinks">
+    <a class="hidem" href="#library">Library</a>
+    <a class="hidem" href="#arena">Arena</a>
+    <a class="hidem" href="#live">Live</a>
+    <button class="modetog" id="modetog" title="Toggle light/dark">◐</button>
+    <a class="btn" href="#door">Enter</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="glow"></div>
+  <div class="wrap">
+    <div class="kicker rv in">A curated library of AI skills</div>
+    <h1 class="display rv in d1">Drunk on<br><span class="line2 serif-i">skill.</span></h1>
+    <p class="sub rv in d2">Discover what actually makes AI agents useful — MCP servers, Claude Skills, GPTs, prompts and rules. <b>Chosen, not crowded.</b></p>
+    <div class="count rv in d3">
+      <div><b id="skillcount">511</b><div class="kicker">skills, one taste</div></div>
+      <div><b>1</b><div class="kicker">curator</div></div>
+      <div><b class="mono" style="color:var(--accent)">⛏</b><div class="kicker">enter the mine</div></div>
+    </div>
+  </div>
+  <div class="scrollcue">scroll ↓</div>
+</section>
+
+<!-- THE LIBRARY -->
+<section class="pad" id="library">
+  <div class="wrap">
+    <div class="eyebrow rv"><span class="kicker">01 — The Library</span></div>
+    <h2 class="sec-h display rv d1">Picks from the stacks.</h2>
+    <div class="plates">
+      <article class="plate rv">
+        <span class="num">01</span>
+        <div class="type"><span class="kicker">MCP Server</span></div>
+        <h3>Vega-Lite</h3>
+        <p>Turn fetched data into charts the moment it lands — grammar-of-graphics, rendered.</p>
+        <div class="pick"><b>Editor's pick</b> · #dataviz</div>
+      </article>
+      <article class="plate rv d1">
+        <span class="num">02</span>
+        <div class="type"><span class="kicker">Claude Skill</span></div>
+        <h3>Vibe Check</h3>
+        <p>A sanity-check agent that stops cascading errors before they snowball into scope creep.</p>
+        <div class="pick"><b>Editor's pick</b> · #agents</div>
+      </article>
+      <article class="plate rv d2">
+        <span class="num">03</span>
+        <div class="type"><span class="kicker">MCP Server</span></div>
+        <h3>Weather</h3>
+        <p>Accurate forecasts via AccuWeather — the small skill every demo secretly needs.</p>
+        <div class="pick"><b>Editor's pick</b> · #utility</div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- THE ARENA -->
+<section class="pad arena" id="arena">
+  <div class="wrap">
+    <div class="eyebrow rv"><span class="kicker">02 — The Arena</span></div>
+    <h2 class="sec-h display rv d1">Two skills walk into a bar.</h2>
+    <p class="rv d1" style="color:var(--ink-soft);max-width:520px;margin-top:14px">You decide who leaves. Every vote moves the Elo — live.</p>
+    <div class="versus">
+      <div class="fighter rv">
+        <span class="live"><span class="dot"></span>live</span>
+        <h4>AWS Cost Analysis</h4>
+        <p>Reads your bill and tells you where the money leaks.</p>
+        <div class="elo" data-elo="1016">1016 <span>ELO</span></div>
+      </div>
+      <div class="vs serif-i rv d1">vs</div>
+      <div class="fighter rv d2">
+        <span class="live"><span class="dot"></span>live</span>
+        <h4>APISIX-MCP</h4>
+        <p>Drive your API gateway by talking to it. Routes, plugins, upstreams.</p>
+        <div class="elo" data-elo="1016">1016 <span>ELO</span></div>
+      </div>
+    </div>
+    <div class="rv d2" style="margin-top:36px"><a class="btn ghost" href="#door">Cast a vote →</a></div>
+  </div>
+</section>
+
+<!-- LIVE -->
+<section id="live" style="padding:90px 0">
+  <div class="wrap"><div class="eyebrow rv"><span class="kicker">03 — Live</span></div>
+  <h2 class="sec-h display rv d1" style="margin-bottom:34px">The estate is alive.</h2></div>
+  <div class="marq">
+    <div class="track">
+      <span class="item"><b>Daily Dose</b> one quote, every morning</span>
+      <span class="item"><b>World Cup 2026</b> 104 matches, tracked</span>
+      <span class="item"><b>The Showcase</b> 10 projects, one shelf</span>
+      <span class="item"><b>ngmars</b> an event, alive</span>
+      <span class="item"><b>Daily Dose</b> one quote, every morning</span>
+      <span class="item"><b>World Cup 2026</b> 104 matches, tracked</span>
+      <span class="item"><b>The Showcase</b> 10 projects, one shelf</span>
+      <span class="item"><b>ngmars</b> an event, alive</span>
+    </div>
+  </div>
+</section>
+
+<!-- THE DOOR -->
+<section class="door" id="door">
+  <div class="glow"></div>
+  <div class="wrap">
+    <div class="tag rv in">members only past here</div>
+    <div class="kicker rv">04 — The Door</div>
+    <h2 class="display rv d1">It's the curator's<br><span class="serif-i" style="color:var(--accent)">domain.</span></h2>
+    <p class="rv d2">Sign in and the window becomes a mine — every tool, every page, one room. Yours.</p>
+    <div class="actions rv d2">
+      <a class="btn" href="#">Enter ⛏</a>
+      <a class="btn ghost" href="#">Submit a skill</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="brand">skill<b>drunk</b></div>
+    <div class="mono">© 2026 · drunk on skill · one taste</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var nav=document.getElementById('nav'), seam=document.getElementById('seam');
+  function onScroll(){
+    var y=window.scrollY, h=document.documentElement.scrollHeight-innerHeight;
+    nav.classList.toggle('solid', y>40);
+    seam.style.width=(h>0?(y/h*100):0)+'%';
+  }
+  addEventListener('scroll',onScroll,{passive:true}); onScroll();
+
+  // reveals
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.18});
+  document.querySelectorAll('.rv:not(.in)').forEach(function(el){io.observe(el);});
+
+  // mode toggle
+  document.getElementById('modetog').addEventListener('click',function(){
+    var r=document.documentElement; r.setAttribute('data-mode', r.getAttribute('data-mode')==='dark'?'light':'dark');
+  });
+
+  // live Elo flicker (spectacle)
+  setInterval(function(){
+    document.querySelectorAll('.elo').forEach(function(el){
+      var base=+el.getAttribute('data-elo'); var v=base+Math.floor(Math.random()*9-4);
+      el.firstChild.textContent=v+' ';
+    });
+  },1400);
+})();
+</script>
+</body>
+</html>
