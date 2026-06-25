@@ -32,6 +32,8 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 **tÖdÜs v2 (CANLI)**: `src/app/todus/` — kanban_cards tablosundan 579 kart (oz_notes pipeline'ından). Orijinal taç/altın tasarım `.todus` scope'lu CSS ile port edildi. Admin: kart taşıma + yeni görev (moveCard/addCard server actions). ZeuX tool'ları: query_oz_notes, query_kanban_cards, update_kanban_card, list_my_meetings, list_oz_secrets_preview, get_cowork_context. Schema: oz_notes, oz_notes_archive, oz_secrets(+preview view), cowork_context_notes, kanban_* (boards/cards/people/activity/comments).
 
+**tÖdÜs Sağkol copilot** (PR #38, canlı): `/todus`'a gömülü onay-kapılı AI panel (ZeuX, opus-4-8). Motor `packages/sagkol-core` (`@sagkol/core` v1.1.0 vendored — DOKUNMA, `~/Documents/sagkol-core`'dan gelir). İki port: `src/lib/sagkol/store.ts` (SupabaseStore) + `adapter.ts/tools.ts/system-prompt.ts/permissions.ts/apply-proposal.ts` (TodusAdapter). Route'lar: `src/app/api/sagkol/{chat,confirm}/route.ts`. UI: `src/components/sagkol/{sagkol-panel,use-sagkol-chat,personas}.tsx`. **ADMIN-ONLY** (kişisel pano + tool'lar service_role/RLS-bypass → veri sızıntısı koruması). Yazma yalnız propose→confirm→apply. DB: `ai_conversations`(version optimistic lock) + `ai_proposals`(status CHECK). Usage → `sd_ai_usage` (app=todus-sagkol). Sağkol kalıbı genel ref'i: `sagkol` skill + `~/Documents/sagkol-core`.
+
 **Live subdomains** (9 tane — pt_apps tablosundan canlı veri):
 ```
 skilldrunk.com           PUBLIC   Marketplace + MCP HTTP + AI Finder
