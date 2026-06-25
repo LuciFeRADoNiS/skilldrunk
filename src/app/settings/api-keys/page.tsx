@@ -1,7 +1,6 @@
-import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/owner/auth";
 import { ApiKeysClient } from "./api-keys-client";
 
 export const metadata: Metadata = {
@@ -22,9 +21,8 @@ type ApiKeyRow = {
 };
 
 export default async function ApiKeysPage() {
-  const supabase = await createClient();
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData.user) redirect("/login?next=/settings/api-keys");
+  // Admin-only — was previously reachable by any logged-in community user (G2).
+  const { supabase } = await requireAdmin("/settings/api-keys");
 
   const { data: keys } = await supabase
     .from("sd_api_keys")

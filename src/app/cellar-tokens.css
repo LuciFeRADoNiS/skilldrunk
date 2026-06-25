@@ -1,0 +1,142 @@
+/* =========================================================================
+   skilldrunk — "Cellar" design tokens (Mine-scoped)
+   Source of truth: design/03-design-tokens.css. Adapted so EVERY raw variable
+   is scoped under [data-shell="mine"] — fully DORMANT until the private Mine
+   layout sets data-shell="mine" on its root. Guarantees zero impact on the
+   still-live public marketplace pages: no global :root/body overrides, no
+   collision with shadcn --radius-*/--font-*/--accent.
+
+   Inside the Mine: data-palette="cellar|ultraviolet|cobalt|oxblood",
+   data-mode="light|dark" (dark is the default; the Mine layout sets it).
+   ========================================================================= */
+
+/* ---------- CELLAR — default palette (light) ---------- */
+[data-shell="mine"],
+[data-shell="mine"][data-palette="cellar"] {
+  --bg: #f3ece0; --bg-elevated: #faf4e9; --bg-soft: #e9e0d0; --line: #ddd2bd;
+  --ink: #181208; --ink-soft: #5a4f3d; --ink-faint: #9a8d76;
+  --accent: #b8801f; --accent-soft: #f0e0bf; --accent-ink: #4a3208; --accent-contrast: #faf4e9;
+  --wine: #7a1f2b; --wine-soft: #ecd3d3;
+  --positive: #2f6a3f; --warn: #b07a1a; --danger: #b33a2a;
+  --shadow-sm: 0 1px 2px rgba(24,18,8,.06), 0 1px 1px rgba(24,18,8,.04);
+  --shadow-md: 0 6px 18px rgba(24,18,8,.08), 0 2px 6px rgba(24,18,8,.05);
+  --shadow-lg: 0 24px 60px rgba(24,18,8,.12), 0 8px 20px rgba(24,18,8,.07);
+  --glow-gold: 0 0 0 1px rgba(184,128,31,.25), 0 8px 30px rgba(184,128,31,.18);
+}
+[data-shell="mine"][data-mode="dark"],
+[data-shell="mine"][data-palette="cellar"][data-mode="dark"] {
+  --bg: #0d0b07; --bg-elevated: #17130c; --bg-soft: #211b10; --line: #2b2417;
+  --ink: #f3ece0; --ink-soft: #b3a890; --ink-faint: #756b58;
+  --accent: #e8b54a; --accent-soft: rgba(232,181,74,.14); --accent-ink: #e8b54a; --accent-contrast: #1a1305;
+  --wine: #cf5563; --wine-soft: rgba(207,85,99,.16);
+  --positive: #5fbf7a; --warn: #d6a23a; --danger: #e0675a;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.5);
+  --shadow-md: 0 8px 24px rgba(0,0,0,.55);
+  --shadow-lg: 0 28px 70px rgba(0,0,0,.65);
+  --glow-gold: 0 0 0 1px rgba(232,181,74,.30), 0 10px 40px rgba(232,181,74,.22);
+}
+
+/* ---------- ALTERNATIVE PALETTES (Mine-scoped) ---------- */
+[data-shell="mine"][data-palette="ultraviolet"] {
+  --bg:#f4f3f8; --bg-elevated:#ffffff; --bg-soft:#ebe9f2; --line:#ddd9ea;
+  --ink:#16121f; --ink-soft:#4b465e; --ink-faint:#8b86a0;
+  --accent:#6d4bd6; --accent-soft:#e6e0fb; --accent-ink:#2a1d63; --accent-contrast:#ffffff;
+  --wine:#0f8aa0; --wine-soft:#d3eef3; --positive:#2f6a3f; --warn:#b07a1a; --danger:#b33a2a;
+}
+[data-shell="mine"][data-palette="ultraviolet"][data-mode="dark"] {
+  --bg:#0b0a0f; --bg-elevated:#15131c; --bg-soft:#1f1c2b; --line:#2b2740;
+  --ink:#efecf6; --ink-soft:#aaa4c2; --ink-faint:#6c6685;
+  --accent:#a98bff; --accent-soft:rgba(169,139,255,.15); --accent-ink:#a98bff; --accent-contrast:#140f24;
+  --wine:#57d0e0; --wine-soft:rgba(87,208,224,.16); --positive:#5fbf7a; --warn:#d6a23a; --danger:#e0675a;
+}
+[data-shell="mine"][data-palette="cobalt"] {
+  --bg:#f3f5f9; --bg-elevated:#ffffff; --bg-soft:#e8edf4; --line:#d6dfea;
+  --ink:#0c1424; --ink-soft:#43566f; --ink-faint:#8090a4;
+  --accent:#1666d8; --accent-soft:#dbe8fc; --accent-ink:#0b2f63; --accent-contrast:#ffffff;
+  --wine:#c2691a; --wine-soft:#f3e0c8; --positive:#2f6a3f; --warn:#b07a1a; --danger:#b33a2a;
+}
+[data-shell="mine"][data-palette="cobalt"][data-mode="dark"] {
+  --bg:#07090f; --bg-elevated:#0f141f; --bg-soft:#161d2c; --line:#243044;
+  --ink:#eef2f8; --ink-soft:#9fb0c6; --ink-faint:#5e6f86;
+  --accent:#4f9dff; --accent-soft:rgba(79,157,255,.15); --accent-ink:#4f9dff; --accent-contrast:#06101f;
+  --wine:#e0a33e; --wine-soft:rgba(224,163,62,.16); --positive:#5fbf7a; --warn:#d6a23a; --danger:#e0675a;
+}
+[data-shell="mine"][data-palette="oxblood"] {
+  --bg:#f6efe9; --bg-elevated:#fdf8f4; --bg-soft:#efe2db; --line:#e0cfc7;
+  --ink:#1c0e0c; --ink-soft:#5f4541; --ink-faint:#9c817b;
+  --accent:#9e2a33; --accent-soft:#f1d8d6; --accent-ink:#5a141a; --accent-contrast:#fdf8f4;
+  --wine:#b8801f; --wine-soft:#f0e0bf; --positive:#2f6a3f; --warn:#b07a1a; --danger:#b33a2a;
+}
+[data-shell="mine"][data-palette="oxblood"][data-mode="dark"] {
+  --bg:#0e0809; --bg-elevated:#1a1011; --bg-soft:#251618; --line:#3a2226;
+  --ink:#f5e9e8; --ink-soft:#c2a3a4; --ink-faint:#87605f;
+  --accent:#d2545f; --accent-soft:rgba(210,84,95,.15); --accent-ink:#d2545f; --accent-contrast:#1c0a0c;
+  --wine:#e8b54a; --wine-soft:rgba(232,181,74,.16); --positive:#5fbf7a; --warn:#d6a23a; --danger:#e0675a;
+}
+
+/* ---------- SCALE TOKENS (Mine-scoped; fonts → next/font variables) ---------- */
+[data-shell="mine"] {
+  --radius-sm: 6px; --radius: 10px; --radius-md: 16px; --radius-lg: 24px; --radius-pill: 999px;
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px; --s-5: 20px;
+  --s-6: 24px; --s-8: 32px; --s-10: 40px; --s-12: 48px; --s-16: 64px; --s-20: 80px;
+
+  /* point Cellar's faces at the next/font variables wired in layout.tsx */
+  --font-display: var(--font-display), ui-serif, Georgia, serif;   /* Fraunces */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", monospace;
+
+  --t-xs: .75rem; --t-sm: .875rem; --t-base: 1rem; --t-lg: 1.25rem;
+  --t-xl: 1.625rem; --t-2xl: 2.25rem; --t-3xl: 3.25rem; --t-4xl: 4.75rem; --t-5xl: 6.5rem;
+
+  --ease-out: cubic-bezier(.2,.7,.2,1);
+  --ease-in-out: cubic-bezier(.6,0,.2,1);
+  --t-fast: 140ms; --t-base-dur: 240ms; --t-slow: 520ms; --t-cine: 1100ms;
+}
+
+/* ---------- TAILWIND v4 BRIDGE (top-level; only NEW names, no shadcn collision) ----------
+   Registers bg-bg / text-ink / border-line / bg-accent-soft / text-accent-contrast /
+   bg-wine / font-display etc. (--accent itself reuses shadcn's existing mapping, so
+   inside the Mine bg-accent resolves to Cellar gold automatically). */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-bg-soft: var(--bg-soft);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-contrast: var(--accent-contrast);
+  --color-wine: var(--wine);
+  --color-wine-soft: var(--wine-soft);
+  --color-positive: var(--positive);
+  --color-warn: var(--warn);
+  --color-danger: var(--danger);
+  --font-display: var(--font-display);
+}
+
+/* ---------- MINE BASE + three-beat helpers (scoped — never leaks to public) ---------- */
+[data-shell="mine"] {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+[data-shell="mine"] .kicker {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  font-size: var(--t-xs);
+  color: var(--ink-faint);
+}
+[data-shell="mine"] .display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -.01em;
+}
+[data-shell="mine"] .serif-italic { font-family: var(--font-display); font-style: italic; }
+[data-shell="mine"] :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+[data-shell="mine"] ::selection { background: var(--accent-soft); color: var(--accent-ink); }
