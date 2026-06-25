@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { OwnerLayout } from "@skilldrunk/brain-ui";
 import { requireAdmin } from "@/lib/owner/auth";
 import { SKILLDRUNK_MENU } from "@/lib/owner/menu";
+import { MineControls } from "@/components/mine/mine-controls";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +33,7 @@ export default async function OwnerRootLayout({
         pathname={pathname}
         breadcrumb={<span>{pathname}</span>}
         userLabel={userLabel}
+        search={<MineControls />}
       >
         {children}
       </OwnerLayout>
