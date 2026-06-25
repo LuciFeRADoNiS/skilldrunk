@@ -34,22 +34,31 @@
   --bd-font-mono: ui-monospace, SF Mono, Menlo, monospace;
 }
 
-/* ─── skilldrunk corporate (D-010) ─────────────────────────────────── */
+/* ─── skilldrunk → Cellar (D1, 2026-06-25) ─────────────────────────────
+ * The private "Mine" shell. --bd-* now map to the Cellar tokens (see
+ * src/app/cellar-tokens.css), which resolve because the owner layout sets
+ * data-shell="mine" + data-mode/data-palette on the SAME element. This makes
+ * the whole brain-ui shell (Sidebar/Topbar/KpiHero/cards/...) Cellar-gold in
+ * ONE edit, and palette/mode switching flows through automatically.
+ * Scoped to this class only — :root default + skimsoulfat class untouched (G5),
+ * so the admin app / skimsoulfat tenant are unaffected. */
 .theme-skilldrunk-corporate {
-  --bd-bg: #0a0a0f;
-  --bd-bg-2: #12121a;
-  --bd-surface: #1a1a26;
-  --bd-surface-2: #21212e;
-  --bd-border: #26263a;
-  --bd-border-strong: #353548;
-  --bd-text: #e4e4e7;
-  --bd-text-2: #a1a1aa;
-  --bd-text-3: #6b6b78;
-  --bd-accent: #8b5cf6;
-  --bd-accent-2: #a78bfa;
-  --bd-accent-bg: rgba(139, 92, 246, 0.10);
-  --bd-accent-bg-strong: rgba(139, 92, 246, 0.18);
+  --bd-bg: var(--bg);
+  --bd-bg-2: var(--bg-elevated);
+  --bd-surface: var(--bg-elevated);
+  --bd-surface-2: var(--bg-soft);
+  --bd-border: var(--line);
+  --bd-border-strong: var(--line);
+  --bd-text: var(--ink);
+  --bd-text-2: var(--ink-soft);
+  --bd-text-3: var(--ink-faint);
+  --bd-accent: var(--accent);
+  --bd-accent-2: var(--accent);
+  --bd-accent-bg: var(--accent-soft);
+  --bd-accent-bg-strong: var(--accent-soft);
   --bd-radius: 12px;
+  --bd-font-display: var(--font-display);
+  --bd-font-mono: var(--font-mono);
 }
 
 /* ─── skimsoulfat glassmorphic (Faz 3 — placeholder so devs see API) ── */
