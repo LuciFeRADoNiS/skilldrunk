@@ -419,8 +419,8 @@ export function TodusApp({
         />
       )}
 
-      {/* ── Sağkol copilot (floating overlay + pantheon avatar seçici) ── */}
-      <SagkolPanel userName={userName} userRole={userRole} />
+      {/* ── Sağkol copilot — kişisel pano, sadece admin (veri/maliyet koruması) ── */}
+      {userRole === "admin" && <SagkolPanel userName={userName} userRole={userRole} />}
     </div>
   );
 }
