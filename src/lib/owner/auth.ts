@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { isAllowedEmail } from "./allowlist";
 
 /**
  * Server-side guard for /(owner)/** routes.
@@ -33,6 +34,11 @@ export async function requireAdmin(next?: string) {
   if (!user) {
     redirect(`/login${next ? `?next=${encodeURIComponent(next)}` : ""}`);
   }
+  // Gate 1 (app): explicit email allowlist — only the curator + authorized list.
+  if (!isAllowedEmail(user.email)) {
+    redirect("/login?error=unauthorized");
+  }
+  // Gate 2 (DB-backed): role must be admin (also what RLS enforces for reads).
   const { data: profile } = await supabase
     .from("sd_profiles")
     .select("role")

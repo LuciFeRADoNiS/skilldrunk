@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { isAllowedEmail } from "@/lib/owner/allowlist";
 
 // OAuth / magic link callback — exchanges the PKCE code for a session cookie,
 // ensures the sd_profiles row exists (safety net for pre-existing auth.users
@@ -27,13 +28,19 @@ export async function GET(request: Request) {
     console.error("sd_ensure_profile rpc error (non-fatal)", rpcError);
   }
 
-  // Private apex (D6 / G10): allowlist = admin only. Anyone else is signed OUT —
-  // clearing the shared .skilldrunk.com cookie so a rejected user can't hold a
-  // session on any sibling subdomain — then bounced. Runs after sd_ensure_profile
-  // so the role row is readable.
+  // Private apex (D6 / G10): two-gate allowlist. Anyone not authorized is signed
+  // OUT — clearing the shared .skilldrunk.com cookie so a rejected user can't hold
+  // a session on any sibling subdomain — then bounced.
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  // Gate 1: explicit email allowlist (SD_ALLOWED_EMAILS, default curator only).
+  if (!isAllowedEmail(user?.email)) {
+    await supabase.auth.signOut();
+    return NextResponse.redirect(`${origin}/login?error=access_denied`);
+  }
+  // Gate 2: role must be admin (also enforced by RLS for data reads).
   const { data: profile } = user
     ? await supabase.from("sd_profiles").select("role").eq("id", user.id).single()
     : { data: null };
