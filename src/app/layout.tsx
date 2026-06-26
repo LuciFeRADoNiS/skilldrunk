@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { TrackerWithAuth } from "@/components/tracker-with-auth";
-import { GA4 } from "@skilldrunk/analytics/ga";
 import { RecoveryHashBridge } from "@/components/recovery-hash-bridge";
 import "./globals.css";
 
@@ -75,7 +74,6 @@ export default function RootLayout({
         {children}
         <Toaster />
         <TrackerWithAuth />
-        <GA4 />
       </body>
     </html>
   );
