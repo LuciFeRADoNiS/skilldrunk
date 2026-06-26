@@ -3,13 +3,12 @@
 import { useState, useTransition } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
-import { passwordSignIn } from "@/app/login/actions";
 
 /**
- * Private apex login. Primary: email + password via a SERVER ACTION
- * (passwordSignIn) — reliable SSR cookie + real errors. Backup: passwordless
- * magic-link (email OTP) client-side → /auth/callback. Either way the email
- * allowlist + role gate ensures only authorized emails get in.
+ * Private apex login. Primary: email + password POSTed to the /auth/login ROUTE
+ * HANDLER (reliable SSR session — mirrors the proven /auth/callback). Backup:
+ * passwordless magic-link (email OTP) → /auth/callback. Either way the email
+ * allowlist + role gate (requireAdmin) ensures only authorized emails get in.
  */
 export function SignInButtons({ next }: { next?: string }) {
   const [pending, startTransition] = useTransition();
@@ -53,8 +52,8 @@ export function SignInButtons({ next }: { next?: string }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-      {/* Password sign-in → server action (reliable). */}
-      <form action={passwordSignIn} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      {/* Password sign-in → /auth/login route handler (plain POST, reliable cookie). */}
+      <form action="/auth/login" method="post" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {next && <input type="hidden" name="next" value={next} />}
         <input
           type="email"
