@@ -49,6 +49,15 @@ export async function POST(req: Request) {
   if (!user) {
     return NextResponse.json({ error: "auth required" }, { status: 401 });
   }
+  // Private apex: admin-only (LLM cost + personal-data protection).
+  const { data: askProfile } = await supabase
+    .from("sd_profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+  if (askProfile?.role !== "admin") {
+    return NextResponse.json({ error: "admin required" }, { status: 403 });
+  }
 
   // SSE response
   const encoder = new TextEncoder();

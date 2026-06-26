@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en" data-palette="cellar" data-mode="dark">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>skilldrunk — Palette explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Geist:wght@300..700&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
+<style>
+/* ---- 4 palettes ---- */
+[data-palette="cellar"]{--bg:#f3ece0;--bg-elevated:#faf4e9;--bg-soft:#e9e0d0;--line:#ddd2bd;--ink:#181208;--ink-soft:#5a4f3d;--ink-faint:#9a8d76;--accent:#b8801f;--accent-soft:#f0e0bf;--accent-contrast:#faf4e9;--wine:#7a1f2b}
+[data-palette="cellar"][data-mode="dark"]{--bg:#0d0b07;--bg-elevated:#17130c;--bg-soft:#211b10;--line:#2b2417;--ink:#f3ece0;--ink-soft:#b3a890;--ink-faint:#756b58;--accent:#e8b54a;--accent-soft:rgba(232,181,74,.14);--accent-contrast:#1a1305;--wine:#cf5563}
+[data-palette="ultraviolet"]{--bg:#f4f3f8;--bg-elevated:#fff;--bg-soft:#ebe9f2;--line:#ddd9ea;--ink:#16121f;--ink-soft:#4b465e;--ink-faint:#8b86a0;--accent:#6d4bd6;--accent-soft:#e6e0fb;--accent-contrast:#fff;--wine:#0f8aa0}
+[data-palette="ultraviolet"][data-mode="dark"]{--bg:#0b0a0f;--bg-elevated:#15131c;--bg-soft:#1f1c2b;--line:#2b2740;--ink:#efecf6;--ink-soft:#aaa4c2;--ink-faint:#6c6685;--accent:#a98bff;--accent-soft:rgba(169,139,255,.15);--accent-contrast:#140f24;--wine:#57d0e0}
+[data-palette="cobalt"]{--bg:#f3f5f9;--bg-elevated:#fff;--bg-soft:#e8edf4;--line:#d6dfea;--ink:#0c1424;--ink-soft:#43566f;--ink-faint:#8090a4;--accent:#1666d8;--accent-soft:#dbe8fc;--accent-contrast:#fff;--wine:#c2691a}
+[data-palette="cobalt"][data-mode="dark"]{--bg:#07090f;--bg-elevated:#0f141f;--bg-soft:#161d2c;--line:#243044;--ink:#eef2f8;--ink-soft:#9fb0c6;--ink-faint:#5e6f86;--accent:#4f9dff;--accent-soft:rgba(79,157,255,.15);--accent-contrast:#06101f;--wine:#e0a33e}
+[data-palette="oxblood"]{--bg:#f6efe9;--bg-elevated:#fdf8f4;--bg-soft:#efe2db;--line:#e0cfc7;--ink:#1c0e0c;--ink-soft:#5f4541;--ink-faint:#9c817b;--accent:#9e2a33;--accent-soft:#f1d8d6;--accent-contrast:#fdf8f4;--wine:#b8801f}
+[data-palette="oxblood"][data-mode="dark"]{--bg:#0e0809;--bg-elevated:#1a1011;--bg-soft:#251618;--line:#3a2226;--ink:#f5e9e8;--ink-soft:#c2a3a4;--ink-faint:#87605f;--accent:#d2545f;--accent-soft:rgba(210,84,95,.15);--accent-contrast:#1c0a0c;--wine:#e8b54a}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:"Geist",system-ui,sans-serif;transition:background .4s,color .4s}
+.kicker{font-family:"Geist Mono",monospace;text-transform:uppercase;letter-spacing:.14em;font-size:.66rem;color:var(--ink-faint)}
+.serif{font-family:"Fraunces",serif;font-weight:400}
+.mono{font-family:"Geist Mono",monospace}
+.wrap{max-width:1080px;margin:0 auto;padding:46px 28px 80px}
+h1{font-family:"Fraunces",serif;font-weight:400;font-size:2.4rem;letter-spacing:-.02em}
+.sub{color:var(--ink-soft);margin-top:8px}
+
+/* controls */
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:28px 0 34px}
+.pchip{display:flex;align-items:center;gap:9px;border:1px solid var(--line);background:var(--bg-elevated);border-radius:999px;padding:8px 14px;cursor:pointer;color:var(--ink);font-size:.86rem;transition:border-color .2s}
+.pchip:hover{border-color:var(--accent)}
+.pchip.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.pchip .sw{width:16px;height:16px;border-radius:50%}
+.modetog{margin-left:auto;border:1px solid var(--line);background:transparent;color:var(--ink-soft);width:38px;height:38px;border-radius:999px;cursor:pointer}
+
+.split{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:820px){.split{grid-template-columns:1fr}}
+
+/* swatches */
+.swrow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.swatch{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.swatch .chip{height:64px}
+.swatch .meta{padding:9px 11px;background:var(--bg-elevated)}
+.swatch .meta b{font-size:.78rem}
+.swatch .meta .hx{font-family:"Geist Mono",monospace;font-size:.66rem;color:var(--ink-faint);display:block;margin-top:2px}
+
+/* preview card */
+.card{background:var(--bg-elevated);border:1px solid var(--line);border-radius:16px;padding:24px}
+.nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.brand{font-family:"Fraunces",serif;font-size:1.25rem}.brand b{color:var(--accent);font-weight:400}
+.btn{font-family:"Geist Mono",monospace;font-size:.74rem;text-transform:uppercase;letter-spacing:.04em;padding:9px 16px;border-radius:999px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-contrast);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.plate{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:20px;margin-top:6px}
+.plate h3{font-family:"Fraunces",serif;font-weight:400;font-size:1.5rem;margin:8px 0 6px}
+.plate p{color:var(--ink-soft);font-size:.9rem}
+.plate .pick{margin-top:14px;font-family:"Geist Mono",monospace;font-size:.66rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-faint)}
+.plate .pick b{color:var(--accent)}
+.live{display:inline-flex;gap:7px;align-items:center;color:var(--wine);font-family:"Geist Mono",monospace;font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;margin-top:18px}
+.live .dot{width:8px;height:8px;border-radius:50%;background:var(--wine)}
+.elo{font-family:"Geist Mono",monospace;color:var(--accent);font-size:1.3rem;margin-top:6px}
+.name{font-family:"Fraunces",serif;font-size:1.8rem;margin-top:4px}
+.story{color:var(--ink-soft);font-size:.92rem;margin-top:6px;min-height:42px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">skilldrunk · theme system</div>
+  <h1>Four cellars, one taste.</h1>
+  <p class="sub">Cellar is primary. Click a palette — everything re-themes from the same tokens. Toggle light/dark top-right.</p>
+
+  <div class="bar">
+    <button class="pchip on" data-p="cellar"><span class="sw" style="background:#e8b54a"></span> Cellar <span class="kicker">gold</span></button>
+    <button class="pchip" data-p="ultraviolet"><span class="sw" style="background:#a98bff"></span> Ultraviolet <span class="kicker">electric</span></button>
+    <button class="pchip" data-p="cobalt"><span class="sw" style="background:#4f9dff"></span> Cobalt Press <span class="kicker">editorial</span></button>
+    <button class="pchip" data-p="oxblood"><span class="sw" style="background:#d2545f"></span> Oxblood <span class="kicker">moody</span></button>
+    <button class="modetog" id="modetog" title="light/dark">◐</button>
+  </div>
+
+  <div class="split">
+    <div>
+      <div class="kicker" style="margin-bottom:12px">Tokens</div>
+      <div class="swrow">
+        <div class="swatch"><div class="chip" style="background:var(--bg)"></div><div class="meta"><b>bg</b><span class="hx" data-v="--bg"></span></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--bg-elevated)"></div><div class="meta"><b>elevated</b><span class="hx" data-v="--bg-elevated"></span></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--bg-soft)"></div><div class="meta"><b>soft</b><span class="hx" data-v="--bg-soft"></span></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ink)"></div><div class="meta"><b>ink</b><span class="hx" data-v="--ink"></span></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--accent)"></div><div class="meta"><b>accent</b><span class="hx" data-v="--accent"></span></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--wine)"></div><div class="meta"><b>wine</b><span class="hx" data-v="--wine"></span></div></div>
+      </div>
+      <div class="kicker" style="margin:22px 0 8px">Character</div>
+      <div class="name serif" id="pname">Cellar</div>
+      <div class="story" id="pstory">Ink + parchment lit by gold. The gold mine, the gilt library, the spirit in the glass. Warm, premium, unmistakably one person's domain.</div>
+    </div>
+
+    <div>
+      <div class="kicker" style="margin-bottom:12px">Live preview</div>
+      <div class="card">
+        <div class="nav"><div class="brand">skill<b>drunk</b></div><button class="btn">Enter</button></div>
+        <div class="plate">
+          <span class="kicker">MCP Server · editor's pick</span>
+          <h3>Weather</h3>
+          <p>Accurate forecasts via AccuWeather — the small skill every demo secretly needs.</p>
+          <div class="pick"><b>Chosen</b> · #utility</div>
+        </div>
+        <span class="live"><span class="dot"></span> live · arena</span>
+        <div class="elo">1016 ELO</div>
+        <div style="margin-top:18px;display:flex;gap:10px"><button class="btn">Cast a vote</button><button class="btn ghost">Skip</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var stories={
+ cellar:["Cellar","Ink + parchment lit by gold. The gold mine, the gilt library, the spirit in the glass. Warm, premium, one person's domain."],
+ ultraviolet:["Ultraviolet","Near-black + cool grey + an electric violet. Reads as AI/energy — modern, a little nocturnal, high-tech."],
+ cobalt:["Cobalt Press","Editorial cool: ink, paper, a vivid press-blue. Clean, trustworthy, newsroom-meets-dev-tool."],
+ oxblood:["Oxblood","Moodier 'drunk': deep wine as the lead, gold as the wink. Intimate, intoxicated, after-hours."]
+};
+var r=document.documentElement;
+function hex(v){return getComputedStyle(r).getPropertyValue(v).trim();}
+function refresh(){document.querySelectorAll('[data-v]').forEach(function(e){e.textContent=hex(e.getAttribute('data-v'));});}
+document.querySelectorAll('.pchip').forEach(function(b){b.addEventListener('click',function(){
+  document.querySelectorAll('.pchip').forEach(function(x){x.classList.remove('on');});b.classList.add('on');
+  var p=b.getAttribute('data-p');r.setAttribute('data-palette',p);
+  document.getElementById('pname').textContent=stories[p][0];document.getElementById('pstory').textContent=stories[p][1];
+  setTimeout(refresh,60);
+});});
+document.getElementById('modetog').addEventListener('click',function(){r.setAttribute('data-mode',r.getAttribute('data-mode')==='dark'?'light':'dark');setTimeout(refresh,60);});
+refresh();
+</script>
+</body>
+</html>

@@ -15,3 +15,31 @@ export async function requireOwner() {
   }
   return { supabase, user };
 }
+
+/**
+ * Admin-only guard — the curator (Özgür) and no one else.
+ * Mirrors the established server-side pattern (sd_profiles.role === "admin",
+ * see todus/actions.ts + api/sagkol/chat). NOT the sd_is_admin() RPC, which is
+ * an RLS helper not granted to authenticated clients.
+ *
+ * This is the lockdown primitive for the private "Mine" apex: any logged-in
+ * non-admin (community user) is bounced to /login?error=unauthorized.
+ */
+export async function requireAdmin(next?: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    redirect(`/login${next ? `?next=${encodeURIComponent(next)}` : ""}`);
+  }
+  const { data: profile } = await supabase
+    .from("sd_profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+  if (profile?.role !== "admin") {
+    redirect("/login?error=unauthorized");
+  }
+  return { supabase, user };
+}
