@@ -11,6 +11,7 @@ const ERRORS: Record<string, string> = {
   access_denied: "Bu alan yalnız küratöre açık. Hesabın yetkili değil.",
   unauthorized: "Yetki gerekiyor — yalnız küratör girebilir.",
   auth: "Giriş başarısız oldu. Tekrar dene.",
+  signin: "E-posta veya şifre hatalı. Tekrar dene ya da şifresiz giriş linkini kullan.",
 };
 
 export default async function LoginPage({

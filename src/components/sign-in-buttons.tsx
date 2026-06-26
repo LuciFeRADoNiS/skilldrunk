@@ -1,40 +1,21 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
+import { passwordSignIn } from "@/app/login/actions";
 
 /**
- * Private apex login. The curator's account is email/password (provider=email),
- * so the primary path is email + password. A passwordless magic-link (email OTP)
- * is the backup. Either way the email allowlist + role gate (auth/callback +
- * requireAdmin) ensures only authorized emails get in.
+ * Private apex login. Primary: email + password via a SERVER ACTION
+ * (passwordSignIn) — reliable SSR cookie + real errors. Backup: passwordless
+ * magic-link (email OTP) client-side → /auth/callback. Either way the email
+ * allowlist + role gate ensures only authorized emails get in.
  */
 export function SignInButtons({ next }: { next?: string }) {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [sentLink, setSentLink] = useState(false);
   const supabase = createClient();
-
-  function signInPassword(e: React.FormEvent) {
-    e.preventDefault();
-    if (!email.trim() || !password) return;
-    startTransition(async () => {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
-      if (error) {
-        toast.error(error.message);
-        return;
-      }
-      router.push(next || "/home");
-      router.refresh();
-    });
-  }
 
   function magicLink() {
     if (!email.trim()) {
@@ -71,43 +52,46 @@ export function SignInButtons({ next }: { next?: string }) {
   };
 
   return (
-    <form onSubmit={signInPassword} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-      <input
-        type="email"
-        autoComplete="email"
-        placeholder="e-posta"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        disabled={pending}
-        required
-        style={inputStyle}
-      />
-      <input
-        type="password"
-        autoComplete="current-password"
-        placeholder="şifre"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        disabled={pending}
-        style={inputStyle}
-      />
-      <button
-        type="submit"
-        disabled={pending || !email.trim() || !password}
-        style={{
-          height: 48,
-          borderRadius: "var(--radius, 10px)",
-          border: "none",
-          background: "var(--accent)",
-          color: "var(--accent-contrast)",
-          fontSize: 15,
-          fontWeight: 600,
-          cursor: pending ? "wait" : "pointer",
-        }}
-      >
-        {pending ? "Giriliyor…" : "Gir"}
-      </button>
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      {/* Password sign-in → server action (reliable). */}
+      <form action={passwordSignIn} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {next && <input type="hidden" name="next" value={next} />}
+        <input
+          type="email"
+          name="email"
+          autoComplete="email"
+          placeholder="e-posta"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          style={inputStyle}
+        />
+        <input
+          type="password"
+          name="password"
+          autoComplete="current-password"
+          placeholder="şifre"
+          required
+          style={inputStyle}
+        />
+        <button
+          type="submit"
+          style={{
+            height: 48,
+            borderRadius: "var(--radius, 10px)",
+            border: "none",
+            background: "var(--accent)",
+            color: "var(--accent-contrast)",
+            fontSize: 15,
+            fontWeight: 600,
+            cursor: "pointer",
+          }}
+        >
+          Gir
+        </button>
+      </form>
 
+      {/* Passwordless backup → magic link via /auth/callback. */}
       <button
         type="button"
         onClick={magicLink}
@@ -124,6 +108,6 @@ export function SignInButtons({ next }: { next?: string }) {
       >
         {sentLink ? "Link gönderildi — e-postana bak" : "Şifresiz: e-posta ile giriş linki gönder"}
       </button>
-    </form>
+    </div>
   );
 }
