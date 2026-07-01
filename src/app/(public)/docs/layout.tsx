@@ -5,6 +5,7 @@ const nav = [
   { href: "/docs", label: "Overview" },
   { href: "/docs/api", label: "REST API" },
   { href: "/docs/mcp", label: "MCP server" },
+  { href: "/docs/sagkol", label: "Sağkol" },
 ];
 
 export default function DocsLayout({ children }: { children: ReactNode }) {
